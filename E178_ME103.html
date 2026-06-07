@@ -1,0 +1,3954 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>E178 / ME103 | Jaden Dew</title>
+
+  <style>
+    :root {
+      --bg: #050505;
+      --panel: rgba(10, 10, 10, 0.76);
+      --panel-solid: rgba(18, 18, 18, 0.94);
+      --border: rgba(255, 255, 255, 0.16);
+      --text: #d4d4d4;
+      --muted: #9cdcfe;
+      --subtle: #b8b8b8;
+      --accent: #007acc;
+      --accent-hover: #179fff;
+      --shadow: rgba(0, 0, 0, 0.48);
+      --topbar-h: 56px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html {
+      scroll-behavior: smooth;
+      background: #000;
+    }
+
+    body {
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: transparent;
+      color: var(--text);
+      line-height: 1.6;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    /* Header background supports native looping MP4 video. */
+    .gif-background {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      overflow: hidden;
+      background: #000;
+      pointer-events: none;
+    }
+
+    .gif-background img,
+    .gif-background video {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center center;
+      display: block;
+      opacity: 1;
+      filter: saturate(0.98) contrast(1.04);
+    }
+
+    .gif-background::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      background: linear-gradient(to bottom, rgba(0, 0, 0, 0.20), rgba(0, 0, 0, 0.18) 38%, rgba(0, 0, 0, 0.62));
+      pointer-events: none;
+    }
+
+    .topbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      min-height: var(--topbar-h);
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      gap: 1rem;
+      padding: 0.45rem 6vw;
+      background: rgba(5, 5, 5, 0.95);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.34);
+    }
+
+    .brand {
+      justify-self: start;
+      display: inline-flex;
+      align-items: center;
+      color: white;
+      font-size: 0.88rem;
+      font-weight: 650;
+      letter-spacing: 0.01em;
+      opacity: 0.92;
+    }
+
+    nav {
+      justify-self: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.1rem;
+    }
+
+    .nav-link {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.46rem 0.82rem;
+      border-radius: 8px;
+      color: white;
+      font-size: 0.84rem;
+      opacity: 0.9;
+      transition: background 180ms ease, opacity 180ms ease;
+    }
+
+    .nav-link:hover,
+    .nav-link:focus-visible {
+      background: rgba(255, 255, 255, 0.09);
+      opacity: 1;
+      outline: none;
+    }
+
+    .nav-item {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .nav-dropdown {
+      position: absolute;
+      top: calc(100% + 0.45rem);
+      left: 50%;
+      transform: translateX(-50%) translateY(-6px);
+      min-width: 235px;
+      padding: 0.45rem;
+      display: grid;
+      gap: 0.12rem;
+      background: rgba(5, 5, 5, 0.96);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 12px;
+      box-shadow: 0 18px 60px rgba(0, 0, 0, 0.55);
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transition: opacity 180ms ease, transform 180ms ease, visibility 180ms ease;
+    }
+
+    .nav-item:hover .nav-dropdown,
+    .nav-item:focus-within .nav-dropdown {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .dropdown-link {
+      display: block;
+      padding: 0.52rem 0.68rem;
+      border-radius: 8px;
+      color: rgba(255, 255, 255, 0.88);
+      font-size: 0.80rem;
+      line-height: 1.2;
+      white-space: nowrap;
+      transition: background 180ms ease, color 180ms ease;
+    }
+
+    .dropdown-link:hover,
+    .dropdown-link:focus-visible {
+      background: rgba(255, 255, 255, 0.09);
+      color: white;
+      outline: none;
+    }
+
+    main {
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: end;
+      padding: calc(var(--topbar-h) + 2rem) 6vw 3.5rem;
+      background: transparent;
+    }
+
+    .hero-card {
+      width: min(920px, 88vw);
+      padding: 1.0rem 1.15rem;
+      color: rgba(255, 255, 255, 0.94);
+      background: rgba(5, 5, 5, 0.50);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 16px;
+      backdrop-filter: blur(14px);
+      box-shadow: 0 18px 60px rgba(0, 0, 0, 0.46);
+    }
+
+    .hero-kicker,
+    .section-kicker {
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      font-size: 0.70rem;
+      font-weight: 760;
+      margin-bottom: 0.26rem;
+    }
+
+    .hero-card h1 {
+      color: white;
+      font-size: clamp(1.65rem, 3.2vw, 3.0rem);
+      font-weight: 760;
+      letter-spacing: -0.055em;
+      line-height: 1.0;
+      margin-bottom: 0.38rem;
+    }
+
+    .hero-subtitle {
+      color: rgba(255, 255, 255, 0.82);
+      font-size: clamp(0.86rem, 1.05vw, 1.08rem);
+      font-weight: 560;
+      letter-spacing: 0.01em;
+      line-height: 1.32;
+    }
+
+    .section {
+      min-height: 100vh;
+      padding: calc(var(--topbar-h) + 0.75rem) 2rem 0.9rem;
+      display: grid;
+      align-items: stretch;
+      background: rgba(0, 0, 0, 0.72);
+      backdrop-filter: blur(10px);
+    }
+
+    .section-inner {
+      width: min(1820px, 100%);
+      margin: 0 auto;
+    }
+
+    .project-panel {
+      min-height: calc(100vh - var(--topbar-h) - 1.65rem);
+      padding: clamp(1.2rem, 2.4vw, 2rem);
+      background: rgba(18, 18, 18, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 26px;
+      box-shadow: 0 28px 95px rgba(0, 0, 0, 0.5);
+      display: grid;
+      grid-template-columns: clamp(280px, 24vw, 430px) minmax(0, 1fr);
+      gap: 0.65rem;
+      align-items: stretch;
+    }
+
+    .project-text-box {
+      min-height: 0;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 0.62rem;
+      padding: 1.0rem 1.15rem;
+      background: rgba(18, 18, 18, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 20px;
+      box-shadow: 0 22px 70px rgba(0, 0, 0, 0.42);
+    }
+
+    .project-text-box .section-kicker {
+      display: none;
+    }
+
+    .project-text-box h2 {
+      color: white;
+      font-size: clamp(1.55rem, 2.4vw, 2.65rem);
+      line-height: 1.0;
+      letter-spacing: -0.055em;
+      margin-bottom: 0.2rem;
+      text-align: left;
+    }
+
+    .project-text-box p {
+      color: rgba(255, 255, 255, 0.74);
+      font-size: clamp(0.84rem, 0.95vw, 1.02rem);
+      line-height: 1.38;
+      margin: 0;
+      text-align: left;
+    }
+
+    .project-text-box p + p {
+      margin-top: 0.32rem;
+      padding-top: 0;
+      border-top: none;
+    }
+
+    .vehicle-overview-image {
+      margin-top: 0;
+      overflow: hidden;
+      border-radius: 22px;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      background: rgba(5, 5, 5, 0.50);
+      min-height: 0;
+      height: 100%;
+      box-shadow: 0 24px 90px var(--shadow);
+    }
+
+    .vehicle-overview-image img,
+    .vehicle-overview-image video {
+      width: 100%;
+      height: 100%;
+      min-height: 0;
+      object-fit: contain;
+      object-position: center center;
+      display: block;
+      background: rgba(30, 30, 30, 0.82);
+    }
+
+    .final-gallery-section {
+      margin-top: 1.1rem;
+      padding: clamp(1.2rem, 2.4vw, 2rem);
+      background: rgba(18, 18, 18, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 26px;
+      box-shadow: 0 28px 95px rgba(0, 0, 0, 0.5);
+    }
+
+    .final-gallery-section h2 {
+      color: white;
+      text-align: center;
+      font-size: clamp(1.55rem, 2.4vw, 2.65rem);
+      line-height: 1.0;
+      letter-spacing: -0.055em;
+      margin-bottom: 1.1rem;
+    }
+
+    .final-gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 0.75rem;
+      min-width: 0;
+    }
+
+    .final-gallery-tile {
+      overflow: hidden;
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(5, 5, 5, 0.50);
+      min-height: 230px;
+    }
+
+    .final-gallery-tile img,
+    .final-gallery-tile video {
+      width: 100%;
+      height: 100%;
+      min-height: 230px;
+      object-fit: cover;
+      object-position: center center;
+      display: block;
+      background: rgba(30, 30, 30, 0.82);
+    }
+
+
+    /* Data Collection Methodologies section */
+    .data-methods-section {
+      margin-top: 1.1rem;
+      padding: clamp(1.2rem, 2.4vw, 2rem);
+      background: rgba(18, 18, 18, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 26px;
+      box-shadow: 0 28px 95px rgba(0, 0, 0, 0.5);
+    }
+
+    .data-methods-section > h2 {
+      display: none;
+    }
+
+    .method-title {
+      color: white;
+      font-size: clamp(1.55rem, 2.4vw, 2.65rem);
+      line-height: 1.0;
+      letter-spacing: -0.055em;
+      margin-bottom: 0.75rem;
+      text-align: left;
+    }
+
+    .method-row {
+      display: grid;
+      gap: 1.1rem;
+      align-items: stretch;
+    }
+
+    .method-row + .method-row {
+      margin-top: 1.1rem;
+      padding-top: 1.1rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.10);
+    }
+
+    .method-row.text-left {
+      grid-template-columns: minmax(360px, 0.78fr) minmax(0, 1.22fr);
+    }
+
+    .method-row.text-right {
+      grid-template-columns: minmax(0, 1.22fr) minmax(360px, 0.78fr);
+    }
+
+    .method-text-box {
+      min-height: 0;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 1.0rem 1.15rem;
+      background: rgba(18, 18, 18, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 20px;
+      box-shadow: 0 22px 70px rgba(0, 0, 0, 0.42);
+    }
+
+    .method-subheading {
+      color: var(--muted);
+      font-size: clamp(1.0rem, 1.2vw, 1.22rem);
+      line-height: 1.15;
+      letter-spacing: -0.025em;
+      font-weight: 760;
+      margin-bottom: 0.45rem;
+    }
+
+    .method-text-box p {
+      color: rgba(255, 255, 255, 0.74);
+      font-size: clamp(0.84rem, 0.95vw, 1.02rem);
+      line-height: 1.38;
+      margin: 0;
+    }
+
+    .method-media-tile {
+      overflow: hidden;
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(5, 5, 5, 0.50);
+      min-height: 310px;
+      box-shadow: 0 24px 90px var(--shadow);
+      display: grid;
+      grid-template-rows: minmax(0, 1fr) auto;
+    }
+
+    .method-media-tile img,
+    .method-media-tile video {
+      width: 100%;
+      height: 100%;
+      min-height: 270px;
+      object-fit: cover;
+      object-position: center center;
+      display: block;
+      background: rgba(30, 30, 30, 0.82);
+    }
+
+    .method-image-caption {
+      padding: 0.42rem 0.65rem;
+      color: rgba(255, 255, 255, 0.78);
+      background: rgba(5, 5, 5, 0.82);
+      border-top: 1px solid rgba(255, 255, 255, 0.10);
+      font-size: 0.78rem;
+      line-height: 1.22;
+      text-align: center;
+    }
+
+
+
+    /* Top Data Collection row image section: 2x2 image grid. */
+    .method-image-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-template-rows: repeat(2, minmax(0, 1fr));
+      gap: 0.75rem;
+      min-height: 310px;
+      height: 100%;
+      min-width: 0;
+    }
+
+    .method-grid-tile {
+      overflow: hidden;
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(5, 5, 5, 0.50);
+      min-height: 0;
+      box-shadow: 0 24px 90px var(--shadow);
+      display: grid;
+      grid-template-rows: minmax(0, 1fr) auto;
+    }
+
+    .method-grid-tile img,
+    .method-grid-tile video {
+      width: 100%;
+      height: 100%;
+      min-height: 0;
+      object-fit: cover;
+      object-position: center center;
+      display: block;
+      background: rgba(30, 30, 30, 0.82);
+    }
+
+    @media (max-width: 640px) {
+      .method-image-grid {
+        grid-template-columns: 1fr;
+        grid-template-rows: none;
+      }
+
+      .method-grid-tile {
+        min-height: 220px;
+      }
+    }
+    @media (max-width: 1050px) {
+      .method-row.text-left,
+      .method-row.text-right {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    footer {
+      position: relative;
+      z-index: 2;
+      border-top: 1px solid rgba(255, 255, 255, 0.13);
+      padding: 2rem 6vw;
+      color: var(--subtle);
+      background: rgba(5, 5, 5, 0.92);
+      backdrop-filter: blur(18px);
+      font-size: 0.9rem;
+    }
+
+    @media (max-width: 1050px) {
+      .topbar {
+        grid-template-columns: 1fr;
+        justify-items: center;
+        gap: 0.3rem;
+        padding: 0.55rem 4vw;
+      }
+
+      .brand {
+        justify-self: center;
+      }
+
+      nav {
+        width: 100%;
+        overflow-x: auto;
+        justify-content: center;
+        padding-bottom: 0.1rem;
+      }
+
+      :root {
+        --topbar-h: 88px;
+      }
+
+      .project-panel,
+      .final-gallery-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .project-panel {
+        min-height: auto;
+      }
+
+      .vehicle-overview-image {
+        min-height: 340px;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .section {
+        padding-left: 1rem;
+        padding-right: 1rem;
+      }
+
+      .hero {
+        padding-left: 1rem;
+        padding-right: 1rem;
+      }
+
+      .vehicle-overview-image {
+        min-height: 300px;
+      }
+    }
+
+
+    /* HARD OVERRIDE: Overview paragraph is capped so the GIF gets enough width.
+       This is placed at the end of the stylesheet to beat any earlier layout rules. */
+    #overview .project-panel {
+      grid-template-columns: clamp(280px, 24vw, 430px) minmax(0, 1fr) !important;
+      gap: 0.65rem !important;
+      align-items: stretch !important;
+    }
+
+    #overview .project-text-box {
+      width: 100% !important;
+      max-width: 430px !important;
+      padding: 0.9rem 1rem !important;
+    }
+
+    #overview .vehicle-overview-image {
+      min-width: 0 !important;
+      width: 100% !important;
+      background: #ffffff !important;
+    }
+
+    #overview .vehicle-overview-image img,
+    #overview .vehicle-overview-image video {
+      width: 100% !important;
+      height: 100% !important;
+      object-fit: contain !important;
+      object-position: center center !important;
+      background: #ffffff !important;
+      display: block !important;
+    }
+
+    @media (max-width: 1050px) {
+      #overview .project-panel {
+        grid-template-columns: 1fr !important;
+      }
+
+      #overview .project-text-box {
+        max-width: none !important;
+      }
+    }
+  
+
+    /* FINAL OVERRIDE: Data Collection media captions use the same image/caption card format as the BEAR page. */
+    #data-collection .method-media-tile,
+    #data-collection .method-grid-tile {
+      display: grid !important;
+      grid-template-rows: minmax(0, 1fr) auto !important;
+      overflow: hidden !important;
+    }
+
+    #data-collection .method-image-caption {
+      padding: 0.42rem 0.65rem !important;
+      color: rgba(255, 255, 255, 0.78) !important;
+      background: rgba(5, 5, 5, 0.82) !important;
+      border-top: 1px solid rgba(255, 255, 255, 0.10) !important;
+      font-size: 0.78rem !important;
+      line-height: 1.22 !important;
+      text-align: center !important;
+    }
+
+
+    /* FINAL OVERRIDE: make the top Data Collection paragraph box narrower so the 2x2 image grid has more width. */
+    #data-collection .method-row:first-child {
+      grid-template-columns: minmax(300px, 0.58fr) minmax(0, 1.42fr) !important;
+      gap: 0.85rem !important;
+    }
+
+    #data-collection .method-row:first-child .method-text-box {
+      padding: 0.95rem 1.05rem !important;
+    }
+
+    /* Keep the wind tunnel methodology graphics fully visible without the unwanted white outlines. */
+    #data-collection .method-row:first-child .method-grid-tile {
+      background: rgba(5, 5, 5, 0.50) !important;
+      border-color: transparent !important;
+      box-shadow: 0 24px 90px rgba(0, 0, 0, 0.48) !important;
+    }
+
+    #data-collection .method-row:first-child .method-grid-tile img,
+    #data-collection .method-row:first-child .method-grid-tile video {
+      object-fit: contain !important;
+      object-position: center center !important;
+      background: rgba(30, 30, 30, 0.82) !important;
+    }
+
+    @media (max-width: 1050px) {
+      #data-collection .method-row:first-child {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+  
+
+    /* FINAL OVERRIDE: match BEAR captioned-image card format exactly for Data Collection images.
+       The tile stays dark, the image viewport is white, and the caption is a black bar underneath. */
+    #data-collection .method-media-tile,
+    #data-collection .method-grid-tile {
+      overflow: hidden !important;
+      border-radius: 16px !important;
+      border: 1px solid rgba(255, 255, 255, 0.12) !important;
+      background: rgba(5, 5, 5, 0.50) !important;
+      box-shadow: 0 24px 90px var(--shadow) !important;
+      display: grid !important;
+      grid-template-rows: minmax(0, 1fr) auto !important;
+    }
+
+    #data-collection .method-media-tile img,
+    #data-collection .method-media-tile video,
+    #data-collection .method-grid-tile img,
+    #data-collection .method-grid-tile video {
+      width: 100% !important;
+      height: 100% !important;
+      min-height: 0 !important;
+      object-fit: contain !important;
+      object-position: center center !important;
+      display: block !important;
+      background: #ffffff !important;
+      border-bottom: none !important;
+    }
+
+    #data-collection .method-image-caption {
+      padding: 0.42rem 0.65rem !important;
+      color: rgba(255, 255, 255, 0.78) !important;
+      background: rgba(5, 5, 5, 0.82) !important;
+      border-top: 1px solid rgba(255, 255, 255, 0.10) !important;
+      font-size: 0.78rem !important;
+      line-height: 1.22 !important;
+      text-align: center !important;
+    }
+
+    #data-collection .method-image-grid {
+      gap: 0.75rem !important;
+    }
+
+
+    /* FINAL OVERRIDE: restore the subtle BEAR-style grey bounding-box outline
+       around every Data Collection captioned image card. */
+    #data-collection .method-media-tile,
+    #data-collection .method-grid-tile {
+      border: 1px solid rgba(255, 255, 255, 0.16) !important;
+      border-radius: 16px !important;
+      background: rgba(5, 5, 5, 0.50) !important;
+      overflow: hidden !important;
+      display: grid !important;
+      grid-template-rows: minmax(0, 1fr) auto !important;
+      box-shadow: 0 24px 90px rgba(0, 0, 0, 0.48) !important;
+    }
+
+    #data-collection .method-media-tile img,
+    #data-collection .method-media-tile video,
+    #data-collection .method-grid-tile img,
+    #data-collection .method-grid-tile video {
+      width: 100% !important;
+      height: 100% !important;
+      min-height: 0 !important;
+      object-fit: contain !important;
+      object-position: center center !important;
+      display: block !important;
+      background: #ffffff !important;
+      border: none !important;
+    }
+
+    #data-collection .method-image-caption {
+      padding: 0.42rem 0.65rem !important;
+      color: rgba(255, 255, 255, 0.78) !important;
+      background: rgba(5, 5, 5, 0.82) !important;
+      border-top: 1px solid rgba(255, 255, 255, 0.10) !important;
+      font-size: 0.78rem !important;
+      line-height: 1.22 !important;
+      text-align: center !important;
+    }
+
+
+
+    /* FINAL FINAL OVERRIDE: re-implement the original visible grey bounding-box borders
+       on the Data Collection captioned image cards while keeping object-fit: contain. */
+    #data-collection .method-media-tile,
+    #data-collection .method-grid-tile {
+      border: 1px solid rgba(255, 255, 255, 0.18) !important;
+      outline: 1px solid rgba(255, 255, 255, 0.10) !important;
+      outline-offset: 0 !important;
+      border-radius: 16px !important;
+      background: rgba(5, 5, 5, 0.50) !important;
+      overflow: hidden !important;
+      display: grid !important;
+      grid-template-rows: minmax(0, 1fr) auto !important;
+      box-shadow:
+        inset 0 0 0 1px rgba(255, 255, 255, 0.06),
+        0 24px 90px rgba(0, 0, 0, 0.48) !important;
+    }
+
+    #data-collection .method-media-tile img,
+    #data-collection .method-media-tile video,
+    #data-collection .method-grid-tile img,
+    #data-collection .method-grid-tile video {
+      width: 100% !important;
+      height: 100% !important;
+      min-height: 0 !important;
+      object-fit: contain !important;
+      object-position: center center !important;
+      display: block !important;
+      background: #ffffff !important;
+      border: none !important;
+    }
+
+    #data-collection .method-image-caption {
+      padding: 0.42rem 0.65rem !important;
+      color: rgba(255, 255, 255, 0.78) !important;
+      background: rgba(5, 5, 5, 0.82) !important;
+      border-top: 1px solid rgba(255, 255, 255, 0.10) !important;
+      font-size: 0.78rem !important;
+      line-height: 1.22 !important;
+      text-align: center !important;
+    }
+
+
+    /* FINAL OVERRIDE v10: replicate the BEAR captioned-image card behavior.
+       The card has the subtle grey outline, the media fills the full media viewport,
+       and there is no forced white image background creating weird empty bands. */
+    #data-collection .method-media-tile,
+    #data-collection .method-grid-tile {
+      overflow: hidden !important;
+      border-radius: 16px !important;
+      border: 1px solid rgba(255, 255, 255, 0.12) !important;
+      outline: none !important;
+      background: rgba(5, 5, 5, 0.50) !important;
+      box-shadow: 0 24px 90px rgba(0, 0, 0, 0.48) !important;
+      display: grid !important;
+      grid-template-rows: minmax(0, 1fr) auto !important;
+    }
+
+    #data-collection .method-media-tile img,
+    #data-collection .method-media-tile video,
+    #data-collection .method-grid-tile img,
+    #data-collection .method-grid-tile video {
+      width: 100% !important;
+      height: 100% !important;
+      min-height: 0 !important;
+      object-fit: cover !important;
+      object-position: center center !important;
+      display: block !important;
+      background: rgba(30, 30, 30, 0.82) !important;
+      border: none !important;
+    }
+
+    #data-collection .method-image-caption {
+      padding: 0.42rem 0.65rem !important;
+      color: rgba(255, 255, 255, 0.78) !important;
+      background: rgba(5, 5, 5, 0.82) !important;
+      border-top: 1px solid rgba(255, 255, 255, 0.10) !important;
+      font-size: 0.78rem !important;
+      line-height: 1.22 !important;
+      text-align: center !important;
+    }
+
+
+
+    /* FINAL OVERRIDE v11: make all Data Collection captioned image cards use the same visible grey outline language as the paragraph boxes and the BEAR cards. */
+    #data-collection .method-media-tile,
+    #data-collection .method-grid-tile {
+      overflow: hidden !important;
+      border-radius: 20px !important;
+      border: 1px solid rgba(255, 255, 255, 0.16) !important;
+      background: rgba(5, 5, 5, 0.78) !important;
+      box-shadow: 0 24px 90px rgba(0, 0, 0, 0.48) !important;
+      display: grid !important;
+      grid-template-rows: minmax(0, 1fr) auto !important;
+    }
+
+    #data-collection .method-media-tile img,
+    #data-collection .method-media-tile video,
+    #data-collection .method-grid-tile img,
+    #data-collection .method-grid-tile video {
+      width: 100% !important;
+      height: 100% !important;
+      min-height: 0 !important;
+      object-fit: cover !important;
+      object-position: center center !important;
+      display: block !important;
+      background: rgba(30, 30, 30, 0.82) !important;
+      border: none !important;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+    }
+
+    #data-collection .method-image-caption {
+      padding: 0.42rem 0.76rem !important;
+      color: rgba(255, 255, 255, 0.82) !important;
+      background: rgba(5, 5, 5, 0.88) !important;
+      border-top: none !important;
+      font-size: 0.78rem !important;
+      line-height: 1.2 !important;
+      text-align: center !important;
+    }
+
+
+
+    /* FINAL OVERRIDE v12: force the 2x2 Wind Tunnel grid tiles to show the same visible grey outline as the paragraph boxes and standalone image cards. */
+    #data-collection .method-image-grid {
+      gap: 0.75rem !important;
+    }
+
+    #data-collection .method-grid-tile {
+      position: relative !important;
+      overflow: hidden !important;
+      border: 1px solid rgba(255, 255, 255, 0.16) !important;
+      border-radius: 20px !important;
+      background: rgba(5, 5, 5, 0.78) !important;
+      box-shadow: 0 24px 90px rgba(0, 0, 0, 0.48) !important;
+    }
+
+    #data-collection .method-grid-tile::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 20px;
+      pointer-events: none;
+      z-index: 3;
+    }
+
+    #data-collection .method-grid-tile img,
+    #data-collection .method-grid-tile video {
+      position: relative !important;
+      z-index: 1 !important;
+    }
+
+    #data-collection .method-grid-tile .method-image-caption {
+      position: relative !important;
+      z-index: 2 !important;
+    }
+
+
+
+    /* FINAL OVERRIDE v14: ANSYS methodology image area split into a 2-row grid.
+       Top row has two horizontal captioned image cards; bottom row has one full-width card. */
+    #data-collection .ansys-image-grid {
+      display: grid !important;
+      grid-template-columns: 1fr !important;
+      grid-template-rows: minmax(0, 1fr) minmax(0, 1fr) !important;
+      gap: 0.75rem !important;
+      min-width: 0 !important;
+      height: 100% !important;
+      min-height: 460px !important;
+    }
+
+    #data-collection .ansys-grid-row {
+      display: grid !important;
+      gap: 0.75rem !important;
+      min-width: 0 !important;
+      min-height: 0 !important;
+    }
+
+    #data-collection .ansys-grid-row-top {
+      grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    }
+
+    #data-collection .ansys-grid-row-bottom {
+      grid-template-columns: 1fr !important;
+    }
+
+    #data-collection .ansys-image-grid .method-media-tile {
+      min-height: 0 !important;
+      height: 100% !important;
+    }
+
+    @media (max-width: 1050px) {
+      #data-collection .ansys-grid-row-top {
+        grid-template-columns: 1fr !important;
+      }
+
+      #data-collection .ansys-image-grid {
+        grid-template-rows: none !important;
+        min-height: 0 !important;
+      }
+
+      #data-collection .ansys-image-grid .method-media-tile {
+        min-height: 260px !important;
+      }
+    }
+
+
+
+    /* FINAL OVERRIDE v15: shrink the ANSYS Methodology paragraph column and give more width to the ANSYS image grid. */
+    #data-collection .method-row.text-left:nth-of-type(3) {
+      grid-template-columns: minmax(280px, 0.48fr) minmax(0, 1.52fr) !important;
+      gap: 0.85rem !important;
+    }
+
+    #data-collection .method-row.text-left:nth-of-type(3) .method-text-box {
+      padding: 0.95rem 1.05rem !important;
+    }
+
+    @media (max-width: 1050px) {
+      #data-collection .method-row.text-left:nth-of-type(3) {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+
+    /* FINAL OVERRIDE v16: ANSYS section uses two rows.
+       Row 1 has the paragraph box on the left and the two top images on the right.
+       Row 2 is one full-width bottom image. */
+    #data-collection .ansys-method-layout {
+      display: grid !important;
+      grid-template-columns: 1fr !important;
+      gap: 0.85rem !important;
+      align-items: stretch !important;
+    }
+
+    #data-collection .ansys-method-top-row {
+      display: grid !important;
+      grid-template-columns: minmax(280px, 0.42fr) minmax(0, 1.58fr) !important;
+      gap: 0.85rem !important;
+      align-items: stretch !important;
+      min-width: 0 !important;
+    }
+
+    #data-collection .ansys-top-image-pair {
+      display: grid !important;
+      grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+      gap: 0.75rem !important;
+      min-width: 0 !important;
+      align-items: stretch !important;
+    }
+
+    #data-collection .ansys-method-bottom-row {
+      display: grid !important;
+      grid-template-columns: 1fr !important;
+      min-width: 0 !important;
+    }
+
+    #data-collection .ansys-method-layout .method-media-tile {
+      min-height: 260px !important;
+      height: 100% !important;
+    }
+
+    #data-collection .ansys-method-bottom-row .method-media-tile {
+      min-height: 330px !important;
+    }
+
+    @media (max-width: 1050px) {
+      #data-collection .ansys-method-top-row,
+      #data-collection .ansys-top-image-pair {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+
+    /* FINAL OVERRIDE v17: ANSYS first row width tuning.
+       Wider paragraph box, narrower first image, wider second image. */
+    #data-collection .ansys-method-top-row {
+      grid-template-columns: minmax(420px, 0.62fr) minmax(0, 1.38fr) !important;
+      gap: 0.85rem !important;
+    }
+
+    #data-collection .ansys-top-image-pair {
+      grid-template-columns: minmax(0, 0.72fr) minmax(0, 1.28fr) !important;
+      gap: 0.75rem !important;
+    }
+
+    @media (max-width: 1050px) {
+      #data-collection .ansys-method-top-row,
+      #data-collection .ansys-top-image-pair {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+
+    /* FINAL OVERRIDE v18: compact ANSYS section so the full ANSYS block fits in one viewport.
+       Keeps the first-row width tuning but reduces vertical height, gaps, and internal padding. */
+    #data-collection .ansys-method-layout {
+      gap: 0.65rem !important;
+      margin-top: 0 !important;
+      padding-top: 0.85rem !important;
+    }
+
+    #data-collection .ansys-method-top-row {
+      grid-template-columns: minmax(460px, 0.68fr) minmax(0, 1.32fr) !important;
+      gap: 0.65rem !important;
+      height: clamp(230px, 30vh, 285px) !important;
+      min-height: 0 !important;
+    }
+
+    #data-collection .ansys-method-top-row .method-text-box {
+      padding: 0.82rem 1.0rem !important;
+      min-height: 0 !important;
+      height: 100% !important;
+    }
+
+    #data-collection .ansys-method-top-row .method-subheading {
+      margin-bottom: 0.35rem !important;
+    }
+
+    #data-collection .ansys-method-top-row .method-text-box p {
+      font-size: clamp(0.80rem, 0.88vw, 0.96rem) !important;
+      line-height: 1.30 !important;
+    }
+
+    #data-collection .ansys-top-image-pair {
+      grid-template-columns: minmax(0, 0.68fr) minmax(0, 1.32fr) !important;
+      gap: 0.65rem !important;
+      height: 100% !important;
+      min-height: 0 !important;
+    }
+
+    #data-collection .ansys-method-top-row .method-media-tile {
+      min-height: 0 !important;
+      height: 100% !important;
+    }
+
+    #data-collection .ansys-method-bottom-row {
+      height: clamp(235px, 32vh, 305px) !important;
+      min-height: 0 !important;
+    }
+
+    #data-collection .ansys-method-bottom-row .method-media-tile {
+      min-height: 0 !important;
+      height: 100% !important;
+    }
+
+    #data-collection .ansys-method-layout .method-media-tile img,
+    #data-collection .ansys-method-layout .method-media-tile video {
+      min-height: 0 !important;
+      height: 100% !important;
+      object-fit: cover !important;
+      object-position: center center !important;
+    }
+
+    #data-collection .ansys-method-layout .method-image-caption {
+      padding: 0.34rem 0.65rem !important;
+      font-size: 0.74rem !important;
+      line-height: 1.15 !important;
+    }
+
+    @media (max-width: 1050px) {
+      #data-collection .ansys-method-top-row,
+      #data-collection .ansys-top-image-pair {
+        grid-template-columns: 1fr !important;
+        height: auto !important;
+      }
+
+      #data-collection .ansys-method-bottom-row {
+        height: auto !important;
+      }
+
+      #data-collection .ansys-method-layout .method-media-tile {
+        min-height: 240px !important;
+      }
+    }
+
+
+
+    /* FINAL OVERRIDE v19: make the ANSYS block taller and stop cropping the images.
+       Only the first image in the first row is allowed to crop; the residual plot and bottom workflow image are contained. */
+    #data-collection .ansys-method-layout {
+      gap: 0.85rem !important;
+      padding-top: 1.0rem !important;
+    }
+
+    #data-collection .ansys-method-top-row {
+      grid-template-columns: minmax(480px, 0.72fr) minmax(0, 1.28fr) !important;
+      gap: 0.75rem !important;
+      height: clamp(300px, 38vh, 390px) !important;
+      min-height: 300px !important;
+    }
+
+    #data-collection .ansys-top-image-pair {
+      grid-template-columns: minmax(0, 0.62fr) minmax(0, 1.38fr) !important;
+      gap: 0.75rem !important;
+      height: 100% !important;
+    }
+
+    #data-collection .ansys-method-top-row .method-media-tile {
+      height: 100% !important;
+      min-height: 0 !important;
+    }
+
+    #data-collection .ansys-method-bottom-row {
+      height: clamp(330px, 40vh, 470px) !important;
+      min-height: 330px !important;
+    }
+
+    #data-collection .ansys-method-bottom-row .method-media-tile {
+      height: 100% !important;
+      min-height: 0 !important;
+    }
+
+    /* Default for ANSYS images: fully visible, no crop. */
+    #data-collection .ansys-method-layout .method-media-tile img,
+    #data-collection .ansys-method-layout .method-media-tile video {
+      width: 100% !important;
+      height: 100% !important;
+      min-height: 0 !important;
+      object-fit: contain !important;
+      object-position: center center !important;
+      background: rgba(30, 30, 30, 0.82) !important;
+    }
+
+    /* Exception allowed by request: first image in first row may crop to fill its card. */
+    #data-collection .ansys-top-image-pair .method-media-tile:first-child img,
+    #data-collection .ansys-top-image-pair .method-media-tile:first-child video {
+      object-fit: cover !important;
+      object-position: center center !important;
+    }
+
+    #data-collection .ansys-method-layout .method-image-caption {
+      padding: 0.38rem 0.65rem !important;
+      font-size: 0.75rem !important;
+      line-height: 1.15 !important;
+    }
+
+    @media (max-width: 1050px) {
+      #data-collection .ansys-method-top-row,
+      #data-collection .ansys-top-image-pair {
+        grid-template-columns: 1fr !important;
+        height: auto !important;
+        min-height: 0 !important;
+      }
+
+      #data-collection .ansys-method-bottom-row {
+        height: auto !important;
+        min-height: 0 !important;
+      }
+
+      #data-collection .ansys-method-layout .method-media-tile {
+        min-height: 280px !important;
+      }
+    }
+
+
+
+    /* FINAL OVERRIDE v20: ANSYS images fill their containers like the rest of the page.
+       Only the bottom workflow image is allowed to preserve full image visibility; its unused space stays white to match the graphic background. */
+    #data-collection .ansys-grid-row-top .method-media-tile {
+      background: rgba(5, 5, 5, 0.78) !important;
+    }
+
+    #data-collection .ansys-grid-row-top .method-media-tile img,
+    #data-collection .ansys-grid-row-top .method-media-tile video {
+      width: 100% !important;
+      height: 100% !important;
+      min-height: 0 !important;
+      object-fit: cover !important;
+      object-position: center center !important;
+      background: rgba(30, 30, 30, 0.82) !important;
+      display: block !important;
+    }
+
+    #data-collection .ansys-grid-row-bottom .method-media-tile {
+      background: #ffffff !important;
+    }
+
+    #data-collection .ansys-grid-row-bottom .method-media-tile img,
+    #data-collection .ansys-grid-row-bottom .method-media-tile video {
+      width: 100% !important;
+      height: 100% !important;
+      min-height: 0 !important;
+      object-fit: contain !important;
+      object-position: center center !important;
+      background: #ffffff !important;
+      display: block !important;
+    }
+
+    #data-collection .ansys-grid-row-bottom .method-image-caption {
+      background: rgba(5, 5, 5, 0.88) !important;
+    }
+
+
+
+    /* FINAL OVERRIDE v21: correct ANSYS image fitting using the actual current HTML classes.
+       Top-row images fill their cards. Bottom workflow image may be contained, but any empty space is white. */
+    #data-collection .ansys-top-image-pair .method-media-tile {
+      background: rgba(5, 5, 5, 0.78) !important;
+      overflow: hidden !important;
+    }
+
+    #data-collection .ansys-top-image-pair .method-media-tile img,
+    #data-collection .ansys-top-image-pair .method-media-tile video {
+      width: 100% !important;
+      height: 100% !important;
+      min-height: 0 !important;
+      object-fit: cover !important;
+      object-position: center center !important;
+      background: rgba(30, 30, 30, 0.82) !important;
+      display: block !important;
+    }
+
+    #data-collection .ansys-method-bottom-row .method-media-tile {
+      background: #ffffff !important;
+      overflow: hidden !important;
+    }
+
+    #data-collection .ansys-method-bottom-row .method-media-tile img,
+    #data-collection .ansys-method-bottom-row .method-media-tile video {
+      width: 100% !important;
+      height: 100% !important;
+      min-height: 0 !important;
+      object-fit: contain !important;
+      object-position: center center !important;
+      background: #ffffff !important;
+      display: block !important;
+    }
+
+    #data-collection .ansys-method-bottom-row .method-image-caption {
+      background: rgba(5, 5, 5, 0.88) !important;
+    }
+
+
+
+    /* FINAL OVERRIDE v22: ANSYS section correction.
+       - Allow the full ANSYS block to be taller.
+       - Make the paragraph column a bit narrower so the residual plot gets enough width.
+       - Only the first top-row image may crop.
+       - The residual plot and bottom workflow image are not cropped.
+       - Remove the unwanted bright white card/outline from the bottom workflow tile. */
+    #data-collection .ansys-method-layout {
+      display: grid !important;
+      grid-template-columns: 1fr !important;
+      gap: 0.9rem !important;
+      min-height: 760px !important;
+      height: auto !important;
+      align-items: stretch !important;
+    }
+
+    #data-collection .ansys-method-top-row {
+      display: grid !important;
+      grid-template-columns: minmax(360px, 0.72fr) minmax(0, 1.78fr) !important;
+      gap: 0.85rem !important;
+      min-height: 330px !important;
+      align-items: stretch !important;
+    }
+
+    #data-collection .ansys-method-top-row .method-text-box {
+      min-height: 0 !important;
+      height: 100% !important;
+      padding: 0.9rem 1rem !important;
+    }
+
+    #data-collection .ansys-top-image-pair {
+      display: grid !important;
+      grid-template-columns: minmax(0, 0.72fr) minmax(0, 1.28fr) !important;
+      gap: 0.75rem !important;
+      min-width: 0 !important;
+      min-height: 0 !important;
+      align-items: stretch !important;
+    }
+
+    #data-collection .ansys-top-image-pair .method-media-tile {
+      height: 100% !important;
+      min-height: 0 !important;
+      background: rgba(5, 5, 5, 0.78) !important;
+      overflow: hidden !important;
+    }
+
+    /* First top-row image is the only ANSYS image allowed to crop. */
+    #data-collection .ansys-top-image-pair .method-media-tile:first-child img,
+    #data-collection .ansys-top-image-pair .method-media-tile:first-child video {
+      width: 100% !important;
+      height: 100% !important;
+      min-height: 0 !important;
+      object-fit: cover !important;
+      object-position: center center !important;
+      background: rgba(30, 30, 30, 0.82) !important;
+      display: block !important;
+    }
+
+    /* Residual plot: no crop. The wider second column prevents the plot from being clipped. */
+    #data-collection .ansys-top-image-pair .method-media-tile:nth-child(2) img,
+    #data-collection .ansys-top-image-pair .method-media-tile:nth-child(2) video {
+      width: 100% !important;
+      height: 100% !important;
+      min-height: 0 !important;
+      object-fit: contain !important;
+      object-position: center center !important;
+      background: rgba(30, 30, 30, 0.82) !important;
+      display: block !important;
+    }
+
+    #data-collection .ansys-method-bottom-row {
+      display: grid !important;
+      grid-template-columns: 1fr !important;
+      min-height: 360px !important;
+      height: auto !important;
+      align-items: stretch !important;
+    }
+
+    #data-collection .ansys-method-bottom-row .method-media-tile {
+      height: 100% !important;
+      min-height: 360px !important;
+      background: rgba(5, 5, 5, 0.78) !important;
+      border: 1px solid rgba(255, 255, 255, 0.16) !important;
+      outline: none !important;
+      overflow: hidden !important;
+    }
+
+    /* Bottom workflow image: no crop, and no forced white card/outline background. */
+    #data-collection .ansys-method-bottom-row .method-media-tile img,
+    #data-collection .ansys-method-bottom-row .method-media-tile video {
+      width: 100% !important;
+      height: 100% !important;
+      min-height: 0 !important;
+      object-fit: contain !important;
+      object-position: center center !important;
+      background: transparent !important;
+      display: block !important;
+      border: none !important;
+    }
+
+    #data-collection .ansys-method-bottom-row .method-image-caption {
+      background: rgba(5, 5, 5, 0.88) !important;
+      border-top: none !important;
+    }
+
+    @media (max-width: 1050px) {
+      #data-collection .ansys-method-layout,
+      #data-collection .ansys-method-top-row,
+      #data-collection .ansys-top-image-pair {
+        grid-template-columns: 1fr !important;
+        min-height: 0 !important;
+      }
+
+      #data-collection .ansys-method-bottom-row,
+      #data-collection .ansys-method-bottom-row .method-media-tile {
+        min-height: 260px !important;
+      }
+    }
+
+
+
+    /* FINAL OVERRIDE v23: restore the ANSYS top-row image formatting from before the height-shrinking edits.
+       No fixed/clamped heights are used here; previous height/min-height rules are neutralized. */
+    #data-collection .ansys-method-layout {
+      display: grid !important;
+      grid-template-columns: 1fr !important;
+      gap: 0.85rem !important;
+      align-items: stretch !important;
+      height: auto !important;
+      min-height: 0 !important;
+    }
+
+    #data-collection .ansys-method-top-row {
+      display: grid !important;
+      grid-template-columns: minmax(420px, 0.62fr) minmax(0, 1.38fr) !important;
+      gap: 0.85rem !important;
+      align-items: stretch !important;
+      min-width: 0 !important;
+      height: auto !important;
+      min-height: 0 !important;
+    }
+
+    #data-collection .ansys-top-image-pair {
+      display: grid !important;
+      grid-template-columns: minmax(0, 0.72fr) minmax(0, 1.28fr) !important;
+      gap: 0.75rem !important;
+      align-items: stretch !important;
+      min-width: 0 !important;
+      height: auto !important;
+      min-height: 0 !important;
+    }
+
+    #data-collection .ansys-method-top-row .method-text-box,
+    #data-collection .ansys-top-image-pair .method-media-tile,
+    #data-collection .ansys-method-bottom-row,
+    #data-collection .ansys-method-bottom-row .method-media-tile {
+      height: auto !important;
+      min-height: 0 !important;
+    }
+
+    /* Top two ANSYS images: back to normal BEAR-style image-card behavior, filling the card. */
+    #data-collection .ansys-top-image-pair .method-media-tile img,
+    #data-collection .ansys-top-image-pair .method-media-tile video {
+      width: 100% !important;
+      height: 100% !important;
+      min-height: 0 !important;
+      object-fit: cover !important;
+      object-position: center center !important;
+      display: block !important;
+      background: rgba(30, 30, 30, 0.82) !important;
+      border: none !important;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+    }
+
+    /* Bottom workflow image keeps the normal dark card. No forced white outline/background. */
+    #data-collection .ansys-method-bottom-row .method-media-tile {
+      background: rgba(5, 5, 5, 0.78) !important;
+      border: 1px solid rgba(255, 255, 255, 0.16) !important;
+      border-radius: 20px !important;
+      overflow: hidden !important;
+    }
+
+    #data-collection .ansys-method-bottom-row .method-media-tile img,
+    #data-collection .ansys-method-bottom-row .method-media-tile video {
+      width: 100% !important;
+      height: auto !important;
+      min-height: 0 !important;
+      object-fit: contain !important;
+      object-position: center center !important;
+      display: block !important;
+      background: transparent !important;
+      border: none !important;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+    }
+
+    @media (max-width: 1050px) {
+      #data-collection .ansys-method-top-row,
+      #data-collection .ansys-top-image-pair {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+
+    /* FINAL OVERRIDE v24: widen the ANSYS paragraph column so the two top images shrink together. */
+    #data-collection .ansys-method-top-row {
+      grid-template-columns: minmax(520px, 0.85fr) minmax(0, 1.15fr) !important;
+      gap: 0.85rem !important;
+      align-items: stretch !important;
+    }
+
+    /* Keep the first ANSYS image narrower than the residual plot inside the reduced image area. */
+    #data-collection .ansys-top-image-pair {
+      grid-template-columns: minmax(0, 0.72fr) minmax(0, 1.28fr) !important;
+      gap: 0.75rem !important;
+    }
+
+    @media (max-width: 1050px) {
+      #data-collection .ansys-method-top-row,
+      #data-collection .ansys-top-image-pair {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+
+    /* FINAL OVERRIDE v25: make the ANSYS paragraph section even wider so the two top images shrink together. */
+    #data-collection .ansys-method-top-row {
+      grid-template-columns: minmax(640px, 1.08fr) minmax(0, 0.92fr) !important;
+      gap: 0.75rem !important;
+      align-items: stretch !important;
+    }
+
+    #data-collection .ansys-method-top-row .method-text-box {
+      width: 100% !important;
+    }
+
+    #data-collection .ansys-top-image-pair {
+      grid-template-columns: minmax(0, 0.72fr) minmax(0, 1.28fr) !important;
+      gap: 0.75rem !important;
+      min-width: 0 !important;
+    }
+
+    @media (max-width: 1050px) {
+      #data-collection .ansys-method-top-row,
+      #data-collection .ansys-top-image-pair {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+
+    /* Results section: three alternating rows matching the methods section layout. */
+    .results-section {
+      margin-top: 1.1rem;
+      padding: clamp(1.2rem, 2.4vw, 2rem);
+      background: rgba(18, 18, 18, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 26px;
+      box-shadow: 0 28px 95px rgba(0, 0, 0, 0.5);
+    }
+
+    .results-section > h2 {
+      display: none;
+    }
+
+    .results-title {
+      color: white;
+      font-size: clamp(1.55rem, 2.4vw, 2.65rem);
+      line-height: 1.0;
+      letter-spacing: -0.055em;
+      margin-bottom: 0.75rem;
+      text-align: left;
+    }
+
+    .results-row {
+      display: grid;
+      gap: 1.1rem;
+      align-items: stretch;
+    }
+
+    .results-row + .results-row {
+      margin-top: 1.1rem;
+      padding-top: 1.1rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.10);
+    }
+
+    .results-row.text-left {
+      grid-template-columns: minmax(360px, 0.78fr) minmax(0, 1.22fr);
+    }
+
+    .results-row.text-right {
+      grid-template-columns: minmax(0, 1.22fr) minmax(360px, 0.78fr);
+    }
+
+    .results-text-box {
+      min-height: 0;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 1.0rem 1.15rem;
+      background: rgba(18, 18, 18, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 20px;
+      box-shadow: 0 22px 70px rgba(0, 0, 0, 0.42);
+    }
+
+    .results-subheading {
+      color: var(--muted);
+      font-size: clamp(1.0rem, 1.2vw, 1.22rem);
+      line-height: 1.15;
+      letter-spacing: -0.025em;
+      font-weight: 760;
+      margin-bottom: 0.45rem;
+    }
+
+    .results-text-box p {
+      color: rgba(255, 255, 255, 0.74);
+      font-size: clamp(0.84rem, 0.95vw, 1.02rem);
+      line-height: 1.38;
+      margin: 0;
+    }
+
+    .results-media-tile {
+      overflow: hidden;
+      border-radius: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      background: rgba(5, 5, 5, 0.78);
+      min-height: 310px;
+      box-shadow: 0 24px 90px rgba(0, 0, 0, 0.48);
+      display: grid;
+      grid-template-rows: minmax(0, 1fr) auto;
+    }
+
+    .results-media-tile img,
+    .results-media-tile video {
+      width: 100%;
+      height: 100%;
+      min-height: 270px;
+      object-fit: cover;
+      object-position: center center;
+      display: block;
+      background: rgba(30, 30, 30, 0.82);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .results-image-caption {
+      padding: 0.42rem 0.76rem;
+      color: rgba(255, 255, 255, 0.82);
+      background: rgba(5, 5, 5, 0.88);
+      font-size: 0.78rem;
+      line-height: 1.2;
+      text-align: center;
+    }
+
+
+
+    /* Results row 1: Simulation vs Wind Tunnel uses a two-row layout.
+       Top row: paragraph left, image right. Bottom row: two images horizontally. */
+    .simulation-results-block {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1.1rem;
+      align-items: stretch;
+    }
+
+    .simulation-results-top-row {
+      display: grid;
+      grid-template-columns: minmax(360px, 0.78fr) minmax(0, 1.22fr);
+      gap: 1.1rem;
+      align-items: stretch;
+    }
+
+    .simulation-results-bottom-row {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1.1rem;
+      align-items: stretch;
+    }
+
+    .simulation-results-block + .results-row {
+      margin-top: 1.1rem;
+      padding-top: 1.1rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.10);
+    }
+
+    @media (max-width: 1050px) {
+      .simulation-results-top-row,
+      .simulation-results-bottom-row {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+    @media (max-width: 1050px) {
+      .results-row.text-left,
+      .results-row.text-right {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    /* FINAL OVERRIDE v30: keep the Simulation vs Wind Tunnel paragraph width unchanged,
+       but shrink the bottom-left image and give the extra width to the bottom-right image. */
+    #results .simulation-results-bottom-row {
+      grid-template-columns: minmax(0, 0.72fr) minmax(0, 1.28fr) !important;
+      gap: 1.1rem !important;
+      align-items: stretch !important;
+    }
+
+    @media (max-width: 1050px) {
+      #results .simulation-results-bottom-row {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    /* FINAL OVERRIDE v31: slightly widen the Simulation vs Wind Tunnel top-row paragraph,
+       while keeping the v30 bottom-left image shrink. */
+    #results .simulation-results-top-row {
+      grid-template-columns: minmax(420px, 0.88fr) minmax(0, 1.12fr) !important;
+      gap: 1.0rem !important;
+      align-items: stretch !important;
+    }
+
+    /* Preserve the v30 bottom row behavior: smaller bottom-left image, wider bottom-right image. */
+    #results .simulation-results-bottom-row {
+      grid-template-columns: minmax(0, 0.72fr) minmax(0, 1.28fr) !important;
+      gap: 1.1rem !important;
+      align-items: stretch !important;
+    }
+
+    @media (max-width: 1050px) {
+      #results .simulation-results-top-row,
+      #results .simulation-results-bottom-row {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    /* FINAL OVERRIDE v32: split the ANSYS vs OpenVSP results image area into a 2x2 grid. */
+    #results .ansys-vsp-results-grid {
+      display: grid !important;
+      grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+      grid-template-rows: repeat(2, minmax(0, 1fr)) !important;
+      gap: 0.75rem !important;
+      min-width: 0 !important;
+      height: 100% !important;
+      min-height: 310px !important;
+    }
+
+    #results .ansys-vsp-results-grid .results-media-tile {
+      min-height: 0 !important;
+      height: 100% !important;
+    }
+
+    #results .ansys-vsp-results-grid .results-media-tile img,
+    #results .ansys-vsp-results-grid .results-media-tile video {
+      min-height: 0 !important;
+      height: 100% !important;
+      object-fit: cover !important;
+      object-position: center center !important;
+    }
+
+    @media (max-width: 1050px) {
+      #results .ansys-vsp-results-grid {
+        grid-template-columns: 1fr !important;
+        grid-template-rows: none !important;
+        min-height: 0 !important;
+      }
+
+      #results .ansys-vsp-results-grid .results-media-tile {
+        min-height: 240px !important;
+      }
+    }
+
+
+    /* FINAL OVERRIDE v33: make the ANSYS vs OpenVSP paragraph less wide and give more width to the 2x2 image grid. */
+    #results .results-row.text-right:has(.ansys-vsp-results-grid) {
+      grid-template-columns: minmax(0, 1.42fr) minmax(300px, 0.58fr) !important;
+      gap: 0.85rem !important;
+      align-items: stretch !important;
+    }
+
+    #results .results-row.text-right:has(.ansys-vsp-results-grid) .results-text-box {
+      width: 100% !important;
+      padding: 0.95rem 1.05rem !important;
+    }
+
+    @media (max-width: 1050px) {
+      #results .results-row.text-right:has(.ansys-vsp-results-grid) {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    /* FINAL OVERRIDE v34: return the ANSYS vs OpenVSP results row to the original paragraph/image width split. */
+    #results .results-row.text-right:has(.ansys-vsp-results-grid) {
+      grid-template-columns: minmax(0, 1.22fr) minmax(360px, 0.78fr) !important;
+      gap: 1.1rem !important;
+      align-items: stretch !important;
+    }
+
+    #results .results-row.text-right:has(.ansys-vsp-results-grid) .results-text-box {
+      width: 100% !important;
+      padding: 1.0rem 1.15rem !important;
+    }
+
+    @media (max-width: 1050px) {
+      #results .results-row.text-right:has(.ansys-vsp-results-grid) {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    /* FINAL OVERRIDE v35: make the ANSYS vs OpenVSP paragraph section slightly less wide than the original split. */
+    #results .results-row.text-right:has(.ansys-vsp-results-grid) {
+      grid-template-columns: minmax(0, 1.28fr) minmax(340px, 0.72fr) !important;
+      gap: 1.0rem !important;
+      align-items: stretch !important;
+    }
+
+    #results .results-row.text-right:has(.ansys-vsp-results-grid) .results-text-box {
+      width: 100% !important;
+      padding: 1.0rem 1.10rem !important;
+    }
+
+    @media (max-width: 1050px) {
+      #results .results-row.text-right:has(.ansys-vsp-results-grid) {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    /* FINAL OVERRIDE v36: make the ANSYS vs OpenVSP results paragraph a bit narrower than v35. */
+    #results .results-row.text-right:has(.ansys-vsp-results-grid) {
+      grid-template-columns: minmax(0, 1.36fr) minmax(320px, 0.64fr) !important;
+      gap: 0.95rem !important;
+      align-items: stretch !important;
+    }
+
+    #results .results-row.text-right:has(.ansys-vsp-results-grid) .results-text-box {
+      width: 100% !important;
+      padding: 0.95rem 1.05rem !important;
+    }
+
+    @media (max-width: 1050px) {
+      #results .results-row.text-right:has(.ansys-vsp-results-grid) {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    /* FINAL OVERRIDE v37: Effect of Design Variables results section uses two rows.
+       First row: paragraph left and image right. Second row: one full-width image. */
+    #results .design-variable-results-block {
+      display: grid !important;
+      grid-template-columns: 1fr !important;
+      gap: 1.1rem !important;
+      align-items: stretch !important;
+    }
+
+    #results .design-variable-results-top-row {
+      display: grid !important;
+      grid-template-columns: minmax(360px, 0.78fr) minmax(0, 1.22fr) !important;
+      gap: 1.1rem !important;
+      align-items: stretch !important;
+    }
+
+    #results .design-variable-results-bottom-row {
+      display: grid !important;
+      grid-template-columns: 1fr !important;
+      gap: 1.1rem !important;
+      align-items: stretch !important;
+    }
+
+    #results .design-variable-results-bottom-row .results-media-tile {
+      min-height: 330px !important;
+    }
+
+    @media (max-width: 1050px) {
+      #results .design-variable-results-top-row {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    /* FINAL OVERRIDE v38: make the Effect of Design Variables top-row paragraph wider,
+       shrinking the image beside it. */
+    #results .design-variable-results-top-row {
+      grid-template-columns: minmax(480px, 0.95fr) minmax(0, 1.05fr) !important;
+      gap: 0.95rem !important;
+      align-items: stretch !important;
+    }
+
+    #results .design-variable-results-top-row .results-text-box {
+      width: 100% !important;
+    }
+
+    @media (max-width: 1050px) {
+      #results .design-variable-results-top-row {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    /* FINAL OVERRIDE v39: add the missing gap before Effect of Design Variables and make it one row:
+       paragraph on the left, two images stacked vertically on the right. */
+    #results .design-variable-results-block {
+      margin-top: 1.1rem !important;
+      padding-top: 1.1rem !important;
+      border-top: 1px solid rgba(255, 255, 255, 0.10) !important;
+      display: grid !important;
+      grid-template-columns: minmax(420px, 0.82fr) minmax(0, 1.18fr) !important;
+      gap: 1.1rem !important;
+      align-items: stretch !important;
+    }
+
+    #results .design-variable-results-block > .results-text-box {
+      height: 100% !important;
+      min-height: 0 !important;
+      width: 100% !important;
+    }
+
+    #results .design-variable-image-stack {
+      display: grid !important;
+      grid-template-columns: 1fr !important;
+      grid-template-rows: repeat(2, minmax(0, 1fr)) !important;
+      gap: 1.1rem !important;
+      min-width: 0 !important;
+      height: 100% !important;
+    }
+
+    #results .design-variable-image-stack .results-media-tile {
+      min-height: 260px !important;
+      height: 100% !important;
+    }
+
+    @media (max-width: 1050px) {
+      #results .design-variable-results-block {
+        grid-template-columns: 1fr !important;
+      }
+
+      #results .design-variable-image-stack {
+        grid-template-rows: none !important;
+      }
+    }
+
+
+    /* FINAL OVERRIDE v40: restore the missing separator/gap between OpenVSP and ANSYS Methodology. */
+    #data-collection .ansys-method-layout {
+      margin-top: 1.1rem !important;
+      padding-top: 1.1rem !important;
+      border-top: 1px solid rgba(255, 255, 255, 0.10) !important;
+    }
+
+
+    /* FINAL OVERRIDE v41: make the top image in the Effect of Design Variables section fit fully.
+       Any leftover space inside that image viewport is white, but the card itself stays dark
+       so no extra white outline/border is created. */
+    #results .design-variable-image-stack .results-media-tile:first-child {
+      background: rgba(5, 5, 5, 0.78) !important;
+      border: 1px solid rgba(255, 255, 255, 0.16) !important;
+      outline: none !important;
+      overflow: hidden !important;
+    }
+
+    #results .design-variable-image-stack .results-media-tile:first-child img,
+    #results .design-variable-image-stack .results-media-tile:first-child video {
+      width: 100% !important;
+      height: 100% !important;
+      min-height: 0 !important;
+      object-fit: contain !important;
+      object-position: center center !important;
+      background: #ffffff !important;
+      border: none !important;
+      display: block !important;
+    }
+
+    #results .design-variable-image-stack .results-media-tile:first-child .results-image-caption {
+      background: rgba(5, 5, 5, 0.88) !important;
+      border-top: none !important;
+    }
+
+
+    /* FINAL OVERRIDE v42: widen the Effect of Design Variables paragraph column
+       so the stacked image column becomes smaller. */
+    #results .design-variable-results-block {
+      grid-template-columns: minmax(560px, 1.12fr) minmax(0, 0.88fr) !important;
+      gap: 0.95rem !important;
+      align-items: stretch !important;
+    }
+
+    #results .design-variable-results-block > .results-text-box {
+      width: 100% !important;
+    }
+
+    @media (max-width: 1050px) {
+      #results .design-variable-results-block {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    /* FINAL OVERRIDE v43: make the Effect of Design Variables paragraph section just a tad wider. */
+    #results .design-variable-results-block {
+      grid-template-columns: minmax(600px, 1.20fr) minmax(0, 0.80fr) !important;
+      gap: 0.9rem !important;
+      align-items: stretch !important;
+    }
+
+    #results .design-variable-results-block > .results-text-box {
+      width: 100% !important;
+    }
+
+    @media (max-width: 1050px) {
+      #results .design-variable-results-block {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    /* FINAL OVERRIDE v44: Effect of Design Variables returns to a two-row layout.
+       Row 1 has paragraph left and one image right. Row 2 has two images side-by-side. */
+    #results .design-variable-results-block {
+      margin-top: 1.1rem !important;
+      padding-top: 1.1rem !important;
+      border-top: 1px solid rgba(255, 255, 255, 0.10) !important;
+      display: grid !important;
+      grid-template-columns: 1fr !important;
+      gap: 1.1rem !important;
+      align-items: stretch !important;
+    }
+
+    #results .design-variable-results-top-row {
+      display: grid !important;
+      grid-template-columns: minmax(600px, 1.20fr) minmax(0, 0.80fr) !important;
+      gap: 0.9rem !important;
+      align-items: stretch !important;
+    }
+
+    #results .design-variable-results-bottom-row {
+      display: grid !important;
+      grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+      gap: 1.1rem !important;
+      align-items: stretch !important;
+    }
+
+    #results .design-variable-results-top-row .results-text-box,
+    #results .design-variable-results-top-row .results-media-tile,
+    #results .design-variable-results-bottom-row .results-media-tile {
+      min-height: 310px !important;
+      height: 100% !important;
+    }
+
+    /* Keep the top row image fully visible with white internal gaps only, not a white card outline. */
+    #results .design-variable-top-image {
+      background: rgba(5, 5, 5, 0.78) !important;
+      border: 1px solid rgba(255, 255, 255, 0.16) !important;
+      outline: none !important;
+      overflow: hidden !important;
+    }
+
+    #results .design-variable-top-image img,
+    #results .design-variable-top-image video {
+      width: 100% !important;
+      height: 100% !important;
+      min-height: 0 !important;
+      object-fit: contain !important;
+      object-position: center center !important;
+      background: #ffffff !important;
+      border: none !important;
+      display: block !important;
+    }
+
+    @media (max-width: 1050px) {
+      #results .design-variable-results-top-row,
+      #results .design-variable-results-bottom-row {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    /* FINAL OVERRIDE v45: decrease the width of the first image in the second row
+       of the Effect of Design Variables section and give the extra width to the second image. */
+    #results .design-variable-results-bottom-row {
+      grid-template-columns: minmax(0, 0.72fr) minmax(0, 1.28fr) !important;
+      gap: 1.1rem !important;
+      align-items: stretch !important;
+    }
+
+    @media (max-width: 1050px) {
+      #results .design-variable-results-bottom-row {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    /* FINAL OVERRIDE v46: reduce the width of the Effect of Design Variables paragraph section
+       and give the extra width to the top-row image. */
+    #results .design-variable-results-top-row {
+      grid-template-columns: minmax(420px, 0.82fr) minmax(0, 1.18fr) !important;
+      gap: 1.0rem !important;
+      align-items: stretch !important;
+    }
+
+    @media (max-width: 1050px) {
+      #results .design-variable-results-top-row {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    /* FINAL OVERRIDE v49: Surrogate Model Data Generation section with image left, paragraph middle, image right. */
+    .image-text-image-section {
+      margin-top: 1.1rem;
+      padding: clamp(1.2rem, 2.4vw, 2rem);
+      background: rgba(18, 18, 18, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 26px;
+      box-shadow: 0 28px 95px rgba(0, 0, 0, 0.5);
+    }
+
+    .image-text-image-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(340px, 0.82fr) minmax(0, 1fr);
+      gap: 1.1rem;
+      align-items: stretch;
+    }
+
+    .image-text-image-section .section-text-box {
+      min-height: 0;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 1.0rem 1.15rem;
+      background: rgba(18, 18, 18, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 20px;
+      box-shadow: 0 22px 70px rgba(0, 0, 0, 0.42);
+    }
+
+    .image-text-image-section .section-subheading {
+      color: var(--muted);
+      font-size: clamp(1.0rem, 1.2vw, 1.22rem);
+      line-height: 1.15;
+      letter-spacing: -0.025em;
+      font-weight: 760;
+      margin-bottom: 0.45rem;
+    }
+
+    .image-text-image-section .section-text-box p {
+      color: rgba(255, 255, 255, 0.74);
+      font-size: clamp(0.84rem, 0.95vw, 1.02rem);
+      line-height: 1.38;
+      margin: 0;
+    }
+
+    .image-text-image-section .section-media-tile {
+      overflow: hidden;
+      border-radius: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      background: rgba(5, 5, 5, 0.78);
+      min-height: 330px;
+      box-shadow: 0 24px 90px rgba(0, 0, 0, 0.48);
+      display: grid;
+      grid-template-rows: minmax(0, 1fr) auto;
+    }
+
+    .image-text-image-section .section-media-tile img,
+    .image-text-image-section .section-media-tile video {
+      width: 100%;
+      height: 100%;
+      min-height: 290px;
+      object-fit: cover;
+      object-position: center center;
+      display: block;
+      background: rgba(30, 30, 30, 0.82);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .image-text-image-section .section-image-caption {
+      padding: 0.42rem 0.76rem;
+      color: rgba(255, 255, 255, 0.82);
+      background: rgba(5, 5, 5, 0.88);
+      font-size: 0.78rem;
+      line-height: 1.2;
+      text-align: center;
+    }
+
+    @media (max-width: 1050px) {
+      .image-text-image-row {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    /* FINAL OVERRIDE v49b: title styling for Surrogate Model Data Generation. */
+    .surrogate-data-title {
+      color: white;
+      font-size: clamp(1.55rem, 2.4vw, 2.65rem);
+      line-height: 1.0;
+      letter-spacing: -0.055em;
+      margin-bottom: 0.9rem;
+      text-align: left;
+    }
+
+
+    /* FINAL OVERRIDE v50: Surrogate Model Data Generation split into two rows.
+       Row 1: paragraph with heading on left, image on right.
+       Row 2: image on left, paragraph on right. */
+    #surrogate-data-generation.surrogate-two-row-section {
+      margin-top: 1.1rem !important;
+      padding: clamp(1.2rem, 2.4vw, 2rem) !important;
+      background: rgba(18, 18, 18, 0.92) !important;
+      border: 1px solid rgba(255, 255, 255, 0.16) !important;
+      border-radius: 26px !important;
+      box-shadow: 0 28px 95px rgba(0, 0, 0, 0.5) !important;
+      display: grid !important;
+      grid-template-columns: 1fr !important;
+      gap: 1.1rem !important;
+    }
+
+    #surrogate-data-generation .surrogate-two-row {
+      display: grid !important;
+      grid-template-columns: minmax(360px, 0.78fr) minmax(0, 1.22fr) !important;
+      gap: 1.1rem !important;
+      align-items: stretch !important;
+    }
+
+    #surrogate-data-generation .surrogate-two-row + .surrogate-two-row {
+      padding-top: 1.1rem !important;
+      border-top: 1px solid rgba(255, 255, 255, 0.10) !important;
+    }
+
+    #surrogate-data-generation .surrogate-two-row-reverse {
+      grid-template-columns: minmax(0, 1.22fr) minmax(360px, 0.78fr) !important;
+    }
+
+    #surrogate-data-generation .surrogate-data-title {
+      color: white !important;
+      font-size: clamp(1.55rem, 2.4vw, 2.65rem) !important;
+      line-height: 1.0 !important;
+      letter-spacing: -0.055em !important;
+      margin-bottom: 0.75rem !important;
+      text-align: left !important;
+    }
+
+    #surrogate-data-generation .section-subheading {
+      color: var(--muted) !important;
+      font-size: clamp(1.0rem, 1.2vw, 1.22rem) !important;
+      line-height: 1.15 !important;
+      letter-spacing: -0.025em !important;
+      font-weight: 760 !important;
+      margin-bottom: 0.45rem !important;
+    }
+
+    #surrogate-data-generation .section-text-box {
+      min-height: 0 !important;
+      height: 100% !important;
+      display: flex !important;
+      flex-direction: column !important;
+      justify-content: center !important;
+      padding: 1.0rem 1.15rem !important;
+      background: rgba(18, 18, 18, 0.92) !important;
+      border: 1px solid rgba(255, 255, 255, 0.16) !important;
+      border-radius: 20px !important;
+      box-shadow: 0 22px 70px rgba(0, 0, 0, 0.42) !important;
+    }
+
+    #surrogate-data-generation .section-media-tile {
+      min-height: 310px !important;
+    }
+
+    @media (max-width: 1050px) {
+      #surrogate-data-generation .surrogate-two-row,
+      #surrogate-data-generation .surrogate-two-row-reverse {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    /* FINAL OVERRIDE v51: widen the bottom Sparse Data Format paragraph box
+       and shrink the image beside it. */
+    #surrogate-data-generation .surrogate-two-row-reverse {
+      grid-template-columns: minmax(0, 1.02fr) minmax(460px, 0.98fr) !important;
+      gap: 1.0rem !important;
+      align-items: stretch !important;
+    }
+
+    #surrogate-data-generation .surrogate-two-row-reverse .section-text-box {
+      width: 100% !important;
+    }
+
+    @media (max-width: 1050px) {
+      #surrogate-data-generation .surrogate-two-row-reverse {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    /* FINAL OVERRIDE v52: make the bottom Sparse Data Format paragraph box even wider
+       and shrink the image beside it further. */
+    #surrogate-data-generation .surrogate-two-row-reverse {
+      grid-template-columns: minmax(0, 0.82fr) minmax(560px, 1.18fr) !important;
+      gap: 0.9rem !important;
+      align-items: stretch !important;
+    }
+
+    #surrogate-data-generation .surrogate-two-row-reverse .section-text-box {
+      width: 100% !important;
+    }
+
+    @media (max-width: 1050px) {
+      #surrogate-data-generation .surrogate-two-row-reverse {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    /* FINAL OVERRIDE v53: make the bottom Sparse Data Format paragraph section even wider again
+       and shrink the image beside it further. */
+    #surrogate-data-generation .surrogate-two-row-reverse {
+      grid-template-columns: minmax(0, 0.68fr) minmax(640px, 1.32fr) !important;
+      gap: 0.85rem !important;
+      align-items: stretch !important;
+    }
+
+    #surrogate-data-generation .surrogate-two-row-reverse .section-text-box {
+      width: 100% !important;
+    }
+
+    @media (max-width: 1050px) {
+      #surrogate-data-generation .surrogate-two-row-reverse {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    /* FINAL OVERRIDE v54: Surrogate Model Creation section after Sparse Data Generation.
+       Two rows. Row 1 uses a looping GIF in the top-left media spot. */
+    #surrogate-model-creation.surrogate-model-creation-section {
+      margin-top: 1.1rem !important;
+      padding: clamp(1.2rem, 2.4vw, 2rem) !important;
+      background: rgba(18, 18, 18, 0.92) !important;
+      border: 1px solid rgba(255, 255, 255, 0.16) !important;
+      border-radius: 26px !important;
+      box-shadow: 0 28px 95px rgba(0, 0, 0, 0.5) !important;
+      display: grid !important;
+      grid-template-columns: 1fr !important;
+      gap: 1.1rem !important;
+    }
+
+    #surrogate-model-creation .surrogate-model-row {
+      display: grid !important;
+      grid-template-columns: minmax(0, 1.22fr) minmax(360px, 0.78fr) !important;
+      gap: 1.1rem !important;
+      align-items: stretch !important;
+    }
+
+    #surrogate-model-creation .surrogate-model-row + .surrogate-model-row {
+      padding-top: 1.1rem !important;
+      border-top: 1px solid rgba(255, 255, 255, 0.10) !important;
+    }
+
+    #surrogate-model-creation .surrogate-model-title {
+      color: white !important;
+      font-size: clamp(1.55rem, 2.4vw, 2.65rem) !important;
+      line-height: 1.0 !important;
+      letter-spacing: -0.055em !important;
+      margin-bottom: 0.75rem !important;
+      text-align: left !important;
+    }
+
+    #surrogate-model-creation .section-subheading {
+      color: var(--muted) !important;
+      font-size: clamp(1.0rem, 1.2vw, 1.22rem) !important;
+      line-height: 1.15 !important;
+      letter-spacing: -0.025em !important;
+      font-weight: 760 !important;
+      margin-bottom: 0.45rem !important;
+    }
+
+    #surrogate-model-creation .section-text-box {
+      min-height: 0 !important;
+      height: 100% !important;
+      display: flex !important;
+      flex-direction: column !important;
+      justify-content: center !important;
+      padding: 1.0rem 1.15rem !important;
+      background: rgba(18, 18, 18, 0.92) !important;
+      border: 1px solid rgba(255, 255, 255, 0.16) !important;
+      border-radius: 20px !important;
+      box-shadow: 0 22px 70px rgba(0, 0, 0, 0.42) !important;
+    }
+
+    #surrogate-model-creation .section-media-tile {
+      min-height: 310px !important;
+      overflow: hidden !important;
+      border-radius: 20px !important;
+      border: 1px solid rgba(255, 255, 255, 0.16) !important;
+      background: rgba(5, 5, 5, 0.78) !important;
+      box-shadow: 0 24px 90px rgba(0, 0, 0, 0.48) !important;
+      display: grid !important;
+      grid-template-rows: minmax(0, 1fr) auto !important;
+    }
+
+    #surrogate-model-creation .section-media-tile img,
+    #surrogate-model-creation .section-media-tile video {
+      width: 100% !important;
+      height: 100% !important;
+      min-height: 270px !important;
+      object-fit: cover !important;
+      object-position: center center !important;
+      display: block !important;
+      background: rgba(30, 30, 30, 0.82) !important;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+    }
+
+    #surrogate-model-creation .section-image-caption {
+      padding: 0.42rem 0.76rem !important;
+      color: rgba(255, 255, 255, 0.82) !important;
+      background: rgba(5, 5, 5, 0.88) !important;
+      font-size: 0.78rem !important;
+      line-height: 1.2 !important;
+      text-align: center !important;
+    }
+
+    @media (max-width: 1050px) {
+      #surrogate-model-creation .surrogate-model-row {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    /* FINAL OVERRIDE v55: top Surrogate Model Creation row has paragraph left and GIF right. */
+    #surrogate-model-creation .surrogate-model-training-row {
+      grid-template-columns: minmax(360px, 0.78fr) minmax(0, 1.22fr) !important;
+      gap: 1.1rem !important;
+      align-items: stretch !important;
+    }
+
+    @media (max-width: 1050px) {
+      #surrogate-model-creation .surrogate-model-training-row {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    /* FINAL OVERRIDE v57: Model Predictive Controller section. */
+    #model-predictive-controller.mpc-section {
+      margin-top: 1.1rem !important;
+      padding: clamp(1.2rem, 2.4vw, 2rem) !important;
+      background: rgba(18, 18, 18, 0.92) !important;
+      border: 1px solid rgba(255, 255, 255, 0.16) !important;
+      border-radius: 26px !important;
+      box-shadow: 0 28px 95px rgba(0, 0, 0, 0.5) !important;
+      display: grid !important;
+      grid-template-columns: 1fr !important;
+      gap: 1.1rem !important;
+    }
+
+    #model-predictive-controller .mpc-top-row,
+    #model-predictive-controller .mpc-bottom-row {
+      display: grid !important;
+      gap: 1.1rem !important;
+      align-items: stretch !important;
+    }
+
+    #model-predictive-controller .mpc-top-row {
+      grid-template-columns: minmax(360px, 0.78fr) minmax(0, 1.22fr) !important;
+    }
+
+    #model-predictive-controller .mpc-bottom-row {
+      grid-template-columns: minmax(0, 1.18fr) minmax(420px, 0.82fr) !important;
+      padding-top: 1.1rem !important;
+      border-top: 1px solid rgba(255, 255, 255, 0.10) !important;
+    }
+
+    #model-predictive-controller .mpc-title {
+      color: white !important;
+      font-size: clamp(1.55rem, 2.4vw, 2.65rem) !important;
+      line-height: 1.0 !important;
+      letter-spacing: -0.055em !important;
+      margin-bottom: 0.75rem !important;
+      text-align: left !important;
+    }
+
+    #model-predictive-controller .mpc-no-caption {
+      grid-template-rows: minmax(0, 1fr) !important;
+    }
+
+    #model-predictive-controller .mpc-no-caption img,
+    #model-predictive-controller .mpc-no-caption video {
+      border-bottom: none !important;
+    }
+
+    #model-predictive-controller .mpc-top-gif-tile img,
+    #model-predictive-controller .mpc-top-gif-tile video {
+      object-fit: cover !important;
+      object-position: center center !important;
+    }
+
+    #model-predictive-controller .mpc-pair-stack {
+      display: grid !important;
+      grid-template-columns: 1fr !important;
+      gap: 1.1rem !important;
+      min-width: 0 !important;
+    }
+
+    #model-predictive-controller .mpc-pair-block {
+      display: grid !important;
+      grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+      grid-template-rows: minmax(0, 1fr) auto !important;
+      gap: 0.75rem !important;
+      min-width: 0 !important;
+      align-items: stretch !important;
+    }
+
+    #model-predictive-controller .mpc-pair-block .section-media-tile {
+      min-height: 245px !important;
+      height: 100% !important;
+    }
+
+    #model-predictive-controller .mpc-pair-block .section-media-tile img,
+    #model-predictive-controller .mpc-pair-block .section-media-tile video {
+      width: 100% !important;
+      height: 100% !important;
+      min-height: 205px !important;
+      object-fit: cover !important;
+      object-position: center center !important;
+      display: block !important;
+      background: rgba(30, 30, 30, 0.82) !important;
+      border-bottom: none !important;
+    }
+
+    #model-predictive-controller .mpc-pair-caption {
+      grid-column: 1 / -1 !important;
+      padding: 0.42rem 0.76rem !important;
+      color: rgba(255, 255, 255, 0.82) !important;
+      background: rgba(5, 5, 5, 0.88) !important;
+      border: 1px solid rgba(255, 255, 255, 0.10) !important;
+      border-radius: 14px !important;
+      font-size: 0.78rem !important;
+      line-height: 1.2 !important;
+      text-align: center !important;
+      box-shadow: 0 16px 45px rgba(0, 0, 0, 0.35) !important;
+    }
+
+    @media (max-width: 1050px) {
+      #model-predictive-controller .mpc-top-row,
+      #model-predictive-controller .mpc-bottom-row {
+        grid-template-columns: 1fr !important;
+      }
+
+      #model-predictive-controller .mpc-pair-block {
+        grid-template-columns: 1fr !important;
+      }
+
+      #model-predictive-controller .mpc-pair-caption {
+        grid-column: 1 !important;
+      }
+    }
+
+
+    /* FINAL OVERRIDE v59: MPC grid now has three GIF/image rows. */
+    #model-predictive-controller .mpc-pair-stack {
+      gap: 0.85rem !important;
+    }
+
+    #model-predictive-controller .mpc-pair-block {
+      gap: 0.65rem !important;
+    }
+
+    #model-predictive-controller .mpc-pair-block .section-media-tile {
+      min-height: 205px !important;
+    }
+
+    #model-predictive-controller .mpc-pair-block .section-media-tile img,
+    #model-predictive-controller .mpc-pair-block .section-media-tile video {
+      min-height: 170px !important;
+    }
+
+
+    /* FINAL OVERRIDE v61: restructure the Model Predictive Controller section.
+       New order:
+       1) Controller Creation paragraph-only row with the main section heading.
+       2) Controller Performance paragraph + overview GIF row.
+       3) MPC vs PID Comparison block with intro paragraph, three GIFs, three images, and three text boxes. */
+    #model-predictive-controller.mpc-section {
+      margin-top: 1.1rem !important;
+      padding: clamp(1.2rem, 2.4vw, 2rem) !important;
+      background: rgba(18, 18, 18, 0.92) !important;
+      border: 1px solid rgba(255, 255, 255, 0.16) !important;
+      border-radius: 26px !important;
+      box-shadow: 0 28px 95px rgba(0, 0, 0, 0.5) !important;
+      display: grid !important;
+      grid-template-columns: 1fr !important;
+      gap: 1.1rem !important;
+    }
+
+    #model-predictive-controller .mpc-controller-creation-row,
+    #model-predictive-controller .mpc-performance-row,
+    #model-predictive-controller .mpc-comparison-block {
+      display: grid !important;
+      grid-template-columns: 1fr !important;
+      gap: 1.1rem !important;
+      align-items: stretch !important;
+    }
+
+    #model-predictive-controller .mpc-performance-row {
+      grid-template-columns: minmax(360px, 0.78fr) minmax(0, 1.22fr) !important;
+      padding-top: 1.1rem !important;
+      border-top: 1px solid rgba(255, 255, 255, 0.10) !important;
+    }
+
+    #model-predictive-controller .mpc-comparison-block {
+      padding-top: 1.1rem !important;
+      border-top: 1px solid rgba(255, 255, 255, 0.10) !important;
+    }
+
+    #model-predictive-controller .mpc-title {
+      color: white !important;
+      font-size: clamp(1.55rem, 2.4vw, 2.65rem) !important;
+      line-height: 1.0 !important;
+      letter-spacing: -0.055em !important;
+      margin-bottom: 0.75rem !important;
+      text-align: left !important;
+    }
+
+    #model-predictive-controller .mpc-comparison-gif-row,
+    #model-predictive-controller .mpc-comparison-image-row,
+    #model-predictive-controller .mpc-comparison-text-row {
+      display: grid !important;
+      grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+      gap: 1.1rem !important;
+      align-items: stretch !important;
+      min-width: 0 !important;
+    }
+
+    #model-predictive-controller .mpc-comparison-gif-row .section-media-tile,
+    #model-predictive-controller .mpc-comparison-image-row .section-media-tile {
+      min-height: 250px !important;
+      height: 100% !important;
+    }
+
+    #model-predictive-controller .mpc-no-caption {
+      grid-template-rows: minmax(0, 1fr) !important;
+    }
+
+    #model-predictive-controller .mpc-no-caption img,
+    #model-predictive-controller .mpc-no-caption video {
+      width: 100% !important;
+      height: 100% !important;
+      min-height: 210px !important;
+      object-fit: cover !important;
+      object-position: center center !important;
+      display: block !important;
+      background: rgba(30, 30, 30, 0.82) !important;
+      border-bottom: none !important;
+    }
+
+    #model-predictive-controller .mpc-top-gif-tile img,
+    #model-predictive-controller .mpc-top-gif-tile video {
+      object-fit: cover !important;
+      object-position: center center !important;
+    }
+
+    @media (max-width: 1050px) {
+      #model-predictive-controller .mpc-performance-row,
+      #model-predictive-controller .mpc-comparison-gif-row,
+      #model-predictive-controller .mpc-comparison-image-row,
+      #model-predictive-controller .mpc-comparison-text-row {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    /* FINAL OVERRIDE v62: MPC comparison media is now a 3x2 grid.
+       Each row has GIF left, image right, and one caption spanning both media slots. */
+    #model-predictive-controller .mpc-comparison-gif-row,
+    #model-predictive-controller .mpc-comparison-image-row {
+      display: none !important;
+    }
+
+    #model-predictive-controller .mpc-comparison-pair-grid {
+      display: grid !important;
+      grid-template-columns: 1fr !important;
+      gap: 1.1rem !important;
+      min-width: 0 !important;
+      align-items: stretch !important;
+    }
+
+    #model-predictive-controller .mpc-comparison-pair-row {
+      display: grid !important;
+      grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+      grid-template-rows: minmax(0, 1fr) auto !important;
+      gap: 0.75rem !important;
+      min-width: 0 !important;
+      align-items: stretch !important;
+    }
+
+    #model-predictive-controller .mpc-comparison-pair-row .section-media-tile {
+      min-height: 245px !important;
+      height: 100% !important;
+    }
+
+    #model-predictive-controller .mpc-comparison-pair-row .section-media-tile img,
+    #model-predictive-controller .mpc-comparison-pair-row .section-media-tile video {
+      width: 100% !important;
+      height: 100% !important;
+      min-height: 205px !important;
+      object-fit: cover !important;
+      object-position: center center !important;
+      display: block !important;
+      background: rgba(30, 30, 30, 0.82) !important;
+      border-bottom: none !important;
+    }
+
+    #model-predictive-controller .mpc-row-caption {
+      grid-column: 1 / -1 !important;
+      padding: 0.42rem 0.76rem !important;
+      color: rgba(255, 255, 255, 0.82) !important;
+      background: rgba(5, 5, 5, 0.88) !important;
+      border: 1px solid rgba(255, 255, 255, 0.10) !important;
+      border-radius: 14px !important;
+      font-size: 0.78rem !important;
+      line-height: 1.2 !important;
+      text-align: center !important;
+      box-shadow: 0 16px 45px rgba(0, 0, 0, 0.35) !important;
+    }
+
+    @media (max-width: 1050px) {
+      #model-predictive-controller .mpc-comparison-pair-row {
+        grid-template-columns: 1fr !important;
+      }
+
+      #model-predictive-controller .mpc-row-caption {
+        grid-column: 1 !important;
+      }
+    }
+
+
+    /* FINAL OVERRIDE v63: make the right image slot wider and the left GIF slot smaller
+       for every row in the MPC 3x2 comparison grid. */
+    #model-predictive-controller .mpc-comparison-pair-row {
+      grid-template-columns: minmax(0, 0.72fr) minmax(0, 1.28fr) !important;
+      gap: 0.75rem !important;
+      align-items: stretch !important;
+    }
+
+    @media (max-width: 1050px) {
+      #model-predictive-controller .mpc-comparison-pair-row {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    /* FINAL OVERRIDE v64: make the right image slot even wider and the left GIF slot smaller
+       for every row in the MPC 3x2 comparison grid. */
+    #model-predictive-controller .mpc-comparison-pair-row {
+      grid-template-columns: minmax(0, 0.58fr) minmax(0, 1.42fr) !important;
+      gap: 0.75rem !important;
+      align-items: stretch !important;
+    }
+
+    @media (max-width: 1050px) {
+      #model-predictive-controller .mpc-comparison-pair-row {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    /* FINAL OVERRIDE v67: widen the Overview paragraph box and shrink the GIF column slightly. */
+    #overview .project-panel {
+      grid-template-columns: minmax(560px, 0.95fr) minmax(0, 1.05fr) !important;
+      gap: 0.75rem !important;
+      align-items: stretch !important;
+    }
+
+    #overview .project-text-box {
+      width: 100% !important;
+      max-width: none !important;
+      padding: 1.0rem 1.15rem !important;
+    }
+
+    @media (max-width: 1050px) {
+      #overview .project-panel {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    /* FINAL OVERRIDE v68: make the Overview paragraph section slightly less wide than v67. */
+    #overview .project-panel {
+      grid-template-columns: minmax(500px, 0.86fr) minmax(0, 1.14fr) !important;
+      gap: 0.75rem !important;
+      align-items: stretch !important;
+    }
+
+    #overview .project-text-box {
+      width: 100% !important;
+      max-width: none !important;
+      padding: 1.0rem 1.15rem !important;
+    }
+
+    @media (max-width: 1050px) {
+      #overview .project-panel {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    /* FINAL OVERRIDE v69: add consistent paragraph indentation across all paragraph/text sections.
+       This targets only real body paragraphs inside paragraph boxes, not captions or navigation text. */
+    .project-text-box p,
+    .method-text-box p,
+    .results-text-box p,
+    .section-text-box p,
+    #model-predictive-controller .section-text-box p,
+    #surrogate-data-generation .section-text-box p,
+    #surrogate-model-creation .section-text-box p {
+      text-indent: 1.45em !important;
+      text-align: left !important;
+    }
+
+    /* Keep the first line indentation even when paragraph boxes use separated paragraph borders. */
+    .project-text-box p + p,
+    .method-text-box p + p,
+    .results-text-box p + p,
+    .section-text-box p + p {
+      text-indent: 1.45em !important;
+    }
+
+
+    /* FINAL OVERRIDE v72: widen the ANSYS / Wind Tunnel comparison paragraph section
+       in the Simulation vs Wind Tunnel results block and shrink the image beside it. */
+    #results .simulation-results-top-row {
+      grid-template-columns: minmax(560px, 1.08fr) minmax(0, 0.92fr) !important;
+      gap: 0.95rem !important;
+      align-items: stretch !important;
+    }
+
+    #results .simulation-results-top-row .results-text-box {
+      width: 100% !important;
+      padding: 1.0rem 1.15rem !important;
+    }
+
+    @media (max-width: 1050px) {
+      #results .simulation-results-top-row {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    /* FINAL OVERRIDE v73: reset ANSYS/Wind Tunnel overview row back to the original paragraph width,
+       and add a full-width statistical analysis paragraph row between the top row and the two-image row. */
+    #results .simulation-results-top-row {
+      grid-template-columns: minmax(420px, 0.88fr) minmax(0, 1.12fr) !important;
+      gap: 1.0rem !important;
+      align-items: stretch !important;
+    }
+
+    #results .simulation-results-analysis-row {
+      display: grid !important;
+      grid-template-columns: 1fr !important;
+      gap: 1.0rem !important;
+      align-items: stretch !important;
+    }
+
+    #results .simulation-results-analysis-row .results-text-box {
+      width: 100% !important;
+      padding: 1.0rem 1.15rem !important;
+    }
+
+    @media (max-width: 1050px) {
+      #results .simulation-results-top-row,
+      #results .simulation-results-analysis-row {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    /* FINAL OVERRIDE v74: make the ANSYS Methodology paragraph section less wide
+       so the right image in the top row has enough room to fully fill its container. */
+    #data-collection .ansys-method-top-row {
+      grid-template-columns: minmax(420px, 0.62fr) minmax(0, 1.38fr) !important;
+      gap: 0.85rem !important;
+      align-items: stretch !important;
+    }
+
+    #data-collection .ansys-method-top-row .method-text-box {
+      width: 100% !important;
+    }
+
+    #data-collection .ansys-top-image-pair {
+      grid-template-columns: minmax(0, 0.72fr) minmax(0, 1.28fr) !important;
+      gap: 0.75rem !important;
+      min-width: 0 !important;
+      align-items: stretch !important;
+    }
+
+    /* Make sure the right image in the ANSYS top row fills the full media viewport. */
+    #data-collection .ansys-top-image-pair .method-media-tile:nth-child(2) img,
+    #data-collection .ansys-top-image-pair .method-media-tile:nth-child(2) video {
+      width: 100% !important;
+      height: 100% !important;
+      min-height: 0 !important;
+      object-fit: cover !important;
+      object-position: center center !important;
+      background: rgba(30, 30, 30, 0.82) !important;
+      display: block !important;
+      border: none !important;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+    }
+
+    @media (max-width: 1050px) {
+      #data-collection .ansys-method-top-row,
+      #data-collection .ansys-top-image-pair {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    /* FINAL OVERRIDE v75: restore the ANSYS Methodology paragraph to the original wider width
+       and remove the top-left surface mesh image from the top image row. */
+    #data-collection .ansys-method-top-row {
+      grid-template-columns: minmax(640px, 1.08fr) minmax(0, 0.92fr) !important;
+      gap: 0.75rem !important;
+      align-items: stretch !important;
+    }
+
+    #data-collection .ansys-method-top-row .method-text-box {
+      width: 100% !important;
+    }
+
+    /* With the surface mesh card removed, the remaining residual plot uses the full top image area. */
+    #data-collection .ansys-top-image-pair {
+      grid-template-columns: 1fr !important;
+      gap: 0.75rem !important;
+      min-width: 0 !important;
+      align-items: stretch !important;
+    }
+
+    #data-collection .ansys-top-image-pair .method-media-tile img,
+    #data-collection .ansys-top-image-pair .method-media-tile video {
+      width: 100% !important;
+      height: 100% !important;
+      min-height: 0 !important;
+      object-fit: cover !important;
+      object-position: center center !important;
+      background: rgba(30, 30, 30, 0.82) !important;
+      display: block !important;
+      border: none !important;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+    }
+
+    @media (max-width: 1050px) {
+      #data-collection .ansys-method-top-row,
+      #data-collection .ansys-top-image-pair {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    /* FINAL OVERRIDE v76: make the ANSYS Methodology paragraph a bit wider
+       after removing the surface mesh image. */
+    #data-collection .ansys-method-top-row {
+      grid-template-columns: minmax(700px, 1.18fr) minmax(0, 0.82fr) !important;
+      gap: 0.75rem !important;
+      align-items: stretch !important;
+    }
+
+    #data-collection .ansys-method-top-row .method-text-box {
+      width: 100% !important;
+    }
+
+    #data-collection .ansys-top-image-pair {
+      grid-template-columns: 1fr !important;
+      gap: 0.75rem !important;
+      min-width: 0 !important;
+      align-items: stretch !important;
+    }
+
+    @media (max-width: 1050px) {
+      #data-collection .ansys-method-top-row,
+      #data-collection .ansys-top-image-pair {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    /* FINAL OVERRIDE v78: widen the ANSYS vs OpenVSP results paragraph box
+       and shrink the 2x2 image grid beside it. */
+    #results .results-row.text-right:has(.ansys-vsp-results-grid) {
+      grid-template-columns: minmax(0, 1.12fr) minmax(460px, 0.88fr) !important;
+      gap: 1.0rem !important;
+      align-items: stretch !important;
+    }
+
+    #results .results-row.text-right:has(.ansys-vsp-results-grid) .results-text-box {
+      width: 100% !important;
+      padding: 1.0rem 1.15rem !important;
+    }
+
+    @media (max-width: 1050px) {
+      #results .results-row.text-right:has(.ansys-vsp-results-grid) {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    /* FINAL OVERRIDE v79: make the ANSYS vs OpenVSP results paragraph box slightly less wide than v78. */
+    #results .results-row.text-right:has(.ansys-vsp-results-grid) {
+      grid-template-columns: minmax(0, 1.18fr) minmax(420px, 0.82fr) !important;
+      gap: 1.0rem !important;
+      align-items: stretch !important;
+    }
+
+    #results .results-row.text-right:has(.ansys-vsp-results-grid) .results-text-box {
+      width: 100% !important;
+      padding: 1.0rem 1.15rem !important;
+    }
+
+    @media (max-width: 1050px) {
+      #results .results-row.text-right:has(.ansys-vsp-results-grid) {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    /* FINAL OVERRIDE v80: split ANSYS vs OpenVSP results into two rows.
+       Row 1: top two original grid images stacked vertically on the left, overview paragraph on the right.
+       Row 2: statistical-analysis paragraph on the left, bottom two original grid images stacked vertically on the right. */
+    #results .ansys-vsp-split-block {
+      display: grid !important;
+      grid-template-columns: 1fr !important;
+      gap: 1.1rem !important;
+      margin-top: 1.1rem !important;
+      padding-top: 1.1rem !important;
+      border-top: 1px solid rgba(255, 255, 255, 0.10) !important;
+      align-items: stretch !important;
+    }
+
+    #results .ansys-vsp-split-row {
+      display: grid !important;
+      grid-template-columns: minmax(0, 1.18fr) minmax(420px, 0.82fr) !important;
+      gap: 1.0rem !important;
+      align-items: stretch !important;
+      min-width: 0 !important;
+    }
+
+    #results .ansys-vsp-split-row + .ansys-vsp-split-row {
+      padding-top: 1.1rem !important;
+      border-top: 1px solid rgba(255, 255, 255, 0.10) !important;
+    }
+
+    #results .ansys-vsp-analysis-row {
+      grid-template-columns: minmax(420px, 0.82fr) minmax(0, 1.18fr) !important;
+    }
+
+    #results .ansys-vsp-vertical-media-stack {
+      display: grid !important;
+      grid-template-columns: 1fr !important;
+      gap: 0.75rem !important;
+      min-width: 0 !important;
+      align-items: stretch !important;
+    }
+
+    #results .ansys-vsp-vertical-media-stack .results-media-tile {
+      min-height: 260px !important;
+      height: 100% !important;
+    }
+
+    #results .ansys-vsp-vertical-media-stack .results-media-tile img,
+    #results .ansys-vsp-vertical-media-stack .results-media-tile video {
+      width: 100% !important;
+      height: 100% !important;
+      min-height: 220px !important;
+      object-fit: cover !important;
+      object-position: center center !important;
+      display: block !important;
+    }
+
+    #results .ansys-vsp-split-row .results-text-box {
+      width: 100% !important;
+      padding: 1.0rem 1.15rem !important;
+    }
+
+    @media (max-width: 1050px) {
+      #results .ansys-vsp-split-row,
+      #results .ansys-vsp-analysis-row {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    /* FINAL OVERRIDE v81: widen the paragraph segments in the split ANSYS vs OpenVSP rows
+       and swap the first Effect of Design Variables row to image-left / paragraph-right. */
+    #results .ansys-vsp-overview-row {
+      grid-template-columns: minmax(0, 0.78fr) minmax(560px, 1.22fr) !important;
+      gap: 1.0rem !important;
+      align-items: stretch !important;
+    }
+
+    #results .ansys-vsp-analysis-row {
+      grid-template-columns: minmax(560px, 1.22fr) minmax(0, 0.78fr) !important;
+      gap: 1.0rem !important;
+      align-items: stretch !important;
+    }
+
+    #results .ansys-vsp-split-row .results-text-box {
+      width: 100% !important;
+      padding: 1.0rem 1.15rem !important;
+    }
+
+    #results .design-variable-results-top-row {
+      grid-template-columns: minmax(0, 1.22fr) minmax(360px, 0.78fr) !important;
+      gap: 1.1rem !important;
+      align-items: stretch !important;
+    }
+
+    @media (max-width: 1050px) {
+      #results .ansys-vsp-overview-row,
+      #results .ansys-vsp-analysis-row,
+      #results .design-variable-results-top-row {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    /* FINAL OVERRIDE v83: add a middle paragraph-only row to Effect of Design Variables
+       while preserving the uploaded baseline wording/captions except for requested subheadings. */
+    #results .design-variable-results-analysis-row {
+      display: grid !important;
+      grid-template-columns: 1fr !important;
+      gap: 1.1rem !important;
+      align-items: stretch !important;
+      padding-top: 1.1rem !important;
+      border-top: 1px solid rgba(255, 255, 255, 0.10) !important;
+    }
+
+    #results .design-variable-results-analysis-row .results-text-box {
+      width: 100% !important;
+      padding: 1.0rem 1.15rem !important;
+    }
+
+    #results .design-variable-results-bottom-row {
+      padding-top: 1.1rem !important;
+      border-top: 1px solid rgba(255, 255, 255, 0.10) !important;
+    }
+
+    @media (max-width: 1050px) {
+      #results .design-variable-results-analysis-row {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    /* FINAL OVERRIDE v88: make the Effect of Design Variables overview image use the same
+       proper bordered/captioned image-card format as the other Results images. */
+    #results .design-variable-results-top-row .results-media-tile.design-variable-top-image {
+      overflow: hidden !important;
+      border-radius: 20px !important;
+      border: 1px solid rgba(255, 255, 255, 0.16) !important;
+      background: rgba(5, 5, 5, 0.78) !important;
+      box-shadow: 0 24px 90px rgba(0, 0, 0, 0.48) !important;
+      display: grid !important;
+      grid-template-rows: minmax(0, 1fr) auto !important;
+      min-height: 310px !important;
+    }
+
+    #results .design-variable-results-top-row .results-media-tile.design-variable-top-image img,
+    #results .design-variable-results-top-row .results-media-tile.design-variable-top-image video {
+      width: 100% !important;
+      height: 100% !important;
+      min-height: 270px !important;
+      object-fit: cover !important;
+      object-position: center center !important;
+      display: block !important;
+      background: rgba(30, 30, 30, 0.82) !important;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+    }
+
+    #results .design-variable-results-top-row .results-media-tile.design-variable-top-image .results-image-caption {
+      padding: 0.42rem 0.76rem !important;
+      color: rgba(255, 255, 255, 0.82) !important;
+      background: rgba(5, 5, 5, 0.88) !important;
+      font-size: 0.78rem !important;
+      line-height: 1.2 !important;
+      text-align: center !important;
+    }
+
+
+    /* FINAL OVERRIDE v89: remove the visible sharp image corners inside the rounded
+       Effect of Design Variables image card by clipping the media to the same rounded shape. */
+    #results .design-variable-results-top-row .results-media-tile.design-variable-top-image {
+      overflow: hidden !important;
+      border-radius: 20px !important;
+      clip-path: inset(0 round 20px) !important;
+      isolation: isolate !important;
+      background: rgba(5, 5, 5, 0.78) !important;
+    }
+
+    #results .design-variable-results-top-row .results-media-tile.design-variable-top-image img,
+    #results .design-variable-results-top-row .results-media-tile.design-variable-top-image video {
+      border-radius: 20px 20px 0 0 !important;
+      clip-path: inset(0 round 20px 20px 0 0) !important;
+      overflow: hidden !important;
+      display: block !important;
+      border: none !important;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+    }
+
+    #results .design-variable-results-top-row .results-media-tile.design-variable-top-image .results-image-caption {
+      border-radius: 0 0 20px 20px !important;
+      margin: 0 !important;
+    }
+
+
+    /* FINAL OVERRIDE v90: make the Effect of Design Variables overview image use the exact
+       same generic results-media-tile behavior as all other Results image cards.
+       The special design-variable-top-image styling is intentionally neutralized. */
+    #results .design-variable-results-top-row > .results-media-tile {
+      overflow: hidden !important;
+      border-radius: 20px !important;
+      border: 1px solid rgba(255, 255, 255, 0.16) !important;
+      background: rgba(5, 5, 5, 0.78) !important;
+      min-height: 310px !important;
+      box-shadow: 0 24px 90px rgba(0, 0, 0, 0.48) !important;
+      display: grid !important;
+      grid-template-rows: minmax(0, 1fr) auto !important;
+      clip-path: none !important;
+      isolation: auto !important;
+    }
+
+    #results .design-variable-results-top-row > .results-media-tile img,
+    #results .design-variable-results-top-row > .results-media-tile video {
+      width: 100% !important;
+      height: 100% !important;
+      min-height: 270px !important;
+      object-fit: cover !important;
+      object-position: center center !important;
+      display: block !important;
+      background: rgba(30, 30, 30, 0.82) !important;
+      border: 0 !important;
+      border-radius: 0 !important;
+      clip-path: none !important;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+    }
+
+    #results .design-variable-results-top-row > .results-media-tile .results-image-caption {
+      padding: 0.42rem 0.76rem !important;
+      color: rgba(255, 255, 255, 0.82) !important;
+      background: rgba(5, 5, 5, 0.88) !important;
+      font-size: 0.78rem !important;
+      line-height: 1.2 !important;
+      text-align: center !important;
+      border-radius: 0 !important;
+      margin: 0 !important;
+    }
+
+
+    /* FINAL OVERRIDE v91: remove the bad extra wrapper that caused a sharp rectangular outline
+       and force the Effect of Design Variables image to behave exactly like the other Results cards. */
+    #results .design-variable-results-top-row > .results-media-tile {
+      overflow: hidden !important;
+      border-radius: 20px !important;
+      border: 1px solid rgba(255, 255, 255, 0.16) !important;
+      background: rgba(5, 5, 5, 0.78) !important;
+      min-height: 310px !important;
+      box-shadow: 0 24px 90px rgba(0, 0, 0, 0.48) !important;
+      display: grid !important;
+      grid-template-rows: minmax(0, 1fr) auto !important;
+    }
+
+    #results .design-variable-results-top-row > .results-media-tile img,
+    #results .design-variable-results-top-row > .results-media-tile video {
+      width: 100% !important;
+      height: 100% !important;
+      min-height: 270px !important;
+      object-fit: cover !important;
+      object-position: center center !important;
+      display: block !important;
+      background: rgba(30, 30, 30, 0.82) !important;
+      border: none !important;
+      border-radius: 0 !important;
+      clip-path: none !important;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+    }
+
+    #results .design-variable-results-top-row > .results-media-tile .results-image-caption {
+      padding: 0.42rem 0.76rem !important;
+      color: rgba(255, 255, 255, 0.82) !important;
+      background: rgba(5, 5, 5, 0.88) !important;
+      font-size: 0.78rem !important;
+      line-height: 1.2 !important;
+      text-align: center !important;
+      border-radius: 0 !important;
+      margin: 0 !important;
+    }
+
+
+    /* FINAL OVERRIDE v92: centered black model-architecture box inside Controller Creation,
+       placed between the first and second paragraphs. */
+    #model-predictive-controller .controller-model-flow-box {
+      margin: 0.72rem 0 !important;
+      padding: 0.85rem 1.15rem !important;
+      width: 100% !important;
+      background: rgba(5, 5, 5, 0.86) !important;
+      border: 1px solid rgba(255, 255, 255, 0.16) !important;
+      border-radius: 14px !important;
+      color: rgba(255, 255, 255, 0.92) !important;
+      font-family: Consolas, Monaco, "Courier New", monospace !important;
+      font-size: clamp(0.82rem, 0.95vw, 1.02rem) !important;
+      line-height: 1.35 !important;
+      text-align: center !important;
+      box-shadow: 0 18px 50px rgba(0, 0, 0, 0.36) !important;
+      white-space: normal !important;
+    }
+
+
+    /* FINAL OVERRIDE v93: top-align the three bottom paragraph boxes in the MPC vs PID comparison section. */
+    #model-predictive-controller .mpc-comparison-summary-row .section-text-box,
+    #model-predictive-controller .mpc-comparison-bottom-row .section-text-box,
+    #model-predictive-controller .mpc-comparison-paragraph-row .section-text-box,
+    #model-predictive-controller .mpc-comparison-text-row .section-text-box,
+    #model-predictive-controller .mpc-pid-summary-row .section-text-box,
+    #model-predictive-controller .pid-comparison-summary-row .section-text-box {
+      justify-content: flex-start !important;
+      align-items: stretch !important;
+    }
+
+    #model-predictive-controller .mpc-comparison-summary-row .section-text-box .section-subheading,
+    #model-predictive-controller .mpc-comparison-bottom-row .section-text-box .section-subheading,
+    #model-predictive-controller .mpc-comparison-paragraph-row .section-text-box .section-subheading,
+    #model-predictive-controller .mpc-comparison-text-row .section-text-box .section-subheading,
+    #model-predictive-controller .mpc-pid-summary-row .section-text-box .section-subheading,
+    #model-predictive-controller .pid-comparison-summary-row .section-text-box .section-subheading {
+      margin-top: 0 !important;
+    }
+
+</style>
+</head>
+
+<body>
+  <div class="gif-background" aria-hidden="true">
+    <!-- Native looping MP4 header background. -->
+    <video autoplay muted loop playsinline preload="auto">
+                  <source src="assets/E178-ME103/mpc_v3_3d_flight_only.mp4" type="video/mp4" />
+                </video>
+  </div>
+
+  <header class="topbar">
+    <a class="brand" href="index.html" aria-label="Jaden Dew homepage">
+      <span>Jaden Dew</span>
+    </a>
+
+    <nav aria-label="Main navigation">
+      <a class="nav-link" href="index.html">Home</a>
+
+      <div class="nav-item">
+        <a class="nav-link" href="portfolio.html">Portfolio</a>
+        <div class="nav-dropdown" aria-label="Portfolio project links">
+          <a class="dropdown-link" href="BEAR.html">BEAR: Berkeley Aerial Emergency Response</a>
+          <a class="dropdown-link" href="E3_MVA.html">Liquid Rocket Test Stand Main Valves</a>
+          <a class="dropdown-link" href="E178_ME103.html">Flying Wing Simulation and Control</a>
+          <a class="dropdown-link" href="ME100.html">The Devious Alarm</a>
+          <a class="dropdown-link" href="vast.html">Vast Space: Saiph Thruster Testing</a>
+          <a class="dropdown-link" href="poppet.html">Custom Poppet Valve</a>
+          <a class="dropdown-link" href="NASA.html">NASA: Dragonfly Rotor Blade Optimization</a>
+        </div>
+      </div>
+
+      <a class="nav-link" href="assets/jaden_resume_alt_3-22-2026.pdf" target="_blank" rel="noopener">Resume</a>
+      <a class="nav-link" href="https://www.linkedin.com/in/jaden-dew-178a37249/" target="_blank" rel="noopener">LinkedIn</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero" aria-label="E178 ME103 project hero">
+      <div class="hero-card">
+        <div class="hero-kicker">Class Project</div>
+        <h1>Flying Wing Simulation and Control</h1>
+        <div class="hero-subtitle"> A combination of my ME103 and E178 final projects involving the simulation, wind tunnel testing, and control of a flying wing aircraft design.</div>
+      </div>
+    </section>
+
+    <section id="overview" class="section" aria-label="E178 ME103 project overview">
+      <div class="section-inner">
+        <section class="project-panel">
+          <div class="project-text-box">
+            <div>
+              <div class="section-kicker">Project Overview</div>
+              <h2>Project Overview</h2>
+            </div>
+
+            <div>
+              <p>
+                This page combines the two projects I did for my ME103 and E178 classes I took during my undergraduate degree. Both projects focused on analyzing
+                the performance of a flying wing with this idea being built off of one of my group partner's personal project where he had designed the particular flying wing We
+                were examined previously.
+              </p>
+              <p>
+                My ME 103: Experimentation and Measurements class final project focuses on determining how well the simulation software VSPAERO a solver within OpenVSP
+                performed relative to  wind tunnel test data. This was specifically done looking at trim and pitch stability with the goal being to determine how well the
+                simulation software predicted three different stability parameters. Additionally, longitudinal wing twist and Reynolds number was varied across tests and models
+                with how these variables affected the stability parameters also being analyzed. Unfortunately due to the Stratasys J55 we were using to print our models breaking early into our test campaign this idea
+                did have to be altered slightly the wind tunnel tests being substituted ANSYS Fluent simulations with those ansys results being validated to the best of our abilities with the
+                little wind tunnel data that had been collected.
+              </p>
+              <p>
+                My E178: Statistics and Data Science for Engineers class final project built upon this work leveraging the validated OpenVSP workflow to create an aerodynamic surrogate model
+                of the flying wing to be used in a model predictive control (MPC) control architecture. This final project was required to focus on machine learning with the majority of the
+                project focusing on training various models, the MPC was added on as a demonstrator to show where a surrogate model like the one we developed could be useful. This page only focuses
+                on the best working model as the model training portion of the project was done by one of my project partners with more focus put upon the MPC controller which is the portion I worked on.
+              </p>
+               <p>
+                The following page details all steps done for both projects. This includes both work that I performed perfectly as well as work done by my project partners. The work done by my
+                partners are included to provide context for the results of the project and as such will not be in as much detail. I will not in respective sections if a portion that is being presented
+                was done by one of my project partners.
+               </p>
+            </div>
+          </div>
+
+          <div class="vehicle-overview-image">
+            <video autoplay muted loop playsinline preload="auto" aria-label="E178 ME103 overview animation">
+                  <source src="assets/E178-ME103/mpc_v3_csv_synced_flight_tracking.mp4?v=data-methods-v2" type="video/mp4" />
+                </video>
+          </div>
+        </section>
+        <section id="data-collection" class="data-methods-section" aria-label="Data Collection Methodologies">
+          <div class="method-row text-left">
+            <div class="method-text-box">
+              <h2 class="method-title">Data Collection Methodologies</h2>
+              <div class="method-subheading">Wind Tunnel Methodology</div>
+              <p>
+                Originally the plan for testing was to test 5 total longitudinal wing twists (-8&deg, -6&deg, -4&deg, -2&deg, 0&deg) and 3 wind tunnel
+                velocities (35 m/s, 45 m/s, 55 m/s) corresponding to Reynolds numbers 9.9e5, 1.3e6 and 1.6e6 respectively. Unfortunately due to issues with a printer only the -6&deg wing
+                twist case model was printed and tested. This model was tested at all three velocities in both -20 to 20 degree pitch sweeps and -10 to 10 degree yaw sweeps. The yaw sweeps were originally
+                planned to be examined however upon examination of the data post test it was determined that the wind tunnel instruments were unable to resolve the forces accurately and as such the yaw cases were not considered
+                post this test.
+              </p>
+              <p>
+                Once the data was collected it was post processed by my project partner. The forces were resolved in aircraft body coordinates from the force data collected by the wind tunnel and then
+                converted into their coefficient forms. Throughout this process the uncertainty from the wind tunnel tare, coordinate transform, normalization, and uncertainty from the printer's tolerances was propagated
+                through the calculations.
+              </p>
+            </div>
+            <div class="method-image-grid" aria-label="Wind tunnel methodology image grid">
+              <div class="method-grid-tile">
+                <img src="assets/E178-ME103/WTMethod1.png" alt="Wind tunnel methodology image 1" />
+                <div class="method-image-caption">Wind tunnel model setup setup and run count</div>
+              </div>
+              <div class="method-grid-tile">
+                <img src="assets/E178-ME103/WTMethod2.png" alt="Wind tunnel methodology image 2" />
+                <div class="method-image-caption">Coefficent reduction methodlogy</div>
+              </div>
+              <div class="method-grid-tile">
+                <img src="assets/E178-ME103/WTMethod3.png" alt="Wind tunnel methodology image 3" />
+                <div class="method-image-caption">Uncertainty propagation methodology</div>
+              </div>
+              <div class="method-grid-tile">
+                <img src="assets/E178-ME103/WTMethod4.png" alt="Wind tunnel methodology image 4" />
+                <div class="method-image-caption">Stecked effect of uncertainty from various sources</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="method-row text-right">
+            <div class="method-media-tile">
+              <img src="assets/E178-ME103/VSPMethod.PNG" alt="OpenVSP methodology image" />
+              <div class="method-image-caption">OpenVSP analysis workflow</div>
+            </div>
+            <div class="method-text-box">
+              <div class="method-subheading">OpenVSP Methodology</div>
+              <p>
+                The OpenVSP setup was adapted from my project parters original personal project and as such feathered a two meter wing span which was much greater than
+                the wing span of the model used during wind tunnel testing. To accommodate this the spanwise Reynolds number was matched between the OpenVSP simulations and
+                wind tunnel conditions. With this setup the OpenVSP simulation was conducted matching the operating points of the wind tunnel test, meaning that three velocity
+                cases were considered with -20 to 20 degree angle of attack sweeps to be conducted for each one. This was done for all 5 wing twist cases outlined earlier.
+              </p>
+            </div>
+          </div>
+
+          <div class="method-row ansys-method-layout">
+            <div class="ansys-method-top-row">
+              <div class="method-text-box">
+                <div class="method-subheading">ANSYS Methodology</div>
+                <p>
+                  To make up for the lack of wind tunnel data a series of ANSYS Fluent simulations were conducted. These simulations cover all all 5 twist cases with Each case being simulated
+                  for all 3 velocity cases with each case being taken through the full -20 to 20 degree angle of attack sweep. Additionally a sixth case was simulated of the -6&deg wing twist wind tunnel model that
+                  included the sting attachment included. This was done for use in verifying the ANSYS Fluent setup and results against the wind tunnel data. These runs were conducted via a python script that utilized PyFluent
+                  to call batches of airfoil sweeps with each of these angle of attack cases being achieved through changing the velocity inlet vector of the simulation to simulate a change in angle of attack. This script utilized a Fluent case I created in ANSYS workbench as a baseline taking the
+                  mesh and setup to be edited for each case.
+                </p>
+                <p>
+                  For the fluid volume I elected to utilize a half cylinder with a half-dome inlet with a symmetry plane along the XZ plane. To ensure adequate distance from the sides of the fluid volume a radius 20 chord lengths
+                  or 2 meters was selected for the cylinder and half-dome with the ends of these being 2 meters away from the drone. With this fluid volume generated, a mesh was generated utilizing ANSYS Fluent meshing and a uniform boundary layer resulting in a y<sup>+</sup> of 25.
+                  This meshing was done for each twist case resulting in 6 unique meshes being generated. The boundary conditions were set up as two velocity inlets on the dome and sides of the cylinder and a pressure outlet at the bottom of the cylinder.
+                  For the viscosity solver the K-Omega SST formulation was used and and the 2nd order upwind formulation was utilized for the solver. From manual testing it was determined that the solutions of these simulations converges generally within 150 iterations with a period of converged noise at the end,
+                   as such each simulation was hardcoded to run for 150 iterations in pyFluent. This was done so that the last fifty converged iterations could be used to create a measure of uncertainty that could be used in later analysis.
+                </p>
+                <p>
+                  These simulations were set up to report values of lift, drag, and pitching moment with the pivot point being determined from the location of the center of gravity from the model's CAD file. The uncertainty of these values were taken to be the maximum and minimum value of
+                  the converged solution within the last 50 iterations divided by two. This way any solver artifacts, oscillations, or issues with convergence could be captured and factored into the statistical analysis done later. With these values extracted the data was post process with the three reported values being multiplied by two to overcome the use of the
+                  symmetry condition and then converted into their respective coefficients. The uncertainty was propagated through this process using the root sum method, with this process being fairly straightforward since all other values in this calculation were exact scalars.  
+                </p>
+              </div>
+
+              <div class="ansys-top-image-pair" aria-label="ANSYS methodology top image row">
+                <div class="method-media-tile">
+                  <img src="assets/E178-ME103/FlyingWingResiduals.png" alt="ANSYS methodology image 2" />
+                  <div class="method-image-caption">Example ANSYS residual convergence graph</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="ansys-method-bottom-row" aria-label="ANSYS methodology bottom image row">
+              <div class="method-media-tile">
+                <img src="assets/E178-ME103/ANSYSMethod.PNG" alt="ANSYS methodology image 3" />
+                <div class="method-image-caption">ANSYS  simulation workflow</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+
+
+
+        <section id="results" class="results-section" aria-label="Results">
+          <div class="simulation-results-block">
+            <div class="simulation-results-top-row">
+              <div class="results-text-box">
+                <h2 class="results-title">Results</h2>
+                <div class="results-subheading">ANSYS vs Wind Tunnel: Overview</div>
+                <p>
+                  To confirm the validity of the ANSYS Fluent methodology the results of the -6&deg wing twist case with the sting attachment was compared to the wind tunnel data for Both
+                  the overall coefficient curves and for the trim conditions. For both cases the effects of uncertainty were considered and the 95% confidence intervals displayed on the comparison graphs.
+                  The ANSYS uncertainty is so small however that the confidence interval is not really visible which explains why it looks as if that confidence interval was not considered.
+                </p>
+                <p>
+                  From the 3D comparison graphs it can be seen that for majority of the angle of attack range the results from the ANSYS simulation falls within the 95% CI of the wind tunnel data
+                  with the majority of the deviations occurring at high angles of attack near stall. This indicates that to a 95% confidence that the results of the ANSYS simulation and wind tunnel tests are the same.
+                </p>
+              </div>
+              <div class="results-media-tile">
+                <img src="assets/E178-ME103/AnsysVsWTGraphs.PNG" alt="Simulation versus wind tunnel results image" />
+                <div class="results-image-caption">ANSYS vs Wind Tunnel coefficent curve comparisons</div>
+              </div>
+            </div>
+
+            <div class="simulation-results-analysis-row">
+              <div class="results-text-box">
+                <div class="results-subheading">ANSYS vs Wind Tunnnel: Statistical Analysis</div>
+                <p>
+                  This is further supported from the tolerance analysis that my partner performed for this comparison. He found that for angles of attack from -7.5 to 12.5 degrees which is defined as the
+                  "linear region" the two values are within 10% of each other indicating that ANSYS gives an accurate prediction of aerodynamic coefficients across this range. This is important because the values that are being analyzed for
+                  trim and stability all fall within this region. This indicates that these values from the ANSYS simulation should be accurate to the results of the wind tunnel tests.
+                </p>
+                <p>
+                  To further verify this I performed additional confidence interval significance testing where I utilized Monte Carlo uncertainty propagation to determine the value and 95% CI of the
+                  three stability parameters across all three Reynolds number conditions. As can be seen for all values except the lift to drag ratio at 35 m/s the value predicted by ANSYS fell within the
+                  value determined from wind tunnel testing. Additionally, for the lift to drag at 35 m/s case it can be visually seen that the value just barely falls outside of 95% CI of the wind tunnel tests.
+                  As such it was determined that for the linear region we are interested in and for the stability conditions the ANSYS Fluent simulations served as an adequate surrogate for wind tunnel testing and could be used as a basis of
+                  comparison for the OpenVSP data.
+                </p>
+              </div>
+            </div>
+
+            <div class="simulation-results-bottom-row" aria-label="Simulation versus wind tunnel bottom image row">
+              <div class="results-media-tile">
+                <img src="assets/E178-ME103/AnsysVsWTToleranceAnalysis.PNG" alt="Simulation versus wind tunnel results image 2" />
+                <div class="results-image-caption">ANSYS vs Wind Tunnel tolerance analysis</div>
+              </div>
+              <div class="results-media-tile">
+                <img src="assets/E178-ME103/ANSYSvsWTTrimCond2.PNG" alt="Simulation versus wind tunnel results image 3" />
+                <div class="results-image-caption">ANSYS vs Wind Tunnel stability parameter analysis</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="ansys-vsp-split-block" aria-label="ANSYS vs OpenVSP results">
+            <div class="ansys-vsp-split-row ansys-vsp-overview-row">
+              <div class="ansys-vsp-vertical-media-stack" aria-label="ANSYS vs OpenVSP overview images">
+                <div class="results-media-tile">
+                  <img src="assets/E178-ME103/ANSYSvsVSPGraphs.png" alt="ANSYS vs OpenVSP results image 1" />
+                  <div class="results-image-caption">Example ANSYS vs OpenVSP coefficent curve comparisons</div>
+                </div>
+                <div class="results-media-tile">
+                  <img src="assets/E178-ME103/AnsysVSPContour.PNG" alt="ANSYS vs OpenVSP results image 2" />
+                  <div class="results-image-caption">Example ANSYS vs OpenVSP surface pressure contours</div>
+                </div>
+              </div>
+
+              <div class="results-text-box">
+                <div class="results-subheading">ANSYS vs OpenVSP: Overview</div>
+                <p>
+                  In comparing the results from ANSYS and OpenVSP simulation results it can be seen where the lower fidelity OpenVSP method shines vs where it falters. From the comparison graphs
+                  it can be seen that the OpenVPS solution performs best in the defined "linear region" after which it diverges significant;y from the ANSYS solution. This makes sense in the context of the solution
+                  methodologies both simulation tools use. ANSYS is an FEA based method that considers viscosity in the flow while OpenVSP utilizes an inviscid potential flow based solver. This means that OpenVSP cannot consider parasitic drag
+                  and cannot predict flow separation and stall which are the values and locations where the two solutions are the most different.
+                </p>
+              </div>
+            </div>
+
+            <div class="ansys-vsp-split-row ansys-vsp-analysis-row">
+              <div class="results-text-box">
+                <div class="results-subheading">ANSYS vs OpenVSP: Statistical Analysis</div>
+                <p>
+                  Once again my partner performed a tolerance analysis examining the same "linear region" as before with the same examination of 10% tolerance. This analysis revealed that the two solutions were within 10% of
+                  each other across the "linear region" with the exception of a small corner of the bounding box for the lift coefficient along the high angle of attack end of the region. In addition to this tolerance analysis
+                  I also performed the same Monte Carlo uncertainty propagation technique to analyze the similarity of the stability parameters between the two solutions for all cases. This analysis showed that the differences were statistically significant
+                  for all cases, however, it is hard to say if this significance has much physical meaning given how small the confidence interval bands are for the ANSYS solution. As such I conducted an additional analysis examining the practical significance of these
+                  differences by looking at the marginal percent differences between each value for all cases. This analysis showed a wide range of differences ranging from 40% to 200% difference between the solutions. This can attributed to two factors, the fact that the values that
+                  the simulation outputs being very small and as such inflating the percentages and to the most likely real level of difference seen between the two solutions. The big takeaway however is that even on the extreme end of a 200% difference this difference is still within the range
+                  that small design modifications, such as adding ballasts, could account for slop in the results of the analysis. As such it was determined that while OpenVSP is not a powerful enough tool to be used for in depth or final analysis, it does
+                  demonstrate adequate functionality as a design aid for rap[id iteration. It achieves enough fidelity to which designers of flying wing aircraft could use it as an analysis tool for rapid iteration as long as they are cognizant of its inherent pitfalls.
+                </p>
+              </div>
+
+              <div class="ansys-vsp-vertical-media-stack" aria-label="ANSYS vs OpenVSP statistical analysis images">
+                <div class="results-media-tile">
+                  <img src="assets/E178-ME103/ANSYSvsVSPTolarence.png" alt="ANSYS vs OpenVSP results image 3" />
+                  <div class="results-image-caption">ANSYS vs OpenVSP tolerance analysis</div>
+                </div>
+                <div class="results-media-tile">
+                  <img src="assets/E178-ME103/ANSYSvsVSPTrim.png" alt="ANSYS vs OpenVSP results image 4" />
+                  <div class="results-image-caption">ANSYS vs OpenVSP stability parameter analysis</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="design-variable-results-block" aria-label="Effect of Design Variables results">
+            <div class="design-variable-results-top-row">
+              <div class="results-media-tile">
+                <img src="assets/E178-ME103/TwistGraphs.PNG" alt="Effect of design variables results image 1" />
+                <div class="results-image-caption">Effect of design variables</div>
+              </div>
+
+              <div class="results-text-box">
+                <div class="results-subheading">Effect of Design Variables: Overview</div>
+                <p>
+                  The results of the ANSYS simulations were also utilized to examine how the wing twist and Reynolds number affected the three stability parameters being examined.
+                  From the graphs on the left upon first glance it seems that twist seems to have a significant effect on the angle of attack at the trim point and L/D at the trim point with
+                  more negative twist values resulting in smaller values of both parameters. In addition for these two values it appears that Reynolds number had a marginal to negligible effect for all of the twist cases. The slope at the
+                  trim point tells a different story with both the effects of twist and Reynolds number seeming to both not having much effect on the value with the maximum difference observed between any two points only being 0.001 1/deg.
+                  This makes sense considering that we would expect wing twist to only shift the location of the Cm vs alpha graph not change its slope and we would expect the Reynols  number to have
+                  marginal effect due to it only being varied over a fairly small range. To confirm these results additional statistical tests were performed on the results including a Two Way Permutation Based ANOVA and a Monte Carlo CI test for significance.
+                </p>
+              </div>
+            </div>
+
+            <div class="design-variable-results-analysis-row">
+              <div class="results-text-box">
+                <div class="results-subheading">Effect of Design Variables: Statistical Analysis</div>
+                <p>
+                  The first analysis that I performed was a Two-Way Permutation Based Anova. This test is similar to a regular ANOVA however since the ANSYS data cannot be assumed to be Gaussian a custom null
+                  distribution through the random shuffling of labels instead of using the regular F-distribution. The results of this ANOVA indicated that for all cases both the effects of twist and Reynolds number were
+                  significant. The result must be taken with a grain of salt however for the same reason as mentioned earlier. The ANOVA relies on the calculated CI of the ANSYS data which we know is very small meaning that even marginal differences between values could be seen as statistically significant.
+                  Therefore despite the ANOVA indicating the significance of the results this does not inherently mean that for every case and every independent variable the effect is practically significant.
+                </p>
+                <p>
+                  Due to the issues with the ANOVA an additional test was performed utilizing a similar CI test with Monte Carlo uncertainty propagation as used in the previous section. The purpose of this test was to determine which of the two factors, twist or Reynolds number was more significant
+                  by comparing the effects both to each other and to variation induced by uncertainty. As can be seen from the results for the location of the trim point and L/D at the trim point the wing twist was determined to be the dominant factor.
+                  Additionally for the slope at the trim point both Reynolds number and twist were determined to be equally dominant. This supports the conclusions from analysing the graphs with Reynolds number being an overall insignificant effect for all cases and twist only having
+                  significant effects on the location of the trim point and L/D at the trim point. This makes sense as stated previously with the twist being expected to have little to no effect on the slope and the Reynolds number not being varied by enough magnitude to have any practical effects on any of the parameters.
+                </p>
+              </div>
+            </div>
+
+            <div class="design-variable-results-bottom-row">
+              <div class="results-media-tile">
+                <img src="assets/E178-ME103/TwistStatSigTable1.png" alt="Effect of design variables results image 2" />
+                <div class="results-image-caption">Permultation based ANOVA results</div>
+              </div>
+              <div class="results-media-tile">
+                <img src="assets/E178-ME103/TwistStatSigTable2.png" alt="Effect of design variables results image 3" />
+                <div class="results-image-caption">Monte Carlo CI test results</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+
+
+        <section id="surrogate-data-generation" class="image-text-image-section surrogate-two-row-section" aria-label="Surrogate Model Data Generation">
+          <div class="surrogate-two-row">
+            <div class="section-text-box">
+              <h2 class="surrogate-data-title">Surrogate Model Data Generation</h2>
+              <div class="section-subheading">Motivation for Surrogate Modeling</div>
+              <p>
+                Given the validity of OpenVSP as an analysis tool for applications where perfect accuracy is not needed the next question became what additional layer of computational speed improvement could be extracted from this solution method.
+                This interest matched well with the topic on our E178 class's final project statement which tasked students with creating an ML model for use in prediction. As such for this project we sought to create a surrogate model for the flying wing
+                using that model to then develop a model predictive control (MPC) architecture that could control a powered glider version of the flying wing's heading in 3D space.
+              </p>
+
+            </div>
+
+            <div class="section-media-tile">
+              <img src="assets/E178-ME103/3DSparseData.png" alt="Surrogate model data generation image 1" />
+              <div class="section-image-caption">Sparse data set 3D visualization</div>
+            </div>
+          </div>
+
+          <div class="surrogate-two-row surrogate-two-row-reverse">
+            <div class="section-media-tile">
+              <img src="assets/E178-ME103/empty_vector_space_visualization.png" alt="Surrogate model sparse data format image" />
+              <div class="section-image-caption">Sparse data principle axis visualizer in 2D space</div>
+            </div>
+
+            <div class="section-text-box">
+              <div class="section-subheading">Sparse Data Format</div>
+              <p>
+                As such the OpenVSP model from the ME103 was modified to take two additional inputs corresponding to the symmetrical and differential actuation of the flying wing's elevons. This
+                reconfigured model was then used to generate thousands of data points across multiple pitch, yaw, symmetrical, and differential angles with each simulation exporting both the 3 force coefficients and 3 moment coefficients acting on
+                the aircraft in 3D space.This was done over a sparse selection of possible points in 3D space with the idea being that we could train our surrogate model to be able to predict these 6 coefficients in the orientations that were not
+                simulated using OpenVSP.
+              </p>
+              <p>
+                The data was generated in OpenVSP along the 4D parameter space's "principle axes". This was achieved by varying the pitch and yaw along 15 to -15 and -10 to 10 degree angle sweep respectively with 1 degree spacing. As such all permutations of this
+                positional data was captured in the training data. However this was not the case for the elevon displacement angles. These angles were only swept independently from -20 to 20 degree sweeps meaning that for each of the trajectory angles only one of the two elevon angles were nonzero at a time.
+                This means that only the two principle axes of the elevon positions were simulated with combinations of the elevon positions not being present as can be visualized in the graph to the left. This was done due to it being nearly impossible to simulate all of these angles with there needing to be 21<sup>11</sup> points to do so.
+                As such there is where the usefulness of the surrogate model comes in as it would be able to predict the values of the coefficients in this unstimulated space without the need of expensive computation.
+              </p>
+              <p>
+                That is not to say no data was generated in this combined parameter space. For model validation purposes an additional 2000 data points were generated with off principle axis elevon positions to be added to the validation set utilized to ensure the proper
+                training on our surrogate model.
+              </p>
+            </div>
+          </div>
+        </section>
+
+
+        <section id="surrogate-model-creation" class="image-text-image-section surrogate-model-creation-section" aria-label="Surrogate Model Creation">
+          <div class="surrogate-model-row surrogate-model-training-row">
+            <div class="section-text-box">
+              <h2 class="surrogate-model-title">Surrogate Model Creation</h2>
+              <div class="section-subheading">Model Training</div>
+              <p>
+                Since the main goal of this project was to explore the different processes and techniques of regression many different models were developed to attempt to create a surrogate model. The majority
+                of this work was not done by me and was done by one of my project partners. As such I will only discuss the final model utilized for the controller, the Multi_Layer Percentron (MLP) model.
+              </p>
+              <p>
+                This model is a type of machine learning that utilizes a series of weighted nodes to predict outputs from the given inputs. These nodes are tuned by training the model in which known input-output
+                pairs are used in conjunction with a given loss function to back propagate and change the weights of the nodes. In this way a very accurate model can be created without any need to manually tune the model.
+                In the case of this model a weighted mean absolute error (MAE) loss function. This modified MAE gives extra weight to the values of C<sub>M</sub>, C<sub>L</sub>, and C<sub>l</sub> as they mattered more for the controller. With this loss function
+                decided the model was trained using 70% of the generated data for training and 10% for validation over 500 epochs resulting in a maximum MAE across all 6 coefficients of 0.4.
+              </p>
+            </div>
+
+            <div class="section-media-tile">
+              <video autoplay muted loop playsinline preload="auto" aria-label="Surrogate model training animation">
+                  <source src="assets/E178-ME103/wmlp_convergence.mp4" type="video/mp4" />
+                </video>
+              <div class="section-image-caption">MLP model convergence in terms of MAE and epochs</div>
+            </div>
+          </div>
+
+          <div class="surrogate-model-row surrogate-model-evaluation-row">
+            <div class="section-media-tile">
+              <img src="assets/E178-ME103/mlp_plot.png" alt="Surrogate model evaluation image" />
+              <div class="section-image-caption">Model evaluation results</div>
+            </div>
+
+            <div class="section-text-box">
+              <div class="section-subheading">Model Evaluation</div>
+              <p>
+                Once the model was trained it was then tested utilizing 20% of the original on principle axis data along with the extra 2000 off principle axis data points. As can be seen from the graph on the left the MLP model
+                performed exceptionally well with each model achieving an R<sup>2</sup> value of 1 and a maximum normalized root mean square (NRMSE) value of 0.1% across all coefficients. This indicates that for both on axis and off axis positions
+                the MLP model was able to accurately capture the trends of the data and use those trends to predict all 6 coefficients well. This model was easily the best of any that were trained and as such was selected to be used in
+                the MPC controller.           
+              </p>
+            </div>
+          </div>
+        </section>
+
+
+        <section id="model-predictive-controller" class="image-text-image-section mpc-section" aria-label="Model Predictive Controller">
+          <div class="mpc-controller-creation-row">
+            <div class="section-text-box">
+              <h2 class="mpc-title">Model Predictive Controller</h2>
+              <div class="section-subheading">Controller Creation</div>
+              <p>
+                As has been discussed previously the MLp model that was developed learned the underlying trends in coefficients change with respect to these different angles from the OpenVSP data
+                and as such is able to predict these coefficients for any combination of angles in 3D space. As a result of this the MLP model also learned how the yaw, pitch, and roll moment coefficients
+                were coupled with the different control surface deflections, which is important considering that the flying wing can only control yaw by also changing its pitch and roll. In practical terms,
+                this means the controller does not need to call any sort of CFD solver during each simulation step. Instead, the trained MLP provides quick coefficient estimates that can be converted into forces and
+                moments. As such this model is perfectly used to be used as the aerodynamic force prediction solver in an MPC control architecture.
+              </p>
+                <div class="controller-model-flow-box">
+                  Input: [α, β, δS, δD] → MLP → Output: [CL, CD, CY, Cl, Cn, Cm]
+                </div>
+              <p>
+                On a basic level, Model Predictive Control works by repeatedly simulating possible future control actions over a short prediction 
+                horizon. At each update, the controller tests candidate control surface commands, predicts the resulting future aircraft states, 
+                scores each rollout, and applies the first command from the best sequence. Once this is done, the controller then completes this 
+                process for the next time step, and the next, and so on, this achieves control based on the predicted outcome of its underlying model.
+              </p>
+              <p>
+              The MLP model is incorporated into this framework as the predictive aerodynamic model inside these rollouts. For every predicted future 
+              state, the controller computes the local aerodynamic inputs, queries the MLP for coefficient predictions, converts those coefficients 
+              into aerodynamic forces and moments utilizing the local pressure and velocity conditions, and advances the dynamics. This is how the 
+              controller is predictive, it can evaluate how a given control choice is expected to generate forces and as such how it is expected to 
+              change future heading, pitch, and roll, position as well as their rates.
+              </p>
+                <div class="controller-model-flow-box">
+                  Candidate Controls → Predicted α, β, δS, δD → MLP Coefficients → Forces/Moments → Next State → Rollout Cost
+                </div>
+                <p>
+                  The MPC framework in its current form is not very advanced and serves as a demonstrative example of what this sort of surrogate
+                  modeling can be used for. The controller in this case is configured only to control heading to a fixed goal and does not care about
+                  its x, y, or z position. In addition, the controller is unable to change thrust values with thrust being set as a fixed number.
+                  Finally, the MPC control horizon is fairly short with only a fixed small number of candidate control sequences being considered at
+                  every step, this was done to lessen the needed compute power at the cost of severely limiting the controller's abilities. As has been mentioned previously, the main goal of this project was to explore regression and
+                  machine learning as such this controller was meant to be a “cherry on top”, showing at least one way this type of ML model could be used and as such was not as advanced as it could have been.
+                </p>
+            </div>
+          </div>
+
+          <div class="mpc-performance-row">
+            <div class="section-text-box">
+              <div class="section-subheading">Controller Performance</div>
+              <p>
+                With the controller made it was then validated over a set of three conditions. The controller was tested under steady state conditions, a 0.1 Hz sinusoidal pitch command, and
+                a 90 degree turn command. As can be seen from the animation on the right the controller was able to achieve the requested commands with only some measurable drift and overshoot. These
+                flaws are most likely present due to the relatively short horizon and large time jump that the MPC controller is working under which was implemented due to the hardware limitations of my laptop.
+                Therefore given the limitations of the hardware available and the nature of what was required by the project this controller worked sufficiently for the purposes it was designed for.
+              </p>
+            </div>
+
+            <div class="section-media-tile mpc-no-caption mpc-top-gif-tile">
+              <video autoplay muted loop playsinline preload="auto" aria-label="Model predictive controller overview animation">
+                  <source src="assets/E178-ME103/mpc_v3_csv_synced_flight_tracking.mp4" type="video/mp4" />
+                </video>
+            </div>
+          </div>
+
+          <div class="mpc-comparison-block" aria-label="MPC vs PID comparison">
+            <div class="mpc-comparison-intro-row">
+              <div class="section-text-box">
+                <div class="section-subheading">MPC vs PID Comparison</div>
+                <p>
+                  In addition to evaluating the MPC on its own via the diagnostic command sequence I also compared the performance of the MPC controller to a baseline
+                  PID controller across the three same command sets. The PID controller was made by one of my project partners as a part of the personal project that this class
+                  project evolved from. As such the controller was already tuned for this aircraft configuration and was perfectly suited for this comparison. For each comparison both the
+                  MPC and PID were set to have the same constant thrust and given the same commands to ensure that a standard basis of comparison was established. Below are the trajectory plots and animations
+                  corresponding to each of the three test commands.
+                </p>
+              </div>
+            </div>
+
+            <div class="mpc-comparison-pair-grid" aria-label="MPC versus PID comparison media grid">
+              <div class="mpc-comparison-pair-row">
+                <div class="section-media-tile mpc-no-caption">
+                  <video autoplay muted loop playsinline preload="auto" aria-label="Steady state performance comparison animation">
+                  <source src="assets/E178-ME103/mpc_v2_vs_base_pid.mp4" type="video/mp4" />
+                </video>
+                </div>
+                <div class="section-media-tile mpc-no-caption">
+                  <img src="assets/E178-ME103/attitude_error_comparison.png" alt="Steady state performance comparison image" />
+                </div>
+                <div class="mpc-row-caption"> Steady state trajectory response</div>
+              </div>
+
+              <div class="mpc-comparison-pair-row">
+                <div class="section-media-tile mpc-no-caption">
+                  <video autoplay muted loop playsinline preload="auto" aria-label="Sinusoidal performance comparison animation">
+                  <source src="assets/E178-ME103/v4_3d_comparison.mp4" type="video/mp4" />
+                </video>
+                </div>
+                <div class="section-media-tile mpc-no-caption">
+                  <img src="assets/E178-ME103/v4_attitude_tracking_horizontal_comparison.png" alt="Sinusoidal performance comparison image" />
+                </div>
+                <div class="mpc-row-caption">Pitch sinusoidal command response</div>
+              </div>
+
+              <div class="mpc-comparison-pair-row">
+                <div class="section-media-tile mpc-no-caption">
+                  <video autoplay muted loop playsinline preload="auto" aria-label="Turning performance comparison animation">
+                  <source src="assets/E178-ME103/v5_3d_comparison.mp4" type="video/mp4" />
+                </video>
+                </div>
+                <div class="section-media-tile mpc-no-caption">
+                  <img src="assets/E178-ME103/v5_attitude_tracking_horizontal_comparison.png" alt="Turning performance comparison image" />
+                </div>
+                <div class="mpc-row-caption">90 degree turning response </div>
+              </div>
+            </div>
+
+            <div class="mpc-comparison-text-row">
+              <div class="section-text-box">
+                <div class="section-subheading">Steady State Performance Comparison</div>
+                <p>
+                  In this case both the MPC and PID controllers reach steady state within a similar time frame with the MPC controller hitting steady state slightly faster.
+                  While they do reach the steady state faster it can be seen that the MPC controller loses less altitude when doing so compared to the PID controller. This most likely due 
+                  to the MPC controller's better understanding of the coupling between roll, pitch, and yaw allowing it to overcome its poor yaw authority with a roll and pitch style
+                  maneuver which the PID does not understand as well.
+                </p>
+                <p>
+                  Additionally as shown in the tracking plots, the MPC stays close to the commanded trajectory once the maneuver settles, with the trajectory error generally
+                  remaining within around 0.2 degrees. However, the response still contains a small amount of jittery oscillation around the command. The PID controller
+                  in steady state does not have this issue and is smooth once it reaches the commanded trajectory. This is likely
+                  caused by a combination of the MPC controller's short prediction horizon, finite candidate sampling, and the strongly coupled yaw-roll dynamics of the
+                  flying wing. The PID does not have these issues with its natural damping, instead maintaining smooth control at the steady state point.
+                </p>
+              </div>
+
+              <div class="section-text-box">
+                <div class="section-subheading">Sinusoidal Performance Comparison</div>
+                <p>
+                  From the plots it can be seen that in the pitch direction both controllers are able to control to the frequency of the sine wave however the MPC controller is
+                  much better at achieving the amplitude of the sign wave while the PID is unable to achieve that amplitude. THis would indicate that the MPC controller performs better under sinusoidal commands compared to the PID controller. This does come with some drawbacks. For
+                  one the sinusoidal tracking of the PID while having less amplitude is much smoother compared to the more erratic behavior that the MPC controller exhibits. In addition,
+                  during this maneuver the PID is much better at keeping the rest of the command directions at a smaller oscillation compared to the MPC controller. This is probably due
+                  to the heightened coupling between the three control directions that the MPC uses causing it to take more aggressive coupled moves to reach the desired control goals.
+                </p>
+              </div>
+
+              <div class="section-text-box">
+                <div class="section-subheading">Turning Performance Comparison</div>
+                <p>
+                  In this case it can be seen that the MPC greatly outperforms the PID controller when making yaw maneuvers. This can be visually seen in the animation where the MPC controller is able to fully complete the 90 degree turn before the gif loop resets while the PID controller is still finishing its maneuver.
+                  The MPC controller was able to take a significantly sharper corner than the PID controller most likely due to its better understanding
+                  of the coupled control directions giving it the ability to take aggressive roll and pitch maneuvers to turn. This does have the drawback however of the MPc controller having a
+                  larger tendency to make more aggressive potentially damaging moves that put stress on the control surfaces when compared to the PID controller. This can most likely be fixed by adjusting the cost function the MPC uses when
+                  determining the optimal control strategy.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="gallery" class="final-gallery-section" aria-label="Gallery">
+          <h2>Gallery</h2>
+
+          <div class="final-gallery-grid">
+            <div class="final-gallery-tile">
+              <img src="assets/E178-ME103/PosAngleWT.jpg" alt="E178 ME103 gallery image 1" />
+            </div>
+            <div class="final-gallery-tile">
+              <img src="assets/E178-ME103/FlyingWingMesh.png" alt="E178 ME103 gallery image 2" />
+            </div>
+            <div class="final-gallery-tile">
+              <img src="assets/E178-ME103/ANSYSContourIso.png" alt="E178 ME103 gallery image 3" />
+            </div>
+          </div>
+        </section>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>© 2026 Jaden Dew.</p>
+  </footer>
+</body>
+</html>

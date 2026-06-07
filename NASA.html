@@ -1,0 +1,1563 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NASA Airfoil Optimization | Jaden Dew</title>
+
+  <style>
+    :root {
+      --bg: #050505;
+      --panel: rgba(10, 10, 10, 0.76);
+      --panel-solid: rgba(18, 18, 18, 0.94);
+      --border: rgba(255, 255, 255, 0.16);
+      --text: #d4d4d4;
+      --muted: #9cdcfe;
+      --subtle: #b8b8b8;
+      --accent: #007acc;
+      --accent-hover: #179fff;
+      --shadow: rgba(0, 0, 0, 0.48);
+      --topbar-h: 56px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html {
+      scroll-behavior: smooth;
+      background: #000;
+    }
+
+    body {
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: transparent;
+      color: var(--text);
+      line-height: 1.6;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    .hero-background {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      overflow: hidden;
+      background: #000;
+      pointer-events: none;
+    }
+
+    .hero-background video {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center center;
+      display: block;
+      opacity: 1;
+      filter: saturate(0.98) contrast(1.04);
+      transition: opacity 180ms ease;
+    }
+
+    .hero-background::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      background: none;
+      pointer-events: none;
+    }
+
+    .topbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      min-height: var(--topbar-h);
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      gap: 1rem;
+      padding: 0.45rem 6vw;
+      background: rgba(5, 5, 5, 0.95);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.34);
+    }
+
+    .brand {
+      justify-self: start;
+      display: inline-flex;
+      align-items: center;
+      color: white;
+      font-size: 0.88rem;
+      font-weight: 650;
+      letter-spacing: 0.01em;
+      opacity: 0.92;
+    }
+
+    nav {
+      justify-self: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.1rem;
+    }
+
+    .nav-link {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.46rem 0.82rem;
+      border-radius: 8px;
+      color: white;
+      font-size: 0.84rem;
+      opacity: 0.9;
+      transition: background 180ms ease, opacity 180ms ease;
+    }
+
+    .nav-link:hover,
+    .nav-link:focus-visible {
+      background: rgba(255, 255, 255, 0.09);
+      opacity: 1;
+      outline: none;
+    }
+
+    .nav-item {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .nav-dropdown {
+      position: absolute;
+      top: calc(100% + 0.45rem);
+      left: 50%;
+      transform: translateX(-50%) translateY(-6px);
+      min-width: 235px;
+      padding: 0.45rem;
+      display: grid;
+      gap: 0.12rem;
+      background: rgba(5, 5, 5, 0.96);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 12px;
+      box-shadow: 0 18px 60px rgba(0, 0, 0, 0.55);
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transition: opacity 180ms ease, transform 180ms ease, visibility 180ms ease;
+    }
+
+    .nav-item:hover .nav-dropdown,
+    .nav-item:focus-within .nav-dropdown {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .dropdown-link {
+      display: block;
+      padding: 0.52rem 0.68rem;
+      border-radius: 8px;
+      color: rgba(255, 255, 255, 0.88);
+      font-size: 0.80rem;
+      line-height: 1.2;
+      white-space: nowrap;
+      transition: background 180ms ease, color 180ms ease;
+    }
+
+    .dropdown-link:hover,
+    .dropdown-link:focus-visible {
+      background: rgba(255, 255, 255, 0.09);
+      color: white;
+      outline: none;
+    }
+
+    main {
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: end;
+      padding: calc(var(--topbar-h) + 2rem) 6vw 3.5rem;
+      background: transparent;
+    }
+
+    .hero-card {
+      width: min(920px, 88vw);
+      padding: 1.0rem 1.15rem;
+      color: rgba(255, 255, 255, 0.94);
+      background: rgba(5, 5, 5, 0.50);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 16px;
+      backdrop-filter: blur(14px);
+      box-shadow: 0 18px 60px rgba(0, 0, 0, 0.46);
+    }
+
+    .hero-kicker,
+    .section-kicker {
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      font-size: 0.70rem;
+      font-weight: 760;
+      margin-bottom: 0.26rem;
+    }
+
+    .hero-card h1 {
+      color: white;
+      font-size: clamp(1.65rem, 3.2vw, 3.0rem);
+      font-weight: 760;
+      letter-spacing: -0.055em;
+      line-height: 1.0;
+      margin-bottom: 0.38rem;
+    }
+
+    .hero-subtitle {
+      color: rgba(255, 255, 255, 0.82);
+      font-size: clamp(0.86rem, 1.05vw, 1.08rem);
+      font-weight: 560;
+      letter-spacing: 0.01em;
+      line-height: 1.32;
+    }
+
+    .section {
+      min-height: 100vh;
+      padding: calc(var(--topbar-h) + 0.75rem) 2rem 0.9rem;
+      display: grid;
+      align-items: stretch;
+      background: rgba(0, 0, 0, 0.72);
+      backdrop-filter: blur(10px);
+    }
+
+    .section-inner {
+      width: min(1820px, 100%);
+      margin: 0 auto;
+    }
+
+    .project-panel {
+      min-height: calc(100vh - var(--topbar-h) - 1.65rem);
+      padding: clamp(1.2rem, 2.4vw, 2rem);
+      background: rgba(18, 18, 18, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 26px;
+      box-shadow: 0 28px 95px rgba(0, 0, 0, 0.5);
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1.1rem;
+      align-items: stretch;
+    }
+
+    .project-text-box {
+      min-height: 0;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 0.62rem;
+      padding: 1.0rem 1.15rem;
+      background: rgba(18, 18, 18, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 20px;
+      box-shadow: 0 22px 70px rgba(0, 0, 0, 0.42);
+    }
+
+    .project-text-box h2 {
+      color: white;
+      font-size: clamp(1.55rem, 2.4vw, 2.65rem);
+      line-height: 1.0;
+      letter-spacing: -0.055em;
+      margin-bottom: 0.75rem;
+      text-align: left;
+    }
+
+    .project-text-box p {
+      color: rgba(255, 255, 255, 0.74);
+      font-size: clamp(0.84rem, 0.95vw, 1.02rem);
+      line-height: 1.38;
+      margin: 0;
+      text-align: left;
+    }
+
+    .project-text-box p + p {
+      margin-top: 0.62rem;
+      padding-top: 0;
+      border-top: none;
+    }
+
+
+
+    /* Prevent grey divider lines between paragraphs in text boxes on this page and future sections. */
+    .project-text-box p + p,
+    .section p + p {
+      border-top: none !important;
+      padding-top: 0 !important;
+    }
+
+    .vehicle-overview-image {
+      margin-top: 0;
+      overflow: hidden;
+      border-radius: 22px;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      background: rgba(5, 5, 5, 0.50);
+      min-height: 0;
+      height: 100%;
+      box-shadow: 0 24px 90px var(--shadow);
+    }
+
+    .vehicle-overview-image img {
+      width: 100%;
+      height: 100%;
+      min-height: 0;
+      object-fit: cover;
+      object-position: center center;
+      display: block;
+      background: rgba(30, 30, 30, 0.82);
+    }
+
+
+
+    /* Preliminary Design Considerations section */
+    .preliminary-section {
+      margin-top: 1.1rem;
+      padding: clamp(1.2rem, 2.4vw, 2rem);
+      background: rgba(18, 18, 18, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 26px;
+      box-shadow: 0 28px 95px rgba(0, 0, 0, 0.5);
+    }
+
+    .preliminary-row {
+      display: grid;
+      grid-template-columns: minmax(340px, 0.85fr) minmax(0, 1.15fr);
+      gap: 1.1rem;
+      align-items: stretch;
+    }
+
+    .preliminary-text-box {
+      min-height: 0;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 1.0rem 1.15rem;
+      background: rgba(18, 18, 18, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 20px;
+      box-shadow: 0 22px 70px rgba(0, 0, 0, 0.42);
+    }
+
+    .preliminary-text-box h2 {
+      color: white;
+      font-size: clamp(1.55rem, 2.4vw, 2.65rem);
+      line-height: 1.0;
+      letter-spacing: -0.055em;
+      margin-bottom: 0.75rem;
+      text-align: left;
+    }
+
+    .preliminary-text-box p {
+      color: rgba(255, 255, 255, 0.74);
+      font-size: clamp(0.84rem, 0.95vw, 1.02rem);
+      line-height: 1.38;
+      margin: 0;
+      text-align: left;
+    }
+
+    .preliminary-text-box p + p {
+      margin-top: 0.62rem;
+      padding-top: 0 !important;
+      border-top: none !important;
+    }
+
+    .preliminary-media-tile {
+      overflow: hidden;
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(5, 5, 5, 0.50);
+      min-height: 360px;
+      box-shadow: 0 24px 90px var(--shadow);
+    }
+
+    .preliminary-media-tile img {
+      width: 100%;
+      height: 100%;
+      min-height: 360px;
+      object-fit: cover;
+      object-position: center center;
+      display: block;
+      background: rgba(30, 30, 30, 0.82);
+    }
+
+
+
+
+    /* Poppet Design section */
+    .poppet-design-section {
+      margin-top: 1.1rem;
+      padding: clamp(1.2rem, 2.4vw, 2rem);
+      background: rgba(18, 18, 18, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 26px;
+      box-shadow: 0 28px 95px rgba(0, 0, 0, 0.5);
+    }
+
+    .poppet-design-row {
+      display: grid;
+      grid-template-columns: minmax(0, 0.75fr) minmax(520px, 1.25fr);
+      gap: 1.1rem;
+      align-items: stretch;
+    }
+
+    .poppet-design-text-box {
+      min-height: 0;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 1.0rem 1.15rem;
+      background: rgba(18, 18, 18, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 20px;
+      box-shadow: 0 22px 70px rgba(0, 0, 0, 0.42);
+    }
+
+    .poppet-design-text-box h2 {
+      color: white;
+      font-size: clamp(1.55rem, 2.4vw, 2.65rem);
+      line-height: 1.0;
+      letter-spacing: -0.055em;
+      margin-bottom: 0.75rem;
+      text-align: left;
+    }
+
+    .poppet-design-text-box p {
+      color: rgba(255, 255, 255, 0.74);
+      font-size: clamp(0.84rem, 0.95vw, 1.02rem);
+      line-height: 1.38;
+      margin: 0;
+      text-align: left;
+    }
+
+    .poppet-design-text-box p + p {
+      margin-top: 0.62rem;
+      padding-top: 0 !important;
+      border-top: none !important;
+    }
+
+    .poppet-design-media-tile {
+      overflow: hidden;
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(5, 5, 5, 0.50);
+      min-height: 360px;
+      box-shadow: 0 24px 90px var(--shadow);
+    }
+
+    .poppet-design-media-tile img {
+      width: 100%;
+      height: 100%;
+      min-height: 360px;
+      object-fit: cover;
+      object-position: center center;
+      display: block;
+      background: rgba(30, 30, 30, 0.82);
+    }
+
+
+
+
+    /* Poppet Analysis section */
+    .poppet-analysis-section {
+      margin-top: 1.1rem;
+      padding: clamp(0.9rem, 1.6vw, 1.35rem);
+      background: rgba(18, 18, 18, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 26px;
+      box-shadow: 0 28px 95px rgba(0, 0, 0, 0.5);
+    }
+
+    .poppet-analysis-row {
+      display: grid;
+      grid-template-columns: 1fr;
+      grid-template-rows: auto auto;
+      gap: 1.1rem;
+      align-items: stretch;
+    }
+
+    .poppet-analysis-text-box {
+      min-height: 0;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 1.0rem 1.15rem;
+      background: rgba(18, 18, 18, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 20px;
+      box-shadow: 0 22px 70px rgba(0, 0, 0, 0.42);
+    }
+
+    .poppet-analysis-text-box h2 {
+      color: white;
+      font-size: clamp(1.55rem, 2.4vw, 2.65rem);
+      line-height: 1.0;
+      letter-spacing: -0.055em;
+      margin-bottom: 0.75rem;
+      text-align: left;
+    }
+
+    .poppet-analysis-text-box p {
+      color: rgba(255, 255, 255, 0.74);
+      font-size: clamp(0.84rem, 0.95vw, 1.02rem);
+      line-height: 1.38;
+      margin: 0;
+      text-align: left;
+    }
+
+    .poppet-analysis-text-box p + p {
+      margin-top: 0.62rem;
+      padding-top: 0 !important;
+      border-top: none !important;
+    }
+
+    .poppet-analysis-media-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1.658fr) minmax(0, 0.944fr);
+      gap: 0.45rem;
+      min-width: 0;
+    }
+
+    .poppet-analysis-media-tile {
+      overflow: hidden;
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(5, 5, 5, 0.50);
+      min-height: 360px;
+      display: grid;
+      grid-template-rows: minmax(0, 1fr) auto;
+      box-shadow: 0 24px 90px var(--shadow);
+    }
+
+    .poppet-analysis-media-tile img {
+      width: 100%;
+      height: 100%;
+      min-height: 315px;
+      object-fit: cover;
+      object-position: center center;
+      display: block;
+      background: rgba(30, 30, 30, 0.82);
+    }
+
+    .poppet-analysis-caption {
+      padding: 0.42rem 0.65rem;
+      color: rgba(255, 255, 255, 0.78);
+      background: rgba(5, 5, 5, 0.82);
+      border-top: 1px solid rgba(255, 255, 255, 0.10);
+      font-size: 0.78rem;
+      line-height: 1.22;
+      text-align: center;
+    }
+
+
+
+    /* FINAL OVERRIDE: Poppet Analysis image widths matched to the source image aspect ratios.
+       This keeps the same image display method while giving the inherently wider
+       deflection image more horizontal space than the buckling image. */
+    .poppet-analysis-media-row {
+      grid-template-columns: minmax(0, 1.658fr) minmax(0, 0.944fr) !important;
+    }
+
+
+    /* Current Project Status section */
+    .current-status-section {
+      margin-top: 1.1rem;
+      padding: clamp(1.2rem, 2.4vw, 2rem);
+      background: rgba(18, 18, 18, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 26px;
+      box-shadow: 0 28px 95px rgba(0, 0, 0, 0.5);
+    }
+
+    .current-status-text-box {
+      min-height: 0;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 1.0rem 1.15rem;
+      background: rgba(18, 18, 18, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 20px;
+      box-shadow: 0 22px 70px rgba(0, 0, 0, 0.42);
+    }
+
+    .current-status-text-box h2 {
+      color: white;
+      font-size: clamp(1.55rem, 2.4vw, 2.65rem);
+      line-height: 1.0;
+      letter-spacing: -0.055em;
+      margin-bottom: 0.75rem;
+      text-align: left;
+    }
+
+    .current-status-text-box p {
+      color: rgba(255, 255, 255, 0.74);
+      font-size: clamp(0.84rem, 0.95vw, 1.02rem);
+      line-height: 1.38;
+      margin: 0;
+      text-align: left;
+    }
+
+
+    /* FINAL OVERRIDE: Overview section with paragraph/heading on the left and looping GIF on the right. */
+    .project-panel {
+      min-height: auto !important;
+      display: grid !important;
+      grid-template-columns: minmax(360px, 0.82fr) minmax(0, 1.18fr) !important;
+      gap: 1.1rem !important;
+      align-items: stretch !important;
+    }
+
+    .project-panel .project-text-box {
+      height: 100% !important;
+      min-height: 0 !important;
+      justify-content: center !important;
+    }
+
+    .overview-gif-card {
+      min-width: 0;
+      min-height: 360px;
+      overflow: hidden;
+      background: rgba(5, 5, 5, 0.50);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 22px;
+      box-shadow: 0 24px 90px var(--shadow);
+    }
+
+    .overview-gif-card img {
+      width: 100%;
+      height: 100%;
+      min-height: 360px;
+      object-fit: cover;
+      object-position: center center;
+      display: block;
+      background: rgba(30, 30, 30, 0.82);
+    }
+
+    /* 2D Airfoil Optimization section */
+    .airfoil-2d-section {
+      margin-top: 1.1rem;
+      padding: clamp(1.2rem, 2.4vw, 2rem);
+      background: rgba(18, 18, 18, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 26px;
+      box-shadow: 0 28px 95px rgba(0, 0, 0, 0.5);
+    }
+
+    .airfoil-2d-row {
+      display: grid;
+      gap: 1.1rem;
+      align-items: stretch;
+    }
+
+    .airfoil-2d-row + .airfoil-2d-row {
+      margin-top: 1.1rem;
+      padding-top: 1.1rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.10);
+    }
+
+    .airfoil-2d-bottom-row {
+      grid-template-columns: minmax(280px, 0.55fr) minmax(0, 1.45fr);
+    }
+
+    .airfoil-2d-text-box {
+      min-height: 0;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 1.0rem 1.15rem;
+      background: rgba(18, 18, 18, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 20px;
+      box-shadow: 0 22px 70px rgba(0, 0, 0, 0.42);
+    }
+
+    .airfoil-2d-text-box h2 {
+      color: white;
+      font-size: clamp(1.55rem, 2.4vw, 2.65rem);
+      line-height: 1.0;
+      letter-spacing: -0.055em;
+      margin-bottom: 0.75rem;
+      text-align: left;
+    }
+
+    .airfoil-2d-subheading {
+      color: var(--muted);
+      font-size: clamp(1.0rem, 1.2vw, 1.22rem);
+      line-height: 1.15;
+      letter-spacing: -0.025em;
+      font-weight: 760;
+      margin-bottom: 0.45rem;
+    }
+
+    .airfoil-2d-text-box p {
+      color: rgba(255, 255, 255, 0.74);
+      font-size: clamp(0.84rem, 0.95vw, 1.02rem);
+      line-height: 1.38;
+      margin: 0;
+      text-align: left;
+    }
+
+    .airfoil-2d-media-tile {
+      min-width: 0;
+      min-height: 360px;
+      overflow: hidden;
+      background: rgba(5, 5, 5, 0.50);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 22px;
+      box-shadow: 0 24px 90px var(--shadow);
+    }
+
+    .airfoil-2d-media-tile img {
+      width: 100%;
+      height: 100%;
+      min-height: 360px;
+      object-fit: cover;
+      object-position: center center;
+      display: block;
+      background: rgba(30, 30, 30, 0.82);
+    }
+
+    @media (max-width: 1050px) {
+      .airfoil-2d-bottom-row {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+    /* 3D Blade Optimization section */
+    .blade-3d-section {
+      margin-top: 1.1rem;
+      padding: clamp(1.2rem, 2.4vw, 2rem);
+      background: rgba(18, 18, 18, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 26px;
+      box-shadow: 0 28px 95px rgba(0, 0, 0, 0.5);
+    }
+
+    .blade-3d-row {
+      display: grid;
+      gap: 1.1rem;
+      align-items: stretch;
+    }
+
+    .blade-3d-row + .blade-3d-row {
+      margin-top: 1.1rem;
+      padding-top: 1.1rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.10);
+    }
+
+    .blade-3d-text-left {
+      grid-template-columns: minmax(340px, 0.80fr) minmax(0, 1.20fr);
+    }
+
+    .blade-3d-text-right {
+      grid-template-columns: minmax(0, 1.20fr) minmax(340px, 0.80fr);
+    }
+
+    .blade-3d-text-box {
+      min-height: 0;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 1.0rem 1.15rem;
+      background: rgba(18, 18, 18, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 20px;
+      box-shadow: 0 22px 70px rgba(0, 0, 0, 0.42);
+    }
+
+    .blade-3d-text-box h2 {
+      color: white;
+      font-size: clamp(1.55rem, 2.4vw, 2.65rem);
+      line-height: 1.0;
+      letter-spacing: -0.055em;
+      margin-bottom: 0.75rem;
+      text-align: left;
+    }
+
+    .blade-3d-subheading {
+      color: var(--muted);
+      font-size: clamp(1.0rem, 1.2vw, 1.22rem);
+      line-height: 1.15;
+      letter-spacing: -0.025em;
+      font-weight: 760;
+      margin-bottom: 0.45rem;
+    }
+
+    .blade-3d-text-box p {
+      color: rgba(255, 255, 255, 0.74);
+      font-size: clamp(0.84rem, 0.95vw, 1.02rem);
+      line-height: 1.38;
+      margin: 0;
+      text-align: left;
+    }
+
+    .blade-3d-media-tile {
+      min-width: 0;
+      min-height: 360px;
+      overflow: hidden;
+      background: rgba(5, 5, 5, 0.50);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 22px;
+      box-shadow: 0 24px 90px var(--shadow);
+    }
+
+    .blade-3d-media-tile img {
+      width: 100%;
+      height: 100%;
+      min-height: 360px;
+      object-fit: cover;
+      object-position: center center;
+      display: block;
+      background: rgba(30, 30, 30, 0.82);
+    }
+
+    @media (max-width: 1050px) {
+      .blade-3d-text-left,
+      .blade-3d-text-right {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    /* FINAL OVERRIDE: 3D Blade Optimization requested layout adjustments. */
+    .blade-3d-section .blade-3d-row:nth-of-type(1) .blade-3d-media-tile {
+      background: #ffffff !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      overflow: hidden !important;
+      border: 1px solid rgba(255, 255, 255, 0.16) !important;
+      border-radius: 22px !important;
+    }
+
+    .blade-3d-section .blade-3d-row:nth-of-type(1) .blade-3d-media-tile img {
+      width: 92% !important;
+      height: 92% !important;
+      min-height: 0 !important;
+      object-fit: contain !important;
+      object-position: center center !important;
+      background: transparent !important;
+      display: block !important;
+    }
+
+    .blade-3d-section .blade-3d-row:nth-of-type(2) {
+      grid-template-columns: minmax(0, 0.92fr) minmax(420px, 1.08fr) !important;
+    }
+
+    .blade-3d-overflow-media-pair {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.75rem;
+      min-width: 0;
+    }
+
+    .blade-3d-captioned-tile {
+      display: grid !important;
+      grid-template-rows: minmax(0, 1fr) auto !important;
+      min-height: 360px;
+      overflow: hidden;
+      background: rgba(5, 5, 5, 0.50);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 22px;
+      box-shadow: 0 24px 90px var(--shadow);
+    }
+
+    .blade-3d-captioned-tile img {
+      width: 100%;
+      height: 100%;
+      min-height: 315px;
+      object-fit: cover;
+      object-position: center center;
+      display: block;
+      background: rgba(30, 30, 30, 0.82);
+    }
+
+    .blade-3d-image-caption {
+      padding: 0.42rem 0.65rem;
+      color: rgba(255, 255, 255, 0.78);
+      background: rgba(5, 5, 5, 0.82);
+      border-top: 1px solid rgba(255, 255, 255, 0.10);
+      font-size: 0.78rem;
+      line-height: 1.22;
+      text-align: center;
+    }
+
+    @media (max-width: 1050px) {
+      .blade-3d-section .blade-3d-row:nth-of-type(2),
+      .blade-3d-overflow-media-pair {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+    /* FINAL OVERRIDE: keep the left OVERFLOW/3D-results image fully visible.
+       Only the image viewport is white, while the outer card keeps the normal
+       dark BEAR-style tile and grey border so there is no white outline. */
+    .blade-3d-overflow-media-pair .blade-3d-captioned-tile:first-child {
+      background: rgba(5, 5, 5, 0.50) !important;
+      border: 1px solid rgba(255, 255, 255, 0.16) !important;
+      overflow: hidden !important;
+    }
+
+    .blade-3d-overflow-media-pair .blade-3d-captioned-tile:first-child img {
+      width: 100% !important;
+      height: 100% !important;
+      min-height: 0 !important;
+      object-fit: contain !important;
+      object-position: center center !important;
+      background: #ffffff !important;
+      border: none !important;
+      display: block !important;
+    }
+
+    .blade-3d-overflow-media-pair .blade-3d-captioned-tile:first-child .blade-3d-image-caption {
+      background: rgba(5, 5, 5, 0.82) !important;
+      border-top: 1px solid rgba(255, 255, 255, 0.10) !important;
+    }
+
+
+
+    /* Summer Research Poster section */
+    .summer-poster-section {
+      margin-top: 1.1rem;
+      padding: clamp(1.2rem, 2.4vw, 2rem);
+      background: rgba(18, 18, 18, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 26px;
+      box-shadow: 0 28px 95px rgba(0, 0, 0, 0.5);
+    }
+
+    .summer-poster-row {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1.1rem;
+      align-items: stretch;
+    }
+
+    .summer-poster-row + .summer-poster-row {
+      margin-top: 1.1rem;
+      padding-top: 1.1rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.10);
+    }
+
+    .summer-poster-text-box {
+      min-height: 0;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 1.0rem 1.15rem;
+      background: rgba(18, 18, 18, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 20px;
+      box-shadow: 0 22px 70px rgba(0, 0, 0, 0.42);
+    }
+
+    .summer-poster-text-box h2 {
+      color: white;
+      font-size: clamp(1.55rem, 2.4vw, 2.65rem);
+      line-height: 1.0;
+      letter-spacing: -0.055em;
+      margin-bottom: 0.75rem;
+      text-align: left;
+    }
+
+    .summer-poster-text-box p {
+      color: rgba(255, 255, 255, 0.74);
+      font-size: clamp(0.84rem, 0.95vw, 1.02rem);
+      line-height: 1.38;
+      margin: 0;
+      text-align: left;
+    }
+
+    .summer-poster-media-tile {
+      min-width: 0;
+      min-height: 620px;
+      overflow: hidden;
+      background: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 22px;
+      box-shadow: 0 24px 90px var(--shadow);
+    }
+
+    .summer-poster-media-tile img {
+      width: 100%;
+      height: 100%;
+      min-height: 620px;
+      object-fit: contain;
+      object-position: center center;
+      display: block;
+      background: #ffffff;
+      border: none;
+    }
+
+    @media (max-width: 1050px) {
+      .summer-poster-media-tile {
+        min-height: 420px;
+      }
+
+      .summer-poster-media-tile img {
+        min-height: 420px;
+      }
+    }
+
+
+    /* Gallery section */
+    .final-gallery-section {
+      margin-top: 1.1rem;
+      padding: clamp(1.2rem, 2.4vw, 2rem);
+      background: rgba(18, 18, 18, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 26px;
+      box-shadow: 0 28px 95px rgba(0, 0, 0, 0.5);
+    }
+
+    .final-gallery-section h2 {
+      color: white;
+      text-align: center;
+      font-size: clamp(1.55rem, 2.4vw, 2.65rem);
+      line-height: 1.0;
+      letter-spacing: -0.055em;
+      margin-bottom: 1.1rem;
+    }
+
+    .final-gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 0.75rem;
+      min-width: 0;
+    }
+
+    .final-gallery-tile {
+      overflow: hidden;
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(5, 5, 5, 0.50);
+      min-height: 260px;
+      box-shadow: 0 24px 90px var(--shadow);
+    }
+
+    .final-gallery-tile img,
+    .final-gallery-tile video {
+      width: 100%;
+      height: 100%;
+      min-height: 260px;
+      object-fit: cover;
+      object-position: center center;
+      display: block;
+      background: rgba(30, 30, 30, 0.82);
+    }
+
+    @media (max-width: 1050px) {
+      .final-gallery-grid {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+
+    /* FINAL OVERRIDE: make the bottom-middle gallery image wider while keeping the BEAR-style gallery tiles. */
+    .final-gallery-grid {
+      grid-template-columns: repeat(12, minmax(0, 1fr)) !important;
+      gap: 0.75rem !important;
+      align-items: stretch !important;
+    }
+
+    .final-gallery-grid .final-gallery-tile:nth-child(1) { grid-column: 1 / span 4; }
+    .final-gallery-grid .final-gallery-tile:nth-child(2) { grid-column: 5 / span 4; }
+    .final-gallery-grid .final-gallery-tile:nth-child(3) { grid-column: 9 / span 4; }
+
+    .final-gallery-grid .final-gallery-tile:nth-child(4) { grid-column: 1 / span 3; }
+    .final-gallery-grid .final-gallery-tile:nth-child(5) { grid-column: 4 / span 6; }
+    .final-gallery-grid .final-gallery-tile:nth-child(6) { grid-column: 10 / span 3; }
+
+    @media (max-width: 1050px) {
+      .final-gallery-grid {
+        grid-template-columns: 1fr !important;
+      }
+
+      .final-gallery-grid .final-gallery-tile:nth-child(n) {
+        grid-column: auto !important;
+      }
+    }
+
+
+
+
+
+
+
+
+
+    @media (max-width: 1050px) {
+      .hero-background video {
+        top: var(--topbar-h) !important;
+        bottom: 230px !important;
+        height: calc(100vh - var(--topbar-h) - 230px) !important;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .hero-background video {
+        bottom: 255px !important;
+        height: calc(100vh - var(--topbar-h) - 255px) !important;
+      }
+    }
+
+    footer {
+      position: relative;
+      z-index: 2;
+      border-top: 1px solid rgba(255, 255, 255, 0.13);
+      padding: 2rem 6vw;
+      color: var(--subtle);
+      background: rgba(5, 5, 5, 0.92);
+      backdrop-filter: blur(18px);
+      font-size: 0.9rem;
+    }
+
+    @media (max-width: 1050px) {
+      .topbar {
+        grid-template-columns: 1fr;
+        justify-items: center;
+        gap: 0.3rem;
+        padding: 0.55rem 4vw;
+      }
+
+      .brand {
+        justify-self: center;
+      }
+
+      nav {
+        width: 100%;
+        overflow-x: auto;
+        justify-content: center;
+        padding-bottom: 0.1rem;
+      }
+
+      :root {
+        --topbar-h: 88px;
+      }
+
+      .project-panel {
+        grid-template-columns: 1fr;
+      }
+
+      .project-panel {
+        min-height: auto;
+      }
+
+      .vehicle-overview-image {
+        min-height: 340px;
+      }
+
+      .preliminary-row,
+      .poppet-design-row,
+      .poppet-analysis-row,
+      .poppet-analysis-media-row {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .section {
+        padding-left: 1rem;
+        padding-right: 1rem;
+      }
+
+      .hero {
+        padding-left: 1rem;
+        padding-right: 1rem;
+      }
+    }
+
+    /* FINAL OVERRIDE: add proper first-line paragraph indentation to all paragraph text sections. */
+    .project-text-box p,
+    .preliminary-text-box p,
+    .poppet-design-text-box p,
+    .poppet-analysis-text-box p,
+    .current-status-text-box p,
+    .airfoil-2d-text-box p,
+    .blade-3d-text-box p,
+    .summer-poster-text-box p {
+      text-indent: 2em !important;
+      text-align: left !important;
+    }
+
+
+    /* FINAL OVERRIDE: 2D Results image fully visible with white fill space.
+       The outer card keeps the normal dark/gray border styling so no white outline forms. */
+    .airfoil-2d-bottom-row .airfoil-2d-media-tile {
+      background: rgba(5, 5, 5, 0.50) !important;
+      border: 1px solid rgba(255, 255, 255, 0.16) !important;
+      border-radius: 22px !important;
+      overflow: hidden !important;
+      box-shadow: 0 24px 90px var(--shadow) !important;
+    }
+
+    .airfoil-2d-bottom-row .airfoil-2d-media-tile img {
+      width: 100% !important;
+      height: 100% !important;
+      min-height: 0 !important;
+      object-fit: contain !important;
+      object-position: center center !important;
+      background: #ffffff !important;
+      display: block !important;
+      border: none !important;
+      outline: none !important;
+      box-shadow: none !important;
+    }
+
+
+    /* FINAL OVERRIDE: stack the OVERFLOW section images vertically.
+       The first/left image from the old horizontal layout is now on top. */
+    .blade-3d-overflow-media-pair {
+      display: grid !important;
+      grid-template-columns: 1fr !important;
+      grid-template-rows: auto auto !important;
+      gap: 0.75rem !important;
+      min-width: 0 !important;
+      align-items: stretch !important;
+    }
+
+    .blade-3d-overflow-media-pair .blade-3d-captioned-tile {
+      width: 100% !important;
+      min-height: 320px !important;
+    }
+
+    .blade-3d-overflow-media-pair .blade-3d-captioned-tile img {
+      min-height: 275px !important;
+    }
+
+
+    /* FINAL OVERRIDE: widen the OVERFLOW paragraph section and narrow the stacked image column. */
+    .blade-3d-section .blade-3d-row:nth-of-type(3).blade-3d-text-left {
+      grid-template-columns: minmax(560px, 1.25fr) minmax(0, 0.75fr) !important;
+      gap: 1.1rem !important;
+      align-items: stretch !important;
+    }
+
+    @media (max-width: 1050px) {
+      .blade-3d-section .blade-3d-row:nth-of-type(3).blade-3d-text-left {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    /* FINAL OVERRIDE: increase the OVERFLOW paragraph width a little more. */
+    .blade-3d-section .blade-3d-row:nth-of-type(3).blade-3d-text-left {
+      grid-template-columns: minmax(640px, 1.40fr) minmax(0, 0.60fr) !important;
+      gap: 1.0rem !important;
+      align-items: stretch !important;
+    }
+
+    @media (max-width: 1050px) {
+      .blade-3d-section .blade-3d-row:nth-of-type(3).blade-3d-text-left {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+  </style>
+</head>
+
+<body>
+  <div class="hero-background" aria-hidden="true">
+    <video id="heroVideo" muted playsinline loop autoplay preload="auto">
+      <source src="assets/NASA/DragonflyVid.mp4" type="video/mp4" />
+    </video>
+  </div>
+
+  <header class="topbar">
+    <a class="brand" href="index.html" aria-label="Jaden Dew homepage">
+      <span>Jaden Dew</span>
+    </a>
+
+    <nav aria-label="Main navigation">
+      <a class="nav-link" href="index.html">Home</a>
+
+      <div class="nav-item">
+        <a class="nav-link" href="portfolio.html">Portfolio</a>
+        <div class="nav-dropdown" aria-label="Portfolio project links">
+          <a class="dropdown-link" href="BEAR.html">BEAR: Berkeley Aerial Emergency Response</a>
+          <a class="dropdown-link" href="E3_MVA.html">Liquid Rocket Test Stand Main Valves</a>
+          <a class="dropdown-link" href="E178_ME103.html">Flying Wing Simulation and Control</a>
+          <a class="dropdown-link" href="ME100.html">The Devious Alarm</a>
+          <a class="dropdown-link" href="vast.html">Vast Space: Saiph Thruster Testing</a>
+          <a class="dropdown-link" href="poppet.html">Custom Poppet Valve</a>
+          <a class="dropdown-link" href="NASA.html">NASA: Dragonfly Rotor Blade Optimization</a>
+        </div>
+      </div>
+
+      <a class="nav-link" href="assets/jaden_resume_alt_3-22-2026.pdf" target="_blank" rel="noopener">Resume</a>
+      <a class="nav-link" href="https://www.linkedin.com/in/jaden-dew-178a37249/" target="_blank" rel="noopener">LinkedIn</a>
+    </nav>
+  </header>
+
+  <main id="top">
+    <section class="hero" aria-label="NASA airfoil optimization project hero">
+      <div class="hero-card">
+        <div class="hero-kicker">Internship</div>
+        <h1>NASA: Dragonfly Rotor Blade Optimization</h1>
+        <div class="hero-subtitle">Aerodynamic optimization research for the rotor blades of NASA-APL's Dragonfly mission, enabling efficient flight in Titan's atmosphere.</div>
+      </div>
+    </section>
+
+    <section class="section" aria-label="NASA airfoil optimization project overview">
+      <div class="section-inner">
+        <section class="project-panel">
+          <div class="project-text-box">
+            <div>
+              <h2>Dragonfly Overview</h2>
+            </div>
+
+            <div>
+              <p>
+                With the success of the Ingenuity helicopter flying on the surface of Mars NASA has developed an increased desire to utilize autonomous rotorcraft to explore the solar system. In furtherance of this goal the Dragonfly rotorcraft was pitched to NASA by the Johns Hopkins University Applied Physics Laboratory (APL)
+                as a large autonomous vehicle that could explore the surface of Titan, Saturn's largest moon. The science goal of the mission is to continue NASA's search for signs of extraterrestrial life by flying to multiple points of geological interest on Titan's surface and collecting samples.
+                The idea is to then examine these samples to determine the habitability of Titan's environment, examine how far prebiotic chemistry has advanced, identify compounds of astrobiological interest, and search for chemical indicators of life.
+              </p>
+              <p>
+                The rotorcraft will achieve this mission over the course of 3.3 years with the rotor craft navigating Titan's surface through a series of short hops followed by a period of recharging. The vehicle itself will be nuclear powered with the radioactive decay
+                of plutonium charging a high capacity lithium ion battery. The flight itself relies on power from the battery, granting a total flight time of 30 minutes with it taking 1-2 Titan sols (16 Earth days) to fully recharge the battery with the nuclear reactor. Due to the crafts relatively low flight times and long recharge times, it is imperative that the
+                rotorcraft can travel a large range in that time. This illustrates the importance of the rotatorcraft being able to achieve efficient flight in Titan's atmosphere to enable the success of the mission.
+              </p>
+              <p>
+                While the bulk of the design and management of the Dragonfly mission is handled by APL, a certain component of the design process is done in conjunction with certain NASA sites and other industry partners. Specifically the Computational Physics Branch of the NASA Advanced Supercomputing Division at NASA Ames Research Center handles most of the computational fluid dynamics (CFD)
+                analysis for the mission utilizing NASA's Pleiades supercomputer. I interned in this branch during the summer in between my sophomore and junior year and the following fall of my undergraduate degree where I was tasked with a  research project the branch was conducting to  increase the aerodynamic efficiency of Dragonfly's rotor blades in Titan's atmosphere.
+                This was to be done by combining mid and low fidelity, 2D and 3D aerodynamic optimization techniques with high fidelity analysis to design a set of drag optimized blades for the Dragonfly rotorcraft.
+              </p>
+            </div>
+          </div>
+
+          <div class="overview-gif-card">
+            <img src="assets/NASA/DragonflyRender.jpg" alt="NASA Dragonfly render overview image" />
+          </div>
+        </section>
+
+        <section class="airfoil-2d-section" aria-label="2D Airfoil Optimization">
+          <div class="airfoil-2d-row">
+            <div class="airfoil-2d-text-box">
+              <h2>2D Airfoil Optimization</h2>
+              <div class="airfoil-2d-subheading">Methods</div>
+              <p>
+                For this research I was tasked with building a pipeline for creating drag efficient rotor blades starting from the design of the airfoils the blades were made up of. Since I inherited this research project from a previous NASA employee much of the 2D components of this pipeline had already been set up.
+                To develop a set of drag efficient airfoils the discrete adjoint aerodynamic shape optimizer DAFoam was utilized. This software is an augmented version of the CFD software OpenFoam that integrates an optimization loop as well as parameterized shape deformation methodologies allowing it to change the shape of an airfoil
+                to optimize for imp[roved aerodynamic properties. It does this by implementing a set of free form deformation (FFD) point pairs along the chord of the airfoil that the optimizer can stretch or squeeze thus altering the shape of the airfoil. IT also allows the user to implement constraints such as minimum thicknesses, volume constraints,
+                fixed lift constraints, etc to allow for the tuning of the optimization process.
+              </p>
+              <p>
+                The goal of this stage of the optimization process was to create a set of drag efficient airfoils at different points along the span of Dragonfly's blades with the idea being that these airfoils could be combined in a way that creates an 3D optimized whole.
+                As such each airfoil needed to be optimized for the local conditions, namely velocity, it would experience at that particular span of the blade. Therefore the velocity setpoint used for each optimization run was determined from the
+                rotational speed of the rotor blades and the local span radius that airfoil was located at. Additionally, I utilized DAFoam's multipoint optimization configuration at each of these points which allows the solver to optimize airfoil geometries across a prescribed set of conditions with user inputted weights deciding the importance of each condition resulting an a geometry
+                that achieves efficient flight over a wider range of operating conditions. In this case, 6 operating points were utilized each representing a different angle of attack with the weights being described as a Gaussian distribution about local twist angle of the current Dragonfly blades. Depending on the location of the airfoil either an incompressible or compressible solvers was used as the
+                the incompressible threshold used by DAFoam is smaller than the usual Mach 0.3 threshold. Finally a set of 6 FFD point pairs were used allowing for fine control of the airfoil geometry by the solver.
+              </p>
+              <p>
+                Each run was configured as a fixed lift optimization where the C<sub>L</sub> of the airfoil was set to be constant and the objective of minimizing the C<sub>D</sub> was given to the optimizer. This was done with a set of geometric constraints also being set on the runs namely a constraint placed on the distance between any two FFD pairs and a constraint
+                on the total volume of the airfoil. The thickness constraint was configured as a percentage of the original FFD pair thickness with a constraint of 90% meaning that the minimum thickness between any FFD pair would be 90% of the original thickness.
+                The volume constraint was set as a fixed constraint with the total volume of the original and optimized versions of the airfoil being forced to remain constant. These optimization runs were set up and submitted to the Pleiades supercomputer utilizing Linux terminal with each attempt taking approximately a day to run.
+              </p>
+            </div>
+          </div>
+
+          <div class="airfoil-2d-row airfoil-2d-bottom-row">
+            <div class="airfoil-2d-text-box">
+              <div class="airfoil-2d-subheading">Results</div>
+              <p>
+                The post processing of optimization results was also done via DAFoam by bypassing the optimizer and running the base OpenFoam solvers on the airfoil for a -20 to 20 angle of attack sweep at the already determined operating velocity. These sweeps were performed for both the original and optimized geometries
+                creating a set of curves that could be used to compare the performance of the airfoils. In particularly the C<sub>L</sub> vs C<sub>D</sub> polars and L/D curves were utilized for comparison with an average C<sub>D</sub> percent change also being generated by taking a weighted average of the drag difference at every operating point with the original multipoint optimization weights being
+                utilized as the weights for the average.
+              </p>
+              <p>
+                Utilizing this methodology over the summer three airfoils were optimized for the 17%, 50%, and 80% span locations representing a root, mid-span, and tip case. These three airfoils collectively saw a minimum 3% decrease in average drag with most of these reductions occurring near the center angle of attack defined during the multipoint process.
+                Additionally during the fall portion of my internship an additional 6 airfoils were optimized at points spaced in between the original three airfoils resulting in a total of 9 airfoils being created during my internship.
+              </p>
+            </div>
+
+            <div class="airfoil-2d-media-tile">
+              <img src="assets/NASA/2DResults.png" alt="Optimized two-dimensional airfoil comparison" />
+            </div>
+          </div>
+        </section>
+
+
+        <section class="blade-3d-section" aria-label="3D Blade Optimization">
+          <div class="blade-3d-row blade-3d-text-left">
+            <div class="blade-3d-text-box">
+              <h2>3D Blade Optimization</h2>
+              <div class="blade-3d-subheading">Methods</div>
+              <p>
+                While DAFoam can handle 3D optimization problems the process takes a large amount of compute and can result in large wait times between iterations. As such to minimize the computational requirements of 3D optimization I decided to make my own optimization script by combining the blade element momentum (BEM) solver CCBlade with the
+                optimizer SNOPT to create rotor blades with optimal chord and twist distributions across its span. Blade element momentum theory is a solution method commonly used for wind turbines and rotor crafts that combines momentum control volume analysis with airfoil analysis at the same span radius. These two methods are combined and computed simultaneously
+                allowing the solver to calculate thrust, torque, and other parameters of the rotor blades. The CCBlade library itself consists of a set of solver functions written in Julia that solves the BEM equations for different blade configurations. This starts with defining an airfoil objects which consists of multiple aerodynamic lookup tables indexed by Mach and Reynolds number and splined together allowing the solver
+                to determine these coefficients for every span location. THis is then fed into the solver along with the rotor blade's operating conditions and is able to spit out overall rotor blade operating parameters.
+              </p>
+              <p>
+                With this solver pipeline made I then wrapped it inside of an optimization framework utilizing SNOPT. This framework takes an initial chord and twist distribution, calculates the objective function which in this case was maximizing figure of merit (FM),
+                and then evaluates the value of FM  utilizing it to march towards a new twist and chord distribution after which the process repeats until the optimizer funds a valley in the solution space. I also implemented a set of constraints in the optimizer namely constraints on how much the optimizer is allowed to alter the twist and chord as a function of
+                original chord and twist distribution. The flow of this optimizer is outlined in the flow chart to the right.
+              </p>
+              <p>
+                This optimizer does have limits that are important to mention. One such limitation is that the BEM method does not use viscosity and as such the optimizer ignores parasitic drag and cannot predict stall outside of what is captured in the CFD generated coefficient data. Additionally, and more importantly, this type of solver can only handle hover cases and does not have the corrections needed to understand forward flight. This means that it can only optimize
+                geometries for very specific flight conditions and would need to have custom correctional factors developed if it were to be expanded to handle forward flight.
+              </p>
+            </div>
+
+            <div class="blade-3d-media-tile">
+              <img src="assets/NASA/Optimizer_Flowchart.png" alt="Three-dimensional blade optimization methods image" />
+            </div>
+          </div>
+
+          <div class="blade-3d-row blade-3d-text-right">
+            <div class="blade-3d-media-tile">
+              <img src="assets/NASA/3DResults.png" alt="Three-dimensional blade optimization results image" />
+            </div>
+
+            <div class="blade-3d-text-box">
+              <div class="blade-3d-subheading">Results</div>
+              <p>
+                During the summer portion of my internship a total of two rotor blade geometries were created using the 3D optimizer. One blade was created utilizing the original un-optimized Dragonfly airfoils but with an optimized chord and twist distribution. THe second blade was created using both the three original optimized blades along with a separately optimized twist and chord distributions.
+                </p>
+                <p>
+                  These optimization runs produced similar geometries which revealed some interesting characteristics about the optimizer itself. As can be seen, for the chord the optimizer prioritized having larger chord lengths at the root of the blade while tapering out the chord as it gets closer to the tip. The optimizer appears to want to make the tip chord as small as possible with the solver hitting the lower bound constraints in both cases.
+                  The reason for this is most likely the optimizer attempting to create a closer to uniform lift distribution across the blade by compensating for lack of speed at the root by increasing the chord and an excess of speed at the tip with reducing the chord. This same trend can be observed with twists with higher twist angles at the root and smaller twist angles at the tip. This is most likely attempting to do the same
+                  thing as higher twist angles result in higher lift across all speeds as long as stall is avoided. This behavior stems largely from the nature of using figures of merit as the objective function. Figure of merit is a widely utilized measure of efficiency for helicopters and rotordraft that captures the ratio of the thrust generated to the torque needed by the engine/motor to achieve that thrust. This is done so by examining a weighted ratio of these forces'
+                  coefficients with the formula being the coefficient of thrust to the power of 3/2 divided by the square root of two times the coefficient of torque. In this way FM actually gives more priority to increasing thrust vs decreasing torque explaining why the optimizer would prioritize altering the lift distribution over
+                  reducing drag directly.  
+                </p>
+
+            </div>
+          </div>
+
+          <div class="blade-3d-row blade-3d-text-left">
+            <div class="blade-3d-text-box">
+              <div class="blade-3d-subheading">OVERFLOW and Results Verification</div>
+              <p>
+                The final step of this workflow was to verify the results of the low-fidelity 3D optimizer with high fidelity CFD utilizing NASA's OVERFLOW solver. This was done by one of my fellow intern colleagues for a hover case mimicking the conditions both the airfoils and 3D geometry was optimized for.
+              </p>
+              <p>
+                As mentioned before two optimized blades were made as a part of my summer research with the first blade that contained the unoptimized airfoils being made to verify that the optimizer was working as intended. Initial post processing analysis in CCBlade suggested that the new optimized blade achieve a little over a 3% increase
+                in FM compared to the completely optimized blade. Based on the nature of the CCBlade solver this was known to be an overestimate however I wanted to know how much of an overestimate that value was. The OVERFLOW simulation revealed that the optimized blade actually achieved a near 2.5% increase in FM, only a 0.5% difference from what CCBlade predicted.
+                This indicated that the 3D optimizer I developed was working as intended and was capable of creating truly increased efficiency blades despite utilizing a low fidelity methodology.
+              </p>
+              <p>
+                The second blade that was generated was meant to test whether the complete 2D-3D optimization pipeline was working as intended. Unfortunately due to time constraints for the summer it was unable to be fully analysed in OVERFLOW and was only able to be analyzed utilizing the CCBlade solver. Given the fairly close alignment of the percent differences between the CCBlade and OVERFLOW
+                simulations of the previous geometry it was deemed that this analysis was acceptable until a full OVERFLOW simulation could be run. This analysis revealed that when compared to the base Dragonfly rotor blade design the fully optimized blade underperformed by a fairly large margin. It did however perform over 4% better than the blade that contained the optimized airfoils but the base chord and twist distribution.
+                This indicated that the 3D optimizer was still working as intended but something was going wrong with how the optimized airfoils were being integrated with the 3D optimization pipeline. Upon examining the process I identified the most likely source of the shortcoming was during the airfoil object creation phase. Since there are only three airfoils and the CCBlade solver relies on interpolating between airfoils to make its calculations, it is entirely possible that for span locations
+                not near one of these airfoils the interpolated coefficient values are completely unrealistic. This could then result in the overall calculated performance to be much lower than it should be than if the blade was made up of more airfoils for the interpolator to interpolate between. As such, to remedy this issue the focus of my fall research was to generate more airfoils to feed into the 3D optimizer to hopefully remedy this issue, resulting in the 6 additional airfoils being created as previously mentioned.
+              </p>
+            </div>
+
+            <div class="blade-3d-overflow-media-pair">
+              <div class="blade-3d-captioned-tile">
+                <img src="assets/NASA/OverflowVerification1.png" alt="OVERFLOW verification image 1" />
+                <div class="blade-3d-image-caption">OVERFLOW verification table for the first optimized blade geometry.</div>
+              </div>
+
+              <div class="blade-3d-captioned-tile">
+                <img src="assets/NASA/OptComp.png" alt="OVERFLOW verification image 2" />
+                <div class="blade-3d-image-caption">CCBlade verification table for the second optimized blade geometry.</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="summer-poster-section" aria-label="Summer Research Poster">
+          <div class="summer-poster-row">
+            <div class="summer-poster-text-box">
+              <h2>Summer Research Poster</h2>
+              <p>
+                Below is the poster that I presented at the end of the summer portion of my research. The power itself covers everything mentioned above that occurred over the summer and was present both to staff at NASA Ames Research Center and to students during the UC Berkeley NASA summer scholars showcase.
+              </p>
+            </div>
+          </div>
+
+          <div class="summer-poster-row">
+            <div class="summer-poster-media-tile">
+              <img src="assets/NASA/NASA_Presentation_Revised.png" alt="NASA summer research poster" />
+            </div>
+          </div>
+        </section>
+
+
+        <section class="final-gallery-section" aria-label="NASA airfoil optimization gallery">
+          <h2>Gallery</h2>
+
+          <div class="final-gallery-grid">
+            <div class="final-gallery-tile">
+              <img src="assets/NASA/NASA_Gate.jpg" alt="NASA airfoil optimization gallery image 1" />
+            </div>
+
+            <div class="final-gallery-tile">
+              <img src="assets/NASA/NFAC_Me.jpg" alt="NASA airfoil optimization gallery image 2" />
+            </div>
+
+            <div class="final-gallery-tile">
+              <img src="assets/NASA/FML.jpg" alt="NASA airfoil optimization gallery image 3" />
+            </div>
+
+            <div class="final-gallery-tile">
+              <img src="assets/NASA/Pliedes.jpg" alt="NASA airfoil optimization gallery image 4" />
+            </div>
+
+            <div class="final-gallery-tile">
+              <img src="assets/NASA/NFAC.jpg" alt="NASA airfoil optimization gallery image 5" />
+            </div>
+
+            <div class="final-gallery-tile">
+              <img src="assets/NASA/VerticalGun.jpg" alt="NASA airfoil optimization gallery image 6" />
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>© 2026 Jaden Dew.</p>
+  </footer>
+
+  <script>
+    const heroVideo = document.getElementById("heroVideo");
+
+    function updateBackgroundFade() {
+      const y = window.scrollY || window.pageYOffset;
+      const fadeStart = window.innerHeight * 0.55;
+      const fadeEnd = window.innerHeight * 1.10;
+
+      let opacity = 1.0;
+      if (y > fadeStart) {
+        const p = Math.min(1, (y - fadeStart) / Math.max(1, fadeEnd - fadeStart));
+        opacity = 1.0 - 0.55 * p;
+      }
+
+      if (heroVideo) heroVideo.style.opacity = String(opacity);
+    }
+
+    if (heroVideo) {
+      heroVideo.play().catch(() => {});
+    }
+
+    window.addEventListener("load", updateBackgroundFade);
+    window.addEventListener("scroll", updateBackgroundFade, { passive: true });
+    window.addEventListener("resize", updateBackgroundFade);
+  </script>
+</body>
+</html>

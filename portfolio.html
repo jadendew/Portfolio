@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Portfolio | Jaden Dew</title>
+
+  <style>
+    :root {
+      --bg: #050505;
+      --panel: rgba(10, 10, 10, 0.76);
+      --panel-solid: rgba(18, 18, 18, 0.94);
+      --border: rgba(255, 255, 255, 0.16);
+      --text: #d4d4d4;
+      --muted: #9cdcfe;
+      --subtle: #b8b8b8;
+      --accent: #007acc;
+      --accent-hover: #179fff;
+      --shadow: rgba(0, 0, 0, 0.48);
+      --topbar-h: 56px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      background: #000;
+    }
+
+    body {
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: transparent;
+      color: var(--text);
+      line-height: 1.6;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .gif-background {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      overflow: hidden;
+      background: #000;
+      pointer-events: none;
+    }
+
+    .gif-background video {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center center;
+      display: block;
+      opacity: 1;
+      filter: saturate(0.98) contrast(1.04);
+      transition: opacity 180ms ease;
+    }
+
+    .gif-background::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      background:
+        linear-gradient(to bottom, rgba(0, 0, 0, 0.32), rgba(0, 0, 0, 0.54) 42%, rgba(0, 0, 0, 0.82));
+      pointer-events: none;
+    }
+
+    .topbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      min-height: var(--topbar-h);
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      gap: 1rem;
+      padding: 0.45rem 6vw;
+      background: rgba(5, 5, 5, 0.95);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.34);
+    }
+
+    .brand {
+      justify-self: start;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.58rem;
+      color: white;
+      font-size: 0.88rem;
+      font-weight: 650;
+      letter-spacing: 0.01em;
+      opacity: 0.92;
+    }
+
+    .brand-mark {
+      width: 9px;
+      height: 9px;
+      background: var(--accent);
+      border-radius: 2px;
+      box-shadow: 0 0 14px rgba(0, 122, 204, 0.85);
+    }
+
+    nav {
+      justify-self: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.1rem;
+    }
+
+    .nav-link {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.46rem 0.82rem;
+      border-radius: 8px;
+      color: white;
+      font-size: 0.84rem;
+      opacity: 0.9;
+      transition: background 180ms ease, opacity 180ms ease;
+    }
+
+    .nav-link:hover,
+    .nav-link:focus-visible {
+      background: rgba(255, 255, 255, 0.09);
+      opacity: 1;
+      outline: none;
+    }
+
+    .nav-item {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .nav-dropdown {
+      position: absolute;
+      top: calc(100% + 0.45rem);
+      left: 50%;
+      transform: translateX(-50%) translateY(-6px);
+      min-width: 235px;
+      padding: 0.45rem;
+      display: grid;
+      gap: 0.12rem;
+      background: rgba(5, 5, 5, 0.96);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 12px;
+      box-shadow: 0 18px 60px rgba(0, 0, 0, 0.55);
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transition: opacity 180ms ease, transform 180ms ease, visibility 180ms ease;
+    }
+
+    .nav-item:hover .nav-dropdown,
+    .nav-item:focus-within .nav-dropdown {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .dropdown-link {
+      display: block;
+      padding: 0.52rem 0.68rem;
+      border-radius: 8px;
+      color: rgba(255, 255, 255, 0.88);
+      font-size: 0.80rem;
+      line-height: 1.2;
+      white-space: nowrap;
+      transition: background 180ms ease, color 180ms ease;
+    }
+
+    .dropdown-link:hover,
+    .dropdown-link:focus-visible {
+      background: rgba(255, 255, 255, 0.09);
+      color: white;
+      outline: none;
+    }
+
+
+    main {
+      position: relative;
+      z-index: 1;
+    }
+
+    .section {
+      min-height: 100vh;
+      padding: calc(var(--topbar-h) + 1.25rem) 2rem 1.25rem;
+      display: grid;
+      align-items: stretch;
+      background: rgba(0, 0, 0, 0.72);
+      backdrop-filter: blur(10px);
+    }
+
+    .section-inner {
+      width: min(1820px, 100%);
+      margin: 0 auto;
+    }
+
+    .portfolio-panel {
+      min-height: calc(100vh - var(--topbar-h) - 2.5rem);
+      padding: clamp(1.2rem, 2.4vw, 2rem);
+      background: rgba(18, 18, 18, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 26px;
+      box-shadow: 0 28px 95px rgba(0, 0, 0, 0.5);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      text-align: center;
+    }
+
+    .section-kicker {
+      color: var(--accent-hover);
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      font-size: 0.66rem;
+      font-weight: 760;
+      margin-bottom: 0.18rem;
+    }
+
+    .portfolio-panel h1 {
+      color: white;
+      font-size: clamp(2.4rem, 5vw, 5rem);
+      font-weight: 760;
+      letter-spacing: -0.06em;
+      line-height: 0.95;
+      margin-bottom: 0.85rem;
+    }
+
+    .portfolio-panel p {
+      color: rgba(255, 255, 255, 0.74);
+      font-size: clamp(0.95rem, 1.2vw, 1.08rem);
+      max-width: 78ch;
+      margin: 0 auto 1.4rem;
+    }
+
+    .placeholder-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 0.9rem;
+      margin-top: 1rem;
+    }
+
+    .placeholder-card {
+      min-height: 220px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 1.25rem;
+      background: rgba(5, 5, 5, 0.50);
+      border: 1px solid rgba(255, 255, 255, 0.13);
+      border-radius: 18px;
+      transition: transform 180ms ease, border-color 180ms ease, background 180ms ease;
+    }
+
+    .placeholder-card:hover,
+    .placeholder-card:focus-visible {
+      transform: translateY(-4px);
+      border-color: rgba(255, 255, 255, 0.38);
+      background: rgba(36, 36, 40, 0.95);
+      outline: none;
+    }
+
+    .placeholder-card span {
+      display: inline-block;
+      color: var(--muted);
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      font-weight: 760;
+      margin-bottom: 0.45rem;
+    }
+
+    .placeholder-card h2 {
+      color: white;
+      font-size: clamp(1.15rem, 1.7vw, 1.55rem);
+      line-height: 1.1;
+      letter-spacing: -0.04em;
+      margin-bottom: 0.45rem;
+    }
+
+    .placeholder-card p {
+      margin: 0;
+      color: var(--subtle);
+      font-size: 0.9rem;
+      line-height: 1.38;
+    }
+
+
+    .portfolio-panel {
+      min-height: calc(100vh - var(--topbar-h) - 2.5rem);
+      padding: clamp(1.2rem, 2.4vw, 2rem);
+      background: rgba(18, 18, 18, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 26px;
+      box-shadow: 0 28px 95px rgba(0, 0, 0, 0.5);
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      text-align: center;
+    }
+
+    .portfolio-intro {
+      color: rgba(255, 255, 255, 0.74);
+      font-size: clamp(0.95rem, 1.2vw, 1.08rem);
+      max-width: 78ch;
+      margin: 0 auto 0.6rem;
+    }
+
+    .portfolio-panel h2 {
+      color: white;
+      font-size: clamp(1.45rem, 2.1vw, 2.2rem);
+      line-height: 1;
+      letter-spacing: -0.045em;
+      margin: 0.25rem 0 0.55rem;
+      text-align: center;
+    }
+
+    .project-card {
+      overflow: hidden;
+      background: rgba(5, 5, 5, 0.50);
+      border: 1px solid rgba(255, 255, 255, 0.13);
+      border-radius: 18px;
+      box-shadow: 0 18px 60px rgba(0, 0, 0, 0.28);
+      transition: transform 180ms ease, border-color 180ms ease, background 180ms ease;
+      text-align: left;
+    }
+
+
+    a.project-card {
+      display: block;
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .featured-project.project-card {
+      display: grid;
+    }
+
+    .project-card:focus-visible {
+      outline: none;
+      border-color: rgba(255, 255, 255, 0.38);
+      background: rgba(36, 36, 40, 0.95);
+      transform: translateY(-4px);
+    }
+
+    .project-card:hover,
+    .project-card:focus-within {
+      transform: translateY(-4px);
+      border-color: rgba(255, 255, 255, 0.38);
+      background: rgba(36, 36, 40, 0.95);
+    }
+
+    .featured-project {
+      display: grid;
+      grid-template-columns: minmax(0, 1.12fr) minmax(320px, 0.88fr);
+      align-items: stretch;
+      min-height: 315px;
+    }
+
+    .project-media {
+      min-height: 220px;
+      background: rgba(30, 30, 30, 0.82);
+      border-right: 1px solid rgba(255, 255, 255, 0.08);
+      overflow: hidden;
+    }
+
+    .project-media img,
+    .project-media video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: var(--focus-x, center) var(--focus-y, center);
+      display: block;
+    }
+
+    /* To change what part of a tile image is emphasized, edit the inline
+       --focus-x and --focus-y values on that tile's .project-media div.
+       Examples:
+       style="--focus-x: 50%; --focus-y: 20%;"  = focus near top-center
+       style="--focus-x: 80%; --focus-y: 50%;"  = focus right-center
+       style="--focus-x: 25%; --focus-y: 70%;"  = focus lower-left-ish
+    */
+
+    .project-content {
+      padding: clamp(1rem, 1.8vw, 1.6rem);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .project-tag {
+      display: inline-block;
+      color: var(--muted);
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      font-weight: 760;
+      margin-bottom: 0.35rem;
+    }
+
+    .project-content h3 {
+      color: white;
+      font-size: clamp(1.15rem, 1.7vw, 1.55rem);
+      line-height: 1.12;
+      letter-spacing: -0.04em;
+      margin-bottom: 0.48rem;
+    }
+
+    .project-content p {
+      color: var(--subtle);
+      font-size: 0.92rem;
+      line-height: 1.38;
+      margin-bottom: 0.85rem;
+    }
+
+
+    .project-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.9rem;
+    }
+
+    .project-grid .project-card {
+      display: grid;
+      grid-template-rows: 185px auto;
+    }
+
+    .project-grid .project-media {
+      min-height: 0;
+      border-right: none;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    footer {
+      position: relative;
+      z-index: 2;
+      border-top: 1px solid rgba(255, 255, 255, 0.13);
+      padding: 2rem 6vw;
+      color: var(--subtle);
+      background: rgba(5, 5, 5, 0.92);
+      backdrop-filter: blur(18px);
+      font-size: 0.9rem;
+    }
+
+    @media (max-width: 1050px) {
+      .topbar {
+        grid-template-columns: 1fr;
+        justify-items: center;
+        gap: 0.3rem;
+        padding: 0.55rem 4vw;
+      }
+
+      .brand {
+        justify-self: center;
+      }
+
+      nav {
+        width: 100%;
+        overflow-x: auto;
+        justify-content: center;
+        padding-bottom: 0.1rem;
+      }
+
+      :root {
+        --topbar-h: 88px;
+      }
+
+      .placeholder-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .section {
+        padding-left: 1rem;
+        padding-right: 1rem;
+      }
+    }
+
+    @media (max-width: 1050px) {
+      .featured-project {
+        grid-template-columns: 1fr;
+      }
+
+      .project-media {
+        border-right: none;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      }
+
+      .project-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+
+    /* FINAL OVERRIDE: two featured project cards in a two-column layout. */
+    .featured-project-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.9rem;
+      width: 100%;
+    }
+
+    .featured-project-grid .featured-project {
+      display: grid;
+      grid-template-columns: 1fr !important;
+      grid-template-rows: 230px auto;
+      min-height: 0;
+    }
+
+    .featured-project-grid .project-media {
+      min-height: 0;
+      border-right: none;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    @media (max-width: 1050px) {
+      .featured-project-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+
+    /* FINAL OVERRIDE: left-align project tile text with no centered paragraph indentation. */
+    .project-card,
+    .project-content,
+    .project-content h3,
+    .project-content p {
+      text-align: left !important;
+    }
+
+    .project-content p {
+      margin-left: 0 !important;
+      margin-right: 0 !important;
+      max-width: none !important;
+    }
+
+
+
+
+
+    /* FINAL OVERRIDE: poppet image only.
+       This tile rotates the CAD image 90 degrees and scales it so the
+       full rotated image fits the tile image area much more naturally.
+       If you want to fine-tune it later, adjust --poppet-scale on the
+       poppet tile's .project-media div. Values around 2.20–2.30 work well.
+    */
+    .poppet-media {
+      overflow: hidden !important;
+      display: block !important;
+      position: relative !important;
+      background: #ffffff !important;
+    }
+
+    .poppet-media img {
+      position: absolute !important;
+      top: 50% !important;
+      left: 50% !important;
+      width: auto !important;
+      height: 100% !important;
+      max-width: none !important;
+      object-fit: contain !important;
+      object-position: center center !important;
+      transform: translate(-50%, -50%) rotate(-90deg) scale(var(--poppet-scale, 2.24)) !important;
+      transform-origin: center center !important;
+    }
+
+
+
+    /* FINAL OVERRIDE: NASA portfolio tile image fully visible with black fill space.
+       The outer tile keeps the normal portfolio-card styling so no white/weird outline appears. */
+    .project-media.nasa-media {
+      background: #000000 !important;
+      overflow: hidden !important;
+      border-right: none !important;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+    }
+
+    .project-media.nasa-media img {
+      width: 100% !important;
+      height: 100% !important;
+      object-fit: contain !important;
+      object-position: center center !important;
+      background: #000000 !important;
+      display: block !important;
+      border: none !important;
+      outline: none !important;
+      box-shadow: none !important;
+    }
+
+  </style>
+</head>
+
+<body>
+  <div class="gif-background" aria-hidden="true">
+    <video id="heroVideo" muted playsinline loop autoplay preload="auto">
+      <source src="assets/Videos/Heavybulb Hotfire 2_slowmo.mp4" type="video/mp4" />
+    </video>
+  </div>
+
+  <header class="topbar">
+    <a class="brand" href="index.html" aria-label="Jaden Dew homepage">
+      <span>Jaden Dew</span>
+    </a>
+
+    <nav aria-label="Main navigation">
+      <a class="nav-link" href="index.html">Home</a>
+
+      <div class="nav-item">
+        <a class="nav-link" href="portfolio.html">Portfolio</a>
+        <div class="nav-dropdown" aria-label="Portfolio project links">
+          <a class="dropdown-link" href="BEAR.html">BEAR: Berkeley Aerial Emergency Response</a>
+          <a class="dropdown-link" href="E3_MVA.html">Liquid Rocket Test Stand Main Valves</a>
+          <a class="dropdown-link" href="E178_ME103.html">Flying Wing Simulation and Control</a>
+          <a class="dropdown-link" href="ME100.html">The Devious Alarm</a>
+          <a class="dropdown-link" href="vast.html">Vast Space: Saiph Thruster Testing</a>
+          <a class="dropdown-link" href="poppet.html">Custom Poppet Valve</a>
+          <a class="dropdown-link" href="NASA.html">NASA: Dragonfly Rotor Blade Optimization</a>
+        </div>
+      </div>
+
+      <a class="nav-link" href="assets/jaden_resume_alt_3-22-2026.pdf" target="_blank" rel="noopener">Resume</a>
+      <a class="nav-link" href="https://www.linkedin.com/in/jaden-dew-178a37249/" target="_blank" rel="noopener">LinkedIn</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="section" aria-label="Portfolio placeholder page">
+      <div class="section-inner">
+        <section class="portfolio-panel">
+          <div>
+            <div class="section-kicker">Portfolio</div>
+            <h1>Engineering Portfolio</h1>
+            <p class="portfolio-intro">
+              A collection of some engineering projects I have worked or am currently working on. These projects span work from internships, student teams, 
+              class projects, and personal projects. Click on a tile to learn more about that project!
+            </p>
+          </div>
+
+          <div>
+            <h2>Featured Projects</h2>
+            <div class="featured-project-grid" aria-label="Featured portfolio projects">
+              <a class="project-card featured-project" href="BEAR.html">
+                <div class="project-media" style="--focus-x: 50%; --focus-y: 55%;">
+                  <img src="assets/BEARSunsetFlight.jpg" alt="Featured propulsion project preview" />
+                </div>
+                <div class="project-content">
+                  <span class="project-tag">Class Project</span>
+                  <h3>BEAR: Berkeley Emergency Aerial Response</h3>
+                  <p>
+                    My UC Berkeley aerospace engineering design capstone. An autonomous tilt-rotor VTOL drone designed to locate a lost hiker, drop and aid packagem, and report that
+                    location back to serach and rescue teams. For this projeft I specifically conducted aerodynamic analysis, wing design, manufacturing, and tilt rotor testing. 
+                  </p>
+                </div>
+              </a>
+
+              <a class="project-card featured-project" href="E3_MVA.html">
+                <div class="project-media" style="--focus-x: 50%; --focus-y: 48%;">
+                  <img src="assets/MVA_GloryShot.JPG" alt="Featured aerodynamics project preview" />
+                </div>
+                <div class="project-content">
+                  <span class="project-tag">Student Team</span>
+                  <h3>Liquid Rocket Test Stand Main Valves</h3>
+                  <p>
+                    The main valves for the vertical test stand of the proplsion system for my undergraduate rocketry team's Eureka 3 rocket. This test stand was build as a 
+                    test bed for custom proulsion hardware as such the main valves neede to be simple and robust to eliminate valve failures as confounding factors. As such I designed
+                    and built these valves using largely off the shelf hardware resulting in a set of robust and reliable valves.
+                  </p>
+                </div>
+              </a>
+            </div>
+          </div>
+
+          <div>
+            <h2>Projects</h2>
+            <div class="project-grid" aria-label="Portfolio project tiles">
+              <a class="project-card" href="E178_ME103.html">
+                <div class="project-media" style="--focus-x: 50%; --focus-y: 50%;">
+                  <video autoplay muted loop playsinline preload="metadata" aria-label="Flying wing simulation and control preview animation">
+                    <source src="assets/Videos/mpc_v2_animation.mp4" type="video/mp4" />
+                  </video>
+                </div>
+                <div class="project-content">
+                  <span class="project-tag">Class Project</span>
+                  <h3> Flying Wing Simulation and Control</h3>
+                  <p>
+                    A combination of the work I did for my ME103 and E178 class pojects during senior year of my undergraduate degree. The ME103 portion of this project consisted of 
+                    conducting simulation of a flying wing aircraft design in both Ansys Fluent and OpenVSP comparing these simulations to wind tunnel tests. This was done with the goal 
+                    of determining how design factors effect trim conditions and how well these effects are captured by simulation. The E178 component expaned on this by rreated a surrrogate 
+                    model fo the design using OpenVSP data, using that model to create a simple MPC controller capable of controlling the aircraft's trajectory in 3D space.
+                  </p>
+                </div>
+              </a>
+
+              <a class="project-card" href="ME100.html">
+                <div class="project-media" style="--focus-x: 50%; --focus-y: 80%;">
+                  <img src="assets/DeviousAlarmTitleImage2.jpeg" alt="Aerodynamics project preview" />
+                </div>
+                <div class="project-content">
+                  <span class="project-tag">Class Project</span>
+                  <h3>The Devious Alarm</h3>
+                  <p>
+                    The final project for my undergraduate ME100 electronics course where I built an alarm clock that progressively annoysi the user untill they get our of bed. This 
+                    alarm clock utilized a set of ESP32 micro controllers, sensors, and actuators to create an a larm that is impossible to ignore and only shust off when the ser is 
+                    truly out of bed.
+                  </p>
+                </div>
+              </a>
+
+              <a class="project-card" href="vast.html">
+                <div class="project-media" style="--focus-x: 50%; --focus-y: 50%;">
+                  <img src="assets/Vast/SaiphBurn.png" alt="Vast Saiph thruster testing preview" />
+                </div>
+                <div class="project-content">
+                  <span class="project-tag">Internship</span>
+                  <h3>Vast Space: Saiph Thruster Testing</h3>
+                  <p>
+                    Worked as a propulsion test intern at Vast Space supporting testing of Impulse Space's Saiph thruster. In this role I served as the test director'operator across 24+ successful hot-fires
+                    and 9+ successful campaigns overseeing operations, managing the flow of test data, and interfacing with REs. This work resulted in the completion of the flight rational for the HAven Demo spacecraft and mission
+                    which successfully launched in November 2025 and completed its mission and de-orbited in February of 2026.
+                  </p>
+                </div>
+              </a>
+
+              <a class="project-card" href="poppet.html">
+                <div class="project-media poppet-media" style="--focus-x: 50%; --focus-y: 50%; --poppet-scale: 2.24;">
+                  <img src="assets/Poppet1.png" alt="Controls project preview" />
+                </div>
+                <div class="project-content">
+                  <span class="project-tag">Student Team</span>
+                  <h3>Custom Poppet Valve</h3>
+                  <p>
+                    A custom poppet value I desiged to be used as the nitrous main valve for my undergraduate student rocketry team's Eureka 3 rocket. This valve consisted of entirely custom hardware with the 
+                    valve being sealed by a pressurized pilot volume and PTFE insert, with the valve being opned by venting this pilot volume. This valve has since not yet been launched or hotfired but has 
+                    acheived successful operation during multiple cold flow tests. 
+                  </p>
+                </div>
+              </a>
+
+              <a class="project-card" href="NASA.html">
+                <div class="project-media nasa-media" style="--focus-x: 50%; --focus-y: 43%;">
+                  <img src="assets/NASA/DragonflyLogo.png" alt="Software project preview" />
+                </div>
+                <div class="project-content">
+                  <span class="project-tag">Internship</span>
+                  <h3>NASA: Dragonfly Rotor Blade Optimization</h3>
+                  <p>
+                    A summary of the research I conducted during my summer internship at NASA Ames Research center in the Advanced Supercomuting Divsion at the end of sophmore year of my undergraduate degree. 
+                    During this reserach I was responsable for developing an optimization infsatructure for the rotor blade design of the Dragonfly UAV being sent to Titan. To do so I combined high and low fidelity 2D and 3D 
+                    computational methods to optimize Dragonfly's indiviudal airfoils and over 3D blade geometry, resulting in the creation of increased efficency blade geometries. 
+                  </p>
+                </div>
+              </a>
+            </div>
+          </div>
+        </section>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>© 2026 Jaden Dew</p>
+  </footer>
+
+  <script>
+    const heroVideo = document.getElementById("heroVideo");
+
+    if (heroVideo) {
+      heroVideo.play().catch(() => {});
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Poppet Valve | Jaden Dew</title>
+
+  <style>
+    :root {
+      --bg: #050505;
+      --panel: rgba(10, 10, 10, 0.76);
+      --panel-solid: rgba(18, 18, 18, 0.94);
+      --border: rgba(255, 255, 255, 0.16);
+      --text: #d4d4d4;
+      --muted: #9cdcfe;
+      --subtle: #b8b8b8;
+      --accent: #007acc;
+      --accent-hover: #179fff;
+      --shadow: rgba(0, 0, 0, 0.48);
+      --topbar-h: 56px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html {
+      scroll-behavior: smooth;
+      background: #000;
+    }
+
+    body {
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: transparent;
+      color: var(--text);
+      line-height: 1.6;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    .gif-background {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      overflow: hidden;
+      background: #fff;
+      pointer-events: none;
+    }
+
+    .gif-background img {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 100vh;
+      height: 100vw;
+      object-fit: cover;
+      object-position: center center;
+      display: block;
+      opacity: 1;
+      filter: saturate(0.98) contrast(1.04);
+      transform: translate(-50%, -50%) rotate(-90deg) scale(0.90);
+      transform-origin: center center;
+      transition: opacity 180ms ease;
+    }
+
+    .gif-background::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      background:
+        linear-gradient(to bottom, rgba(0, 0, 0, 0.20), rgba(0, 0, 0, 0.18) 38%, rgba(0, 0, 0, 0.62));
+      pointer-events: none;
+    }
+
+    .topbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      min-height: var(--topbar-h);
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      gap: 1rem;
+      padding: 0.45rem 6vw;
+      background: rgba(5, 5, 5, 0.95);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.34);
+    }
+
+    .brand {
+      justify-self: start;
+      display: inline-flex;
+      align-items: center;
+      color: white;
+      font-size: 0.88rem;
+      font-weight: 650;
+      letter-spacing: 0.01em;
+      opacity: 0.92;
+    }
+
+    nav {
+      justify-self: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.1rem;
+    }
+
+    .nav-link {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.46rem 0.82rem;
+      border-radius: 8px;
+      color: white;
+      font-size: 0.84rem;
+      opacity: 0.9;
+      transition: background 180ms ease, opacity 180ms ease;
+    }
+
+    .nav-link:hover,
+    .nav-link:focus-visible {
+      background: rgba(255, 255, 255, 0.09);
+      opacity: 1;
+      outline: none;
+    }
+
+    .nav-item {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .nav-dropdown {
+      position: absolute;
+      top: calc(100% + 0.45rem);
+      left: 50%;
+      transform: translateX(-50%) translateY(-6px);
+      min-width: 235px;
+      padding: 0.45rem;
+      display: grid;
+      gap: 0.12rem;
+      background: rgba(5, 5, 5, 0.96);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 12px;
+      box-shadow: 0 18px 60px rgba(0, 0, 0, 0.55);
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transition: opacity 180ms ease, transform 180ms ease, visibility 180ms ease;
+    }
+
+    .nav-item:hover .nav-dropdown,
+    .nav-item:focus-within .nav-dropdown {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .dropdown-link {
+      display: block;
+      padding: 0.52rem 0.68rem;
+      border-radius: 8px;
+      color: rgba(255, 255, 255, 0.88);
+      font-size: 0.80rem;
+      line-height: 1.2;
+      white-space: nowrap;
+      transition: background 180ms ease, color 180ms ease;
+    }
+
+    .dropdown-link:hover,
+    .dropdown-link:focus-visible {
+      background: rgba(255, 255, 255, 0.09);
+      color: white;
+      outline: none;
+    }
+
+    main {
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: end;
+      padding: calc(var(--topbar-h) + 2rem) 6vw 3.5rem;
+      background: transparent;
+    }
+
+    .hero-card {
+      width: min(920px, 88vw);
+      padding: 1.0rem 1.15rem;
+      color: rgba(255, 255, 255, 0.94);
+      background: rgba(5, 5, 5, 0.50);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 16px;
+      backdrop-filter: blur(14px);
+      box-shadow: 0 18px 60px rgba(0, 0, 0, 0.46);
+    }
+
+    .hero-kicker,
+    .section-kicker {
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      font-size: 0.70rem;
+      font-weight: 760;
+      margin-bottom: 0.26rem;
+    }
+
+    .hero-card h1 {
+      color: white;
+      font-size: clamp(1.65rem, 3.2vw, 3.0rem);
+      font-weight: 760;
+      letter-spacing: -0.055em;
+      line-height: 1.0;
+      margin-bottom: 0.38rem;
+    }
+
+    .hero-subtitle {
+      color: rgba(255, 255, 255, 0.82);
+      font-size: clamp(0.86rem, 1.05vw, 1.08rem);
+      font-weight: 560;
+      letter-spacing: 0.01em;
+      line-height: 1.32;
+    }
+
+    .section {
+      min-height: 100vh;
+      padding: calc(var(--topbar-h) + 0.75rem) 2rem 0.9rem;
+      display: grid;
+      align-items: stretch;
+      background: rgba(0, 0, 0, 0.72);
+      backdrop-filter: blur(10px);
+    }
+
+    .section-inner {
+      width: min(1820px, 100%);
+      margin: 0 auto;
+    }
+
+    .project-panel {
+      min-height: calc(100vh - var(--topbar-h) - 1.65rem);
+      padding: clamp(1.2rem, 2.4vw, 2rem);
+      background: rgba(18, 18, 18, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 26px;
+      box-shadow: 0 28px 95px rgba(0, 0, 0, 0.5);
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1.1rem;
+      align-items: stretch;
+    }
+
+    .project-text-box {
+      min-height: 0;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 0.62rem;
+      padding: 1.0rem 1.15rem;
+      background: rgba(18, 18, 18, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 20px;
+      box-shadow: 0 22px 70px rgba(0, 0, 0, 0.42);
+    }
+
+    .project-text-box h2 {
+      color: white;
+      font-size: clamp(1.55rem, 2.4vw, 2.65rem);
+      line-height: 1.0;
+      letter-spacing: -0.055em;
+      margin-bottom: 0.75rem;
+      text-align: left;
+    }
+
+    .project-text-box p {
+      color: rgba(255, 255, 255, 0.74);
+      font-size: clamp(0.84rem, 0.95vw, 1.02rem);
+      line-height: 1.38;
+      margin: 0;
+      text-align: left;
+    }
+
+    .project-text-box p + p {
+      margin-top: 0.62rem;
+      padding-top: 0;
+      border-top: none;
+    }
+
+
+
+    /* Prevent grey divider lines between paragraphs in text boxes on this page and future sections. */
+    .project-text-box p + p,
+    .section p + p {
+      border-top: none !important;
+      padding-top: 0 !important;
+    }
+
+    .vehicle-overview-image {
+      margin-top: 0;
+      overflow: hidden;
+      border-radius: 22px;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      background: rgba(5, 5, 5, 0.50);
+      min-height: 0;
+      height: 100%;
+      box-shadow: 0 24px 90px var(--shadow);
+    }
+
+    .vehicle-overview-image img {
+      width: 100%;
+      height: 100%;
+      min-height: 0;
+      object-fit: cover;
+      object-position: center center;
+      display: block;
+      background: rgba(30, 30, 30, 0.82);
+    }
+
+
+
+    /* Preliminary Design Considerations section */
+    .preliminary-section {
+      margin-top: 1.1rem;
+      padding: clamp(1.2rem, 2.4vw, 2rem);
+      background: rgba(18, 18, 18, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 26px;
+      box-shadow: 0 28px 95px rgba(0, 0, 0, 0.5);
+    }
+
+    .preliminary-row {
+      display: grid;
+      grid-template-columns: minmax(340px, 0.85fr) minmax(0, 1.15fr);
+      gap: 1.1rem;
+      align-items: stretch;
+    }
+
+    .preliminary-text-box {
+      min-height: 0;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 1.0rem 1.15rem;
+      background: rgba(18, 18, 18, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 20px;
+      box-shadow: 0 22px 70px rgba(0, 0, 0, 0.42);
+    }
+
+    .preliminary-text-box h2 {
+      color: white;
+      font-size: clamp(1.55rem, 2.4vw, 2.65rem);
+      line-height: 1.0;
+      letter-spacing: -0.055em;
+      margin-bottom: 0.75rem;
+      text-align: left;
+    }
+
+    .preliminary-text-box p {
+      color: rgba(255, 255, 255, 0.74);
+      font-size: clamp(0.84rem, 0.95vw, 1.02rem);
+      line-height: 1.38;
+      margin: 0;
+      text-align: left;
+    }
+
+    .preliminary-text-box p + p {
+      margin-top: 0.62rem;
+      padding-top: 0 !important;
+      border-top: none !important;
+    }
+
+    .preliminary-media-tile {
+      overflow: hidden;
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(5, 5, 5, 0.50);
+      min-height: 360px;
+      box-shadow: 0 24px 90px var(--shadow);
+    }
+
+    .preliminary-media-tile img {
+      width: 100%;
+      height: 100%;
+      min-height: 360px;
+      object-fit: cover;
+      object-position: center center;
+      display: block;
+      background: rgba(30, 30, 30, 0.82);
+    }
+
+
+
+
+    /* Poppet Design section */
+    .poppet-design-section {
+      margin-top: 1.1rem;
+      padding: clamp(1.2rem, 2.4vw, 2rem);
+      background: rgba(18, 18, 18, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 26px;
+      box-shadow: 0 28px 95px rgba(0, 0, 0, 0.5);
+    }
+
+    .poppet-design-row {
+      display: grid;
+      grid-template-columns: minmax(0, 0.75fr) minmax(520px, 1.25fr);
+      gap: 1.1rem;
+      align-items: stretch;
+    }
+
+    .poppet-design-text-box {
+      min-height: 0;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 1.0rem 1.15rem;
+      background: rgba(18, 18, 18, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 20px;
+      box-shadow: 0 22px 70px rgba(0, 0, 0, 0.42);
+    }
+
+    .poppet-design-text-box h2 {
+      color: white;
+      font-size: clamp(1.55rem, 2.4vw, 2.65rem);
+      line-height: 1.0;
+      letter-spacing: -0.055em;
+      margin-bottom: 0.75rem;
+      text-align: left;
+    }
+
+    .poppet-design-text-box p {
+      color: rgba(255, 255, 255, 0.74);
+      font-size: clamp(0.84rem, 0.95vw, 1.02rem);
+      line-height: 1.38;
+      margin: 0;
+      text-align: left;
+    }
+
+    .poppet-design-text-box p + p {
+      margin-top: 0.62rem;
+      padding-top: 0 !important;
+      border-top: none !important;
+    }
+
+    .poppet-design-media-tile {
+      overflow: hidden;
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(5, 5, 5, 0.50);
+      min-height: 360px;
+      box-shadow: 0 24px 90px var(--shadow);
+    }
+
+    .poppet-design-media-tile img {
+      width: 100%;
+      height: 100%;
+      min-height: 360px;
+      object-fit: cover;
+      object-position: center center;
+      display: block;
+      background: rgba(30, 30, 30, 0.82);
+    }
+
+
+
+
+    /* Poppet Analysis section */
+    .poppet-analysis-section {
+      margin-top: 1.1rem;
+      padding: clamp(0.9rem, 1.6vw, 1.35rem);
+      background: rgba(18, 18, 18, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 26px;
+      box-shadow: 0 28px 95px rgba(0, 0, 0, 0.5);
+    }
+
+    .poppet-analysis-row {
+      display: grid;
+      grid-template-columns: 1fr;
+      grid-template-rows: auto auto;
+      gap: 1.1rem;
+      align-items: stretch;
+    }
+
+    .poppet-analysis-text-box {
+      min-height: 0;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 1.0rem 1.15rem;
+      background: rgba(18, 18, 18, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 20px;
+      box-shadow: 0 22px 70px rgba(0, 0, 0, 0.42);
+    }
+
+    .poppet-analysis-text-box h2 {
+      color: white;
+      font-size: clamp(1.55rem, 2.4vw, 2.65rem);
+      line-height: 1.0;
+      letter-spacing: -0.055em;
+      margin-bottom: 0.75rem;
+      text-align: left;
+    }
+
+    .poppet-analysis-text-box p {
+      color: rgba(255, 255, 255, 0.74);
+      font-size: clamp(0.84rem, 0.95vw, 1.02rem);
+      line-height: 1.38;
+      margin: 0;
+      text-align: left;
+    }
+
+    .poppet-analysis-text-box p + p {
+      margin-top: 0.62rem;
+      padding-top: 0 !important;
+      border-top: none !important;
+    }
+
+    .poppet-analysis-media-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1.658fr) minmax(0, 0.944fr);
+      gap: 0.45rem;
+      min-width: 0;
+    }
+
+    .poppet-analysis-media-tile {
+      overflow: hidden;
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(5, 5, 5, 0.50);
+      min-height: 360px;
+      display: grid;
+      grid-template-rows: minmax(0, 1fr) auto;
+      box-shadow: 0 24px 90px var(--shadow);
+    }
+
+    .poppet-analysis-media-tile img {
+      width: 100%;
+      height: 100%;
+      min-height: 315px;
+      object-fit: cover;
+      object-position: center center;
+      display: block;
+      background: rgba(30, 30, 30, 0.82);
+    }
+
+    .poppet-analysis-caption {
+      padding: 0.42rem 0.65rem;
+      color: rgba(255, 255, 255, 0.78);
+      background: rgba(5, 5, 5, 0.82);
+      border-top: 1px solid rgba(255, 255, 255, 0.10);
+      font-size: 0.78rem;
+      line-height: 1.22;
+      text-align: center;
+    }
+
+
+
+    /* FINAL OVERRIDE: Poppet Analysis image widths matched to the source image aspect ratios.
+       This keeps the same image display method while giving the inherently wider
+       deflection image more horizontal space than the buckling image. */
+    .poppet-analysis-media-row {
+      grid-template-columns: minmax(0, 1.658fr) minmax(0, 0.944fr) !important;
+    }
+
+
+    /* Current Project Status section */
+    .current-status-section {
+      margin-top: 1.1rem;
+      padding: clamp(1.2rem, 2.4vw, 2rem);
+      background: rgba(18, 18, 18, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 26px;
+      box-shadow: 0 28px 95px rgba(0, 0, 0, 0.5);
+    }
+
+    .current-status-text-box {
+      min-height: 0;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 1.0rem 1.15rem;
+      background: rgba(18, 18, 18, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 20px;
+      box-shadow: 0 22px 70px rgba(0, 0, 0, 0.42);
+    }
+
+    .current-status-text-box h2 {
+      color: white;
+      font-size: clamp(1.55rem, 2.4vw, 2.65rem);
+      line-height: 1.0;
+      letter-spacing: -0.055em;
+      margin-bottom: 0.75rem;
+      text-align: left;
+    }
+
+    .current-status-text-box p {
+      color: rgba(255, 255, 255, 0.74);
+      font-size: clamp(0.84rem, 0.95vw, 1.02rem);
+      line-height: 1.38;
+      margin: 0;
+      text-align: left;
+    }
+
+
+    /* FINAL OVERRIDE: shrink the height of the overview paragraph section. */
+    .project-panel {
+      min-height: auto !important;
+      align-items: start !important;
+    }
+
+    .project-panel .project-text-box {
+      height: auto !important;
+      min-height: 0 !important;
+      justify-content: flex-start !important;
+    }
+
+
+    footer {
+      position: relative;
+      z-index: 2;
+      border-top: 1px solid rgba(255, 255, 255, 0.13);
+      padding: 2rem 6vw;
+      color: var(--subtle);
+      background: rgba(5, 5, 5, 0.92);
+      backdrop-filter: blur(18px);
+      font-size: 0.9rem;
+    }
+
+    @media (max-width: 1050px) {
+      .topbar {
+        grid-template-columns: 1fr;
+        justify-items: center;
+        gap: 0.3rem;
+        padding: 0.55rem 4vw;
+      }
+
+      .brand {
+        justify-self: center;
+      }
+
+      nav {
+        width: 100%;
+        overflow-x: auto;
+        justify-content: center;
+        padding-bottom: 0.1rem;
+      }
+
+      :root {
+        --topbar-h: 88px;
+      }
+
+      .project-panel {
+        grid-template-columns: 1fr;
+      }
+
+      .project-panel {
+        min-height: auto;
+      }
+
+      .vehicle-overview-image {
+        min-height: 340px;
+      }
+
+      .preliminary-row,
+      .poppet-design-row,
+      .poppet-analysis-row,
+      .poppet-analysis-media-row {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .section {
+        padding-left: 1rem;
+        padding-right: 1rem;
+      }
+
+      .hero {
+        padding-left: 1rem;
+        padding-right: 1rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="gif-background" aria-hidden="true">
+    <img id="heroImage" src="assets/Poppet1.png" alt="" />
+  </div>
+
+  <header class="topbar">
+    <a class="brand" href="index.html" aria-label="Jaden Dew homepage">
+      <span>Jaden Dew</span>
+    </a>
+
+    <nav aria-label="Main navigation">
+      <a class="nav-link" href="index.html">Home</a>
+
+      <div class="nav-item">
+        <a class="nav-link" href="portfolio.html">Portfolio</a>
+        <div class="nav-dropdown" aria-label="Portfolio project links">
+          <a class="dropdown-link" href="BEAR.html">BEAR: Berkeley Aerial Emergency Response</a>
+          <a class="dropdown-link" href="E3_MVA.html">Liquid Rocket Test Stand Main Valves</a>
+          <a class="dropdown-link" href="E178_ME103.html">Flying Wing Simulation and Control</a>
+          <a class="dropdown-link" href="ME100.html">The Devious Alarm</a>
+          <a class="dropdown-link" href="vast.html">Vast Space: Saiph Thruster Testing</a>
+          <a class="dropdown-link" href="poppet.html">Custom Poppet Valve</a>
+          <a class="dropdown-link" href="NASA.html">NASA: Dragonfly Rotor Blade Optimization</a>
+        </div>
+      </div>
+
+      <a class="nav-link" href="assets/jaden_resume_alt_3-22-2026.pdf" target="_blank" rel="noopener">Resume</a>
+      <a class="nav-link" href="https://www.linkedin.com/in/jaden-dew-178a37249/" target="_blank" rel="noopener">LinkedIn</a>
+    </nav>
+  </header>
+
+  <main id="top">
+    <section class="hero" aria-label="Poppet valve project hero">
+      <div class="hero-card">
+        <div class="hero-kicker">Student Team</div>
+        <h1>Custom Poppet Valve</h1>
+        <div class="hero-subtitle">Custom poppet valve to be used as the nitrous main valve for the "Eureka 3" rocket.</div>
+      </div>
+    </section>
+
+    <section class="section" aria-label="Poppet valve project overview">
+      <div class="section-inner">
+        <section class="project-panel">
+          <div class="project-text-box">
+            <div>
+              <h2>Poppet Valve Overview</h2>
+            </div>
+
+            <div>
+              <p>
+                Eureka 3 is my undergraduate student rocketry team's third liquid rocket and is the most recent step the team is taking towards developing a liquid spaceshot.
+                 This rocket marked a transition for the team away from utilizing mostly off the shelf hardware towards developing our own mass optimized custom flight hardware.
+                 As a part of this push the main valves of the rocket were identified as an area where developing a custom set of flight hardware could improve the rocket's design. Previous
+                 designs of the main valves across both previous liquid rockets and tests stands made use of largely off the shelf parts combining pneumatic cylinders and balls valves to achieve a
+                 reliable main valve system. This system, while reliable and flight proven, is fairly bulky and space inefficient. Additionally valves of this type require additional structure to mount the valves in place and transfer loads from the engine.
+                 To address these issues it was decided that the best course of action would be to develop our own set of poppet valves that were compact enough to save space compared to the traditional design and were strong enough to transfer flight loads without the need of additional structure.  
+                 In addition since poppet valves open and close via the pressurization and venting of a pilot volume all systems needed to actuate the valves could be placed on the ground, further
+                 saving weight.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section class="preliminary-section" aria-label="Preliminary Design Considerations">
+          <div class="preliminary-row">
+            <div class="preliminary-text-box">
+              <h2>Preliminary Design Considerations</h2>
+              <p>
+                 Poppet valves operate on the principle of pressure-area ratios. The idea of a poppet valve is that the inner section of the valve, the poppet, can seal against a 
+                 large upstream pressure by having a smaller pilot pressure below the poppet holding it up. This is achieved by designing the poppet such that the 
+                 smaller pilot pressure acts over a larger area than the upstream pressure, allowing for a net upwards sealing force to act on the poppet.  
+                As mentioned before, this also makes the poppet valve very simple to open and close because all that needs to be done is to either vent or pressurize the pilot volume.
+              </p>
+              <p>
+                With this working principle in mind, the first step I took was to determine an area ratio to allow me to calculate what the pilot pressure would need to be.  To inform this decision, 
+                I considered what the inner radius of the poppet would need to be to allow for proper sealing with the 1 in ID hardware the poppet would be 
+                interfacing, as well as minimizing the pressure drop through the poppet. With this, as well as the space the poppet had available to it within 
+                the rocket's airframe in mind, I was able to determine a set of reasonable radii for the inner and outer diameters for the poppet and casing. 
+                From there, I was able to calculate a working pilot pressure of 475 psi to hold an upstream pressure of 650 psi.
+              </p>
+            </div>
+
+            <div class="preliminary-media-tile">
+              <img src="assets/Poppet/PoppetMath2.jpg" alt="Preliminary poppet valve design image" />
+            </div>
+          </div>
+        </section>
+
+
+
+        <section class="poppet-design-section" aria-label="Poppet Design">
+          <div class="poppet-design-row">
+            <div class="poppet-design-media-tile">
+              <img src="assets/Poppet/PoppetCAD2.png" alt="Poppet valve design image" />
+            </div>
+
+            <div class="poppet-design-text-box">
+              <h2>Poppet Design</h2>
+              <p>
+                This version of the poppet was meant to serve as a unit test version of the poppet valve allowing the team to test poppet functionality and operations separate from the rest of the propulsion system.
+                As such for the outer casing I opted for a flange and O-ring face seal design at the top and bottom end. This was done such that an adapter piece could be added to the poppet adapting it to a fitting or could be bolted directly into a tank or injector face
+                allowing for full integrated tests. This outer casing was designed with a 1/8 in thickness to provide ample safety margin to avoid bursting with the thickness potentially being decreased in later iterations. In addition an additional NPT
+                port was added that attaches to a high pressure PTC fitting to be used as the fill/vent port for the pilot volume.
+              </p>
+              <p>
+               This poppet utilizes a straight through design meaning that when the poppet valve is opened fluid is allowed to flow through the inner poppet and out the other side. This is achieved by making the inner poppet hollow, with four slots that have a combine area of 1 in<sup>2</sup> being machined into it allowing for fluid to enter
+               and flow through the inner volume. THe poppet was designed with a PTFE insert on its top which is fastened to the inner poppet via a retaining pin. This PTFE insert presses against the fitting, tank bottom, or injector face resulting in the seal that holds the tank pressure in. The poppet itself is sealed in two places
+               along the inner face. The first double O-ring seal prevents the pilot volume from leaking into the tank or vice versa, preventing the accidental release of nitrous into the rest of the propulsion system. The second lower seal is also for the pilot volume preventing it from leaking into the injector.
+              </p>
+            </div>
+          </div>
+        </section>
+
+
+
+        <section class="poppet-analysis-section" aria-label="Poppet Analysis">
+          <div class="poppet-analysis-row">
+            <div class="poppet-analysis-text-box">
+              <h2>Poppet Analysis</h2>
+              <p>
+                With the design made, I conducted both FEA and CFD analysis to confirm that the poppet worked as expected before manufacturing. Two types of FEA were conducted. The first was a burst FEA on the outer poppet casing which finding that the casing had ample safety factor at
+                the maximum pressures that were expected during operations. The second FEA was a deflection and buckling analysis on the columns of the inner poppet when it was pressed against the sealing face. This was accomplished by applying a fixed support at the tip of the PTFE insert and then a pressure equivalent to the pilot pressure at the bottom face of the inner poppet, simulating the effects of a fully sealed poppet.
+                TNBe results of this analysis revealed a maximum deflection of 1.4e-5 which was deemed well within a reasonable range of operation. This analysis was then expanded into a full buckling analysis which revealed a minimum load factor of 112 which indicated that the poppet was operating in a regime well away from buckling.
+              </p>
+              <p>
+                In addition to FEA, CFD analysis was also conducted on the flow through the poppet. This was set up utilizing an incompressible internal fluid flow framework with a mass flow inlet and pressure outlet boundary conditions. For the simulation nitrous was used as the fluid with a K-Omega SST viscosity model and uniform boundary layer.
+                The results of this analysis was that the poppet only experienced 15 psi of pressure loss when fully opened which was considered within the pressure loss budget allocated for the poppet during operation.
+              </p>
+            </div>
+
+            <div class="poppet-analysis-media-row">
+              <div class="poppet-analysis-media-tile">
+                <img src="assets/Poppet/FEADeflection.png" alt="Poppet valve analysis image 1" />
+                <div class="poppet-analysis-caption">Inner poppet deflection analysis.</div>
+              </div>
+
+              <div class="poppet-analysis-media-tile">
+                <img src="assets/Poppet/FEABuckling.png" alt="Poppet valve analysis image 2" />
+                <div class="poppet-analysis-caption">Inner poppet buckling analysis.</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="current-status-section" aria-label="Current Project Status">
+          <div class="current-status-text-box">
+            <h2>Current Project Status</h2>
+            <p>
+              Unfortunately these poppets were unable to be fully manufactured and tested before I left the team to pursue study abroad. This was due to the complex geometry of the poppets requiring the use of CNC machining which my student team did not have available to them. As such
+              the parts needed to be contracted out to an external machine shop, namely JLC PCB. Before this was done a few revisions were made to the design before I left. Namely the flange seal was removed and replaced with two concentric O-ring seals that would slide into cavities bored into the injector face and tank bulkhead.
+              With these changes made the poppets have been ordered, manufactured, and received with unit testing showing that the poppet works as expected. Currently the poppet has been fully integrated into Eureka 3's propulsion architecture with current cold flow testing focusing on tuning valve timing to help overcome issues that the team
+              has been having with their ignition procedures.
+            </p>
+          </div>
+        </section>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>© 2026 Jaden Dew.</p>
+  </footer>
+
+  <script>
+    const heroImage = document.getElementById("heroImage");
+
+    function updateBackgroundFade() {
+      const y = window.scrollY || window.pageYOffset;
+      const fadeStart = window.innerHeight * 0.55;
+      const fadeEnd = window.innerHeight * 1.10;
+
+      let opacity = 1.0;
+      if (y > fadeStart) {
+        const p = Math.min(1, (y - fadeStart) / Math.max(1, fadeEnd - fadeStart));
+        opacity = 1.0 - 0.55 * p;
+      }
+
+      if (heroImage) heroImage.style.opacity = String(opacity);
+    }
+
+    window.addEventListener("load", updateBackgroundFade);
+    window.addEventListener("scroll", updateBackgroundFade, { passive: true });
+    window.addEventListener("resize", updateBackgroundFade);
+  </script>
+</body>
+</html>

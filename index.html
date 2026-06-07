@@ -1,0 +1,1117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Project Homepage</title>
+
+  <style>
+    :root {
+      --bg: #050505;
+      --panel: rgba(10, 10, 10, 0.76);
+      --panel-solid: rgba(18, 18, 18, 0.94);
+      --border: rgba(255, 255, 255, 0.16);
+      --text: #d4d4d4;
+      --muted: #9cdcfe;
+      --subtle: #b8b8b8;
+      --accent: #007acc;
+      --accent-hover: #179fff;
+      --shadow: rgba(0, 0, 0, 0.48);
+      --topbar-h: 56px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      background: #000;
+    }
+
+    body {
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: transparent;
+      color: var(--text);
+      line-height: 1.6;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    /* ------------------------------------------------------------------
+       Fixed background: the actual aircraft animation is the landing view.
+       ------------------------------------------------------------------ */
+
+    .gif-background {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      overflow: hidden;
+      background: #000;
+      pointer-events: none;
+    }
+
+    .gif-background img,
+    .gif-background video {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center center;
+      display: block;
+      opacity: 1;
+      filter: saturate(0.98) contrast(1.04);
+      transition: opacity 180ms ease;
+    }
+
+    .gif-background::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      background:
+        linear-gradient(to bottom, rgba(0, 0, 0, 0.16), rgba(0, 0, 0, 0.00) 38%, rgba(0, 0, 0, 0.42));
+      pointer-events: none;
+    }
+
+    /* ------------------------------------------------------------------
+       Top nav
+       ------------------------------------------------------------------ */
+
+    .topbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      min-height: var(--topbar-h);
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      gap: 1rem;
+      padding: 0.45rem 6vw;
+      background: rgba(5, 5, 5, 0.95);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.34);
+    }
+
+    .brand {
+      justify-self: start;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.58rem;
+      color: white;
+      font-size: 0.88rem;
+      font-weight: 650;
+      letter-spacing: 0.01em;
+      opacity: 0.92;
+    }
+
+    .brand-mark {
+      width: 9px;
+      height: 9px;
+      background: var(--accent);
+      border-radius: 2px;
+      box-shadow: 0 0 14px rgba(0, 122, 204, 0.85);
+    }
+
+    nav {
+      justify-self: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.1rem;
+    }
+
+    .nav-link {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.46rem 0.82rem;
+      border-radius: 8px;
+      color: white;
+      font-size: 0.84rem;
+      opacity: 0.9;
+      transition: background 180ms ease, opacity 180ms ease;
+    }
+
+    .nav-link:hover,
+    .nav-link:focus-visible {
+      background: rgba(255, 255, 255, 0.09);
+      opacity: 1;
+      outline: none;
+    }
+
+    .nav-item {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .nav-dropdown {
+      position: absolute;
+      top: calc(100% + 0.45rem);
+      left: 50%;
+      transform: translateX(-50%) translateY(-6px);
+      min-width: 235px;
+      padding: 0.45rem;
+      display: grid;
+      gap: 0.12rem;
+      background: rgba(5, 5, 5, 0.96);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 12px;
+      box-shadow: 0 18px 60px rgba(0, 0, 0, 0.55);
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transition: opacity 180ms ease, transform 180ms ease, visibility 180ms ease;
+    }
+
+    .nav-item:hover .nav-dropdown,
+    .nav-item:focus-within .nav-dropdown {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .dropdown-link {
+      display: block;
+      padding: 0.52rem 0.68rem;
+      border-radius: 8px;
+      color: rgba(255, 255, 255, 0.88);
+      font-size: 0.80rem;
+      line-height: 1.2;
+      white-space: nowrap;
+      transition: background 180ms ease, color 180ms ease;
+    }
+
+    .dropdown-link:hover,
+    .dropdown-link:focus-visible {
+      background: rgba(255, 255, 255, 0.09);
+      color: white;
+      outline: none;
+    }
+
+
+    /* ------------------------------------------------------------------
+       Scroll sections
+       ------------------------------------------------------------------ */
+
+    main {
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: end;
+      padding: calc(var(--topbar-h) + 2rem) 6vw 3.5rem;
+      background: transparent;
+    }
+
+    .hero-card {
+      width: min(780px, 86vw);
+      padding: 0.85rem 1.05rem;
+      color: rgba(255, 255, 255, 0.94);
+      background: rgba(5, 5, 5, 0.46);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 16px;
+      backdrop-filter: blur(14px);
+      box-shadow: 0 18px 60px rgba(0, 0, 0, 0.46);
+    }
+
+    .hero-card h1 {
+      color: white;
+      font-size: clamp(1.25rem, 2.35vw, 2.0rem);
+      font-weight: 760;
+      letter-spacing: -0.04em;
+      line-height: 1.08;
+      margin-bottom: 0.32rem;
+    }
+
+    .hero-subtitle {
+      color: rgba(255, 255, 255, 0.82);
+      font-size: clamp(0.84rem, 1.05vw, 1.05rem);
+      font-weight: 560;
+      letter-spacing: 0.01em;
+      line-height: 1.25;
+    }
+
+    .hero-card p {
+      display: none;
+    }
+
+    .section {
+      min-height: 100vh;
+      padding: calc(var(--topbar-h) + 0.75rem) 2rem 0.9rem;
+      display: grid;
+      align-items: stretch;
+    }
+
+    .section-inner {
+      width: min(1820px, 100%);
+      margin: 0 auto;
+    }
+
+    /* ------------------------------------------------------------------
+       Media comparison section:
+       Side-by-side GIFs after the first scroll.
+       They are intentionally stretched/fitted to use the full card space.
+       ------------------------------------------------------------------ */
+
+    .media-section {
+      background: rgba(0, 0, 0, 0.72);
+      backdrop-filter: blur(10px);
+    }
+
+    .media-results-layout {
+      height: calc(100vh - var(--topbar-h) - 1.65rem);
+      display: grid;
+      grid-template-columns: minmax(360px, 0.32fr) minmax(390px, 0.68fr);
+      grid-template-rows: minmax(0, 1fr);
+      gap: 0.85rem;
+    }
+
+    .media-text-column {
+      min-height: 0;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    .media-grid {
+      min-height: 0;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
+
+    .combined-media-grid {
+      min-height: 0;
+      grid-template-columns: 1fr;
+      grid-template-rows: minmax(0, 1fr);
+    }
+
+    .combined-media-card {
+      width: 100%;
+      height: 100%;
+      min-height: 0;
+      display: grid;
+      grid-template-rows: minmax(0, 1fr) auto;
+      align-items: stretch;
+      overflow: hidden;
+    }
+
+    .combined-media-visual {
+      min-height: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      background: rgba(245, 245, 245, 0.98);
+    }
+
+    .combined-media-card img,
+    .combined-media-card video,
+    .combined-media-card .combined-media-visual > img,
+    .combined-media-card .combined-media-visual > video,
+    .combined-media-card img.combined-media-img,
+    .combined-media-card video.combined-media-img {
+      width: 100%;
+      height: 100%;
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: cover;
+      object-position: center center;
+      display: block;
+      background: rgba(5, 5, 5, 0.78);
+      margin: 0 auto;
+    }
+
+    .media-card {
+      min-width: 0;
+      min-height: 0;
+      display: grid;
+      grid-template-rows: minmax(0, 1fr) auto;
+      overflow: hidden;
+      background: rgba(5, 5, 5, 0.78);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 22px;
+      box-shadow: 0 24px 90px var(--shadow);
+    }
+
+    .media-card img,
+    .media-card video {
+      width: 100%;
+      height: 100%;
+      min-height: 0;
+      display: block;
+      background: rgba(255, 255, 255, 0.98);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    /*
+      Fill mode:
+      - The flight and tracking GIFs are intentionally set to fill the boxes.
+      - This can stretch the plot GIF slightly, but it avoids unused whitespace.
+      - Change object-fit to "contain" if you prefer exact aspect ratio.
+    */
+    .media-card img.fill,
+    .media-card video.fill {
+      object-fit: fill;
+      object-position: center center;
+    }
+
+    .media-card-caption {
+      padding: 0.36rem 0.7rem;
+      color: rgba(255, 255, 255, 0.82);
+      background: rgba(5, 5, 5, 0.88);
+      font-size: 0.78rem;
+      line-height: 1.18;
+    }
+
+    .compact-results-box {
+      min-height: 0;
+      height: 100%;
+      display: grid;
+      grid-template-columns: 1fr;
+      align-content: start;
+      gap: 0.50rem;
+      padding: 0.82rem 1.0rem;
+      background: rgba(18, 18, 18, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 20px;
+      box-shadow: 0 22px 70px rgba(0, 0, 0, 0.42);
+    }
+
+    .compact-results-box h2 {
+      color: white;
+      font-size: clamp(1.30rem, 1.70vw, 1.84rem);
+      line-height: 1.0;
+      letter-spacing: -0.04em;
+      max-width: 100%;
+    }
+
+    .compact-results-box p {
+      color: rgba(255, 255, 255, 0.74);
+      font-size: clamp(0.755rem, 0.795vw, 0.92rem);
+      line-height: 1.255;
+      max-width: 100%;
+      margin: 0;
+      text-align: center;
+    }
+
+    .compact-results-box p + p {
+      margin-top: 0.28rem;
+      padding-top: 0.28rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.10);
+    }
+
+
+    .skills-section {
+      margin-top: 0.28rem;
+      padding-top: 0.28rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.10);
+    }
+
+    .skills-section h2 {
+      color: white;
+      text-align: center;
+      margin-bottom: 0.45rem;
+    }
+
+    .skills-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.75rem;
+      width: 100%;
+    }
+
+    /* Change this one line to switch the Skills subheadings:
+       Blue:  --skills-subheading-color: var(--muted);
+       White: --skills-subheading-color: white;
+    */
+    :root {
+      --skills-subheading-color: var(--muted);
+    }
+
+    .skills-column {
+      padding: 0.65rem 0.75rem;
+      background: rgba(5, 5, 5, 0.34);
+      border: 1px solid rgba(255, 255, 255, 0.10);
+      border-radius: 14px;
+    }
+
+    .skills-column h3 {
+      color: var(--skills-subheading-color);
+      text-align: center;
+      font-size: clamp(0.92rem, 1.0vw, 1.08rem);
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.35rem;
+    }
+
+    .skills-column p {
+      border-top: none !important;
+      padding-top: 0 !important;
+      margin-top: 0 !important;
+    }
+
+
+
+    .learn-more-section {
+      margin-top: 0.65rem;
+      padding-top: 0.55rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.10);
+    }
+
+    .learn-more-section h2 {
+      color: white;
+      text-align: center;
+      margin-bottom: 0.55rem;
+    }
+
+    .learn-more-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.75rem;
+      width: 100%;
+    }
+
+    .learn-more-tile {
+      display: block;
+      background: rgba(30, 30, 30, 0.82);
+      border: 1px solid rgba(255, 255, 255, 0.13);
+      border-radius: 14px;
+      overflow: hidden;
+      transition: transform 180ms ease, border-color 180ms ease, background 180ms ease;
+      min-width: 0;
+      cursor: pointer;
+    }
+
+    .learn-more-tile:hover,
+    .learn-more-tile:focus-visible {
+      transform: translateY(-4px);
+      border-color: rgba(255, 255, 255, 0.38);
+      background: rgba(36, 36, 40, 0.95);
+      outline: none;
+    }
+
+    .learn-more-tile img {
+      width: 100%;
+      height: 115px;
+      object-fit: cover;
+      display: block;
+      background: rgba(30, 30, 30, 0.82);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .learn-more-tile-content {
+      padding: 0.72rem;
+    }
+
+    .learn-more-tile-page {
+      display: inline-block;
+      color: var(--muted);
+      font-size: 0.66rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      font-weight: 760;
+      margin-bottom: 0.22rem;
+    }
+
+    .learn-more-tile h3 {
+      color: white;
+      font-size: 0.98rem;
+      line-height: 1.15;
+      margin-bottom: 0.16rem;
+    }
+
+    .learn-more-tile p {
+      color: var(--subtle);
+      font-size: 0.78rem;
+      line-height: 1.25;
+      border-top: none !important;
+      padding-top: 0 !important;
+      margin-top: 0 !important;
+    }
+
+    /* ------------------------------------------------------------------
+       Tests / explanation section
+       ------------------------------------------------------------------ */
+
+    .tests-section {
+      background: rgba(5, 5, 5, 0.84);
+    }
+
+    .text-panel {
+      min-height: calc(100vh - var(--topbar-h) - 3.35rem);
+      display: grid;
+      grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+      gap: 1.25rem;
+      align-items: stretch;
+      padding: clamp(1.2rem, 2.5vw, 2rem);
+      background:
+        radial-gradient(circle at 85% 10%, rgba(0, 122, 204, 0.18), transparent 32%),
+        rgba(18, 18, 18, 0.90);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 26px;
+      box-shadow: 0 28px 95px rgba(0, 0, 0, 0.5);
+    }
+
+    .text-panel-main {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .section-kicker {
+      color: var(--accent-hover);
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      font-size: 0.66rem;
+      font-weight: 760;
+      margin-bottom: 0.18rem;
+    }
+
+    .text-panel h2 {
+      color: white;
+      font-size: clamp(2rem, 4vw, 4rem);
+      letter-spacing: -0.06em;
+      line-height: 0.98;
+      margin-bottom: 1rem;
+    }
+
+    .text-panel p {
+      color: rgba(255, 255, 255, 0.74);
+      font-size: clamp(1rem, 1.4vw, 1.16rem);
+      max-width: 70ch;
+      margin-bottom: 1rem;
+    }
+
+    .tests-notes {
+      width: 100%;
+      min-height: 100%;
+      padding: 1.25rem;
+      color: rgba(255, 255, 255, 0.82);
+      background: rgba(5, 5, 5, 0.74);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 18px;
+      font: inherit;
+      outline: none;
+      box-shadow: inset 0 0 50px rgba(0, 0, 0, 0.18);
+    }
+
+    .tests-notes h3 {
+      color: white;
+      font-size: 1.1rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .tests-notes p {
+      margin-bottom: 0.85rem;
+    }
+
+    /* ------------------------------------------------------------------
+       Process / flowchart section
+       ------------------------------------------------------------------ */
+
+    .process-section {
+      background: rgba(0, 0, 0, 0.78);
+    }
+
+    .flowchart-panel {
+      min-height: calc(100vh - var(--topbar-h) - 3.35rem);
+      padding: clamp(1.2rem, 2.4vw, 2rem);
+      background: rgba(18, 18, 18, 0.90);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 26px;
+      box-shadow: 0 28px 95px rgba(0, 0, 0, 0.5);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .flowchart-header {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: 1.4rem;
+    }
+
+    .flowchart-header h2 {
+      color: white;
+      font-size: clamp(2rem, 3.2vw, 3.8rem);
+      font-weight: 760;
+      letter-spacing: -0.06em;
+      line-height: 1;
+    }
+
+    .flowchart-header p {
+      color: rgba(255, 255, 255, 0.65);
+      font-size: 0.95rem;
+      text-align: right;
+    }
+
+    .flowchart {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 70px minmax(0, 1fr) 70px minmax(0, 1fr);
+      align-items: stretch;
+      gap: 0.9rem;
+    }
+
+    .flow-step {
+      display: block;
+      background: rgba(30, 30, 30, 0.82);
+      border: 1px solid rgba(255, 255, 255, 0.13);
+      border-radius: 18px;
+      overflow: hidden;
+      transition: transform 180ms ease, border-color 180ms ease, background 180ms ease;
+      min-width: 0;
+      cursor: pointer;
+    }
+
+    .flow-step:hover,
+    .flow-step:focus-visible {
+      transform: translateY(-4px);
+      border-color: rgba(255, 255, 255, 0.38);
+      background: rgba(36, 36, 40, 0.95);
+      outline: none;
+    }
+
+    .flow-step img {
+      width: 100%;
+      height: 170px;
+      object-fit: cover;
+      display: block;
+      background: rgba(30, 30, 30, 0.82);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .flow-step-content {
+      padding: 1rem;
+    }
+
+    .flow-step-page {
+      display: inline-block;
+      color: var(--muted);
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      font-weight: 760;
+      margin-bottom: 0.3rem;
+    }
+
+    .flow-step h3 {
+      color: white;
+      font-size: 1.08rem;
+      line-height: 1.25;
+      margin-bottom: 0.24rem;
+    }
+
+    .flow-step p {
+      color: var(--subtle);
+      font-size: 0.9rem;
+      line-height: 1.38;
+    }
+
+    .flow-arrow {
+      display: grid;
+      place-items: center;
+      align-self: center;
+      height: 70px;
+      color: white;
+      font-size: 3.2rem;
+      font-weight: 700;
+      line-height: 1;
+      user-select: none;
+    }
+
+    footer {
+      position: relative;
+      z-index: 2;
+      border-top: 1px solid rgba(255, 255, 255, 0.13);
+      padding: 2rem 6vw;
+      color: var(--subtle);
+      background: rgba(5, 5, 5, 0.92);
+      backdrop-filter: blur(18px);
+      font-size: 0.9rem;
+    }
+
+    @media (max-width: 1050px) {
+      .topbar {
+        grid-template-columns: 1fr;
+        justify-items: center;
+        gap: 0.3rem;
+        padding: 0.55rem 4vw;
+      }
+
+      .brand {
+        justify-self: center;
+      }
+
+      nav {
+        width: 100%;
+        overflow-x: auto;
+        justify-content: center;
+        padding-bottom: 0.1rem;
+      }
+
+      :root {
+        --topbar-h: 88px;
+      }
+
+      .media-grid,
+      .text-panel,
+      .flowchart {
+        grid-template-columns: 1fr;
+      }
+
+      .media-results-layout {
+        height: auto;
+        min-height: calc(100vh - var(--topbar-h) - 3.35rem);
+        grid-template-columns: 1fr;
+        grid-template-rows: auto minmax(300px, 1fr);
+      }
+
+      .media-text-column {
+        height: auto;
+        overflow: visible;
+      }
+
+      .media-grid {
+        grid-template-rows: minmax(240px, 1fr);
+      }
+
+      .compact-results-box {
+        grid-template-columns: 1fr;
+        height: auto;
+      }
+
+      .skills-grid,
+      .learn-more-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .flow-arrow {
+        width: 88px;
+        height: 52px;
+        justify-self: center;
+        transform: rotate(90deg);
+      }
+
+      .text-panel {
+        min-height: auto;
+      }
+
+      .tests-notes {
+        min-height: 320px;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .section {
+        padding-left: 1rem;
+        padding-right: 1rem;
+      }
+
+      .media-grid {
+        grid-template-rows: minmax(300px, 1fr) minmax(300px, 1fr);
+      }
+
+      .flow-step img {
+        height: 120px;
+      }
+    }
+  
+    /* FINAL OVERRIDE: preserve combined GIF aspect ratio.
+       Keep the card/section height, center the GIF, and allow white bars. */
+    .combined-media-card {
+      width: 100%;
+      height: 100%;
+      display: grid !important;
+      grid-template-rows: minmax(0, 1fr) auto !important;
+      overflow: hidden;
+    }
+
+    .combined-media-visual {
+      width: 100%;
+      height: 100%;
+      min-height: 0;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      overflow: hidden;
+      background: rgba(5, 5, 5, 0.78) !important;
+    }
+
+    .combined-media-card .combined-media-visual > img,
+    .combined-media-card .combined-media-visual > video,
+    .combined-media-card img.combined-media-img,
+    .combined-media-card video.combined-media-img {
+      width: 100% !important;
+      height: 100% !important;
+      max-width: 100% !important;
+      max-height: 100% !important;
+      object-fit: cover !important;
+      object-position: center center !important;
+      display: block !important;
+      margin: 0 auto !important;
+      background: rgba(5, 5, 5, 0.78) !important;
+    }
+
+
+    /* FINAL OVERRIDE: center About Me heading and text. */
+    .compact-results-box {
+      text-align: center;
+    }
+
+    .compact-results-box .section-kicker,
+    .compact-results-box h2,
+    .compact-results-box p {
+      text-align: center;
+    }
+
+
+    /* FINAL OVERRIDE: make Learn More tiles stretch to the bottom of the text box. */
+    .compact-results-box {
+      display: flex !important;
+      flex-direction: column !important;
+      align-content: stretch !important;
+    }
+
+    .learn-more-section {
+      flex: 1 1 auto !important;
+      display: flex !important;
+      flex-direction: column !important;
+      min-height: 0 !important;
+    }
+
+    .learn-more-grid {
+      flex: 1 1 auto !important;
+      min-height: 0 !important;
+      align-items: stretch !important;
+    }
+
+    .learn-more-tile {
+      height: 100% !important;
+      display: grid !important;
+      grid-template-rows: minmax(0, 1fr) auto !important;
+    }
+
+    .learn-more-tile img {
+      height: 100% !important;
+      min-height: 115px !important;
+    }
+
+
+    /* About Me boxed intro block. */
+    .about-me-box {
+      width: 100%;
+      padding: 0.85rem 1.0rem;
+      background: rgba(5, 5, 5, 0.34);
+      border: 1px solid rgba(255, 255, 255, 0.10);
+      border-radius: 14px;
+    }
+
+    .about-me-heading {
+      margin-bottom: 0.50rem;
+    }
+
+    .about-me-box p {
+      text-align: center;
+    }
+
+    .about-me-box p + p {
+      margin-top: 0.35rem;
+      padding-top: 0;
+      border-top: none;
+    }
+
+  </style>
+</head>
+
+<body>
+  <div class="gif-background" aria-hidden="true">
+    <video id="heroVideo" muted playsinline loop autoplay preload="auto">
+      <source src="assets/Videos/Heavybulb Hotfire 2_slowmo.mp4" type="video/mp4" />
+    </video>
+  </div>
+
+  <header class="topbar">
+    <a class="brand" href="#top" aria-label="Project homepage">
+      <span>Jaden Dew</span>
+    </a>
+
+    <nav aria-label="Main navigation">
+      <a class="nav-link" href="index.html">Home</a>
+
+      <div class="nav-item">
+        <a class="nav-link" href="portfolio.html">Portfolio</a>
+        <div class="nav-dropdown" aria-label="Portfolio project links">
+          <a class="dropdown-link" href="BEAR.html">BEAR: Berkeley Aerial Emergency Response</a>
+          <a class="dropdown-link" href="E3_MVA.html">Liquid Rocket Test Stand Main Valves</a>
+          <a class="dropdown-link" href="E178_ME103.html">Flying Wing Simulation and Control</a>
+          <a class="dropdown-link" href="ME100.html">The Devious Alarm</a>
+          <a class="dropdown-link" href="vast.html">Vast Space: Saiph Thruster Testing</a>
+          <a class="dropdown-link" href="poppet.html">Custom Poppet Valve</a>
+          <a class="dropdown-link" href="NASA.html">NASA: Dragonfly Rotor Blade Optimization</a>
+        </div>
+      </div>
+
+      <a class="nav-link" href="assets/jaden_resume_alt_3-22-2026.pdf" target="_blank" rel="noopener">Resume</a>
+      <a class="nav-link" href="https://www.linkedin.com/in/jaden-dew-178a37249/" target="_blank" rel="noopener">LinkedIn</a>
+    </nav>
+  </header>
+
+  <main id="top">
+    <section class="hero" aria-label="MPC aircraft animation hero">
+      <div class="hero-card">
+        <h1>Jaden Dew</h1>
+        <div class="hero-subtitle">Aerospace Engineer | Propulsion, Aerodynamics, and Rocket Systems</div>
+      </div>
+    </section>
+
+    <section id="tracking" class="section media-section" aria-label="Flight, tracking, and results explanation">
+      <div class="section-inner">
+        <div class="media-results-layout">
+          <div class="media-grid combined-media-grid">
+            <article class="media-card combined-media-card">
+              <div class="combined-media-visual">
+                <img
+                  id="combinedTrackingGif"
+                  class="combined-media-img"
+                  src="assets/Headshot.jpg"
+                  alt="Headshot"
+                />
+              </div>
+            </article>
+          </div>
+
+          <div class="compact-results-box media-text-column" aria-label="Short results explanation">
+            <h2 class="about-me-heading">About Me</h2>
+
+            <div class="about-me-box">
+              <p>
+                Hello, my name is Jaden and I am currently a Masters student at UCLA studying Aerospace Engineering. I have recently graduated from the University of California, Berkeley 
+                with a B.S. in Aerospace Engineering as a part of the major's inaugural class. I am interested in all things propulsion and aerodynamics, a passion I have cultivated throughout
+                my undergraduate degree.  I believe that the exploration and inhabitation of space is essential for humanity's future, and I am determined to push us towards this reality.    
+              </p>
+
+              <p>
+                Through my experiences in classes, student teams, research, internships, and personal projects, I have developed a versatile skill set in the design, 
+                simulation, manufacturing, and testing of complex systems. From conducting aerodynamic optimization research at NASA Ames Research Center to supporting 
+                thruster hot-fire testing at Vast, to designing multiple iterations of rocket valves on my student team I have built a strong foundation in 
+                aerodynamics and propulsion systems. 
+              </p>
+
+              <p>
+                Please feel free to contact me at jaden.dew1@gmail.com or via LinkedIn!
+              </p>
+            </div>
+
+            <div class="skills-section">
+              <h2>Skills</h2>
+              <div class="skills-grid">
+                <div class="skills-column">
+                  <h3>Technical Skills</h3>
+                  <p>
+                    CAD, CFD, FEA, Waterjet, Lathe, Mill, Design, Analysis, Test Operations, Propulsion Systems, Aerodynamics, Rocketry
+                  </p>
+                </div>
+                <div class="skills-column">
+                  <h3>Software Skills</h3>
+                  <p>
+                    Python, MATLAB, Julia, Siemens NX, Fusion 360, Ansys Fluent, Ansys Mechanical, OpenFOAM, Winplot, Git, 
+                    XFoil
+                  </p>
+                </div>
+                <div class="skills-column">
+                  <h3>Interpersonal Skills</h3>
+                  <p>
+                    Leadership, Communication, Teamwork, Organization, Problem Solving, Adaptability, Persistence, Conflict Resolution
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div class="learn-more-section">
+              <h2>Learn More!</h2>
+              <div class="learn-more-grid">
+                <a class="learn-more-tile" href="portfolio.html">
+                  <img src="assets/MVA_GloryShot.JPG" alt="Portfolio preview" />
+                  <div class="learn-more-tile-content">
+                    <span class="learn-more-tile-page">Portfolio</span>
+                    <h3>Engineering Project Portfolio</h3>
+                    <p>Learn about my various engineering projects and technical work.</p>
+                  </div>
+                </a>
+
+                <a class="learn-more-tile" href="assets/jaden_resume_alt_3-22-2026.pdf" target="_blank" rel="noopener">
+                  <img src="assets/ResumeSnippet.png" alt="Resume preview" />
+                  <div class="learn-more-tile-content">
+                    <span class="learn-more-tile-page">Resume</span>
+                    <h3>Updated Resume PDF</h3>
+                    <p>View the most up to date version of my resume.</p>
+                  </div>
+                </a>
+
+                <a class="learn-more-tile" href="https://www.linkedin.com/in/jaden-dew-178a37249/" target="_blank" rel="noopener">
+                  <img src="assets/LinkedInIcon.png" alt="LinkedIn preview" />
+                  <div class="learn-more-tile-content">
+                    <span class="learn-more-tile-page">LinkedIn</span>
+                    <h3>Connect With Me</h3>
+                    <p>Visit my LinkedIn profile for more information.</p>
+                  </div>
+                </a>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>© 2026 Jaden Dew. </p>
+  </footer>
+
+  <script>
+    const heroVideo = document.getElementById("heroVideo");
+
+    function updateBackgroundFade() {
+      const y = window.scrollY || window.pageYOffset;
+      const fadeStart = window.innerHeight * 0.55;
+      const fadeEnd = window.innerHeight * 1.10;
+
+      let opacity = 1.0;
+      if (y > fadeStart) {
+        const p = Math.min(1, (y - fadeStart) / Math.max(1, fadeEnd - fadeStart));
+        opacity = 1.0 - 0.55 * p;
+      }
+
+      if (heroVideo) heroVideo.style.opacity = String(opacity);
+    }
+
+    if (heroVideo) {
+      heroVideo.play().catch(() => {});
+    }
+
+    window.addEventListener("load", updateBackgroundFade);
+    window.addEventListener("scroll", updateBackgroundFade, { passive: true });
+    window.addEventListener("resize", updateBackgroundFade);
+  </script>
+</body>
+</html>

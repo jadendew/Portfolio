@@ -1,0 +1,4738 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ME100 | Jaden Dew</title>
+
+  <style>
+    :root {
+      --bg: #050505;
+      --panel: rgba(10, 10, 10, 0.76);
+      --panel-solid: rgba(18, 18, 18, 0.94);
+      --border: rgba(255, 255, 255, 0.16);
+      --text: #d4d4d4;
+      --muted: #9cdcfe;
+      --subtle: #b8b8b8;
+      --accent: #007acc;
+      --accent-hover: #179fff;
+      --shadow: rgba(0, 0, 0, 0.48);
+      --topbar-h: 56px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html {
+      scroll-behavior: smooth;
+      background: #000;
+    }
+
+    body {
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: transparent;
+      color: var(--text);
+      line-height: 1.6;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    .gif-background {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      overflow: hidden;
+      background: #000;
+      pointer-events: none;
+    }
+
+    .gif-background video {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center center;
+      display: block;
+      opacity: 1;
+      filter: saturate(0.98) contrast(1.04);
+      transition: opacity 180ms ease;
+    }
+
+    .gif-background::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      background:
+        linear-gradient(to bottom, rgba(0, 0, 0, 0.20), rgba(0, 0, 0, 0.18) 38%, rgba(0, 0, 0, 0.62));
+      pointer-events: none;
+    }
+
+    .topbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      min-height: var(--topbar-h);
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      gap: 1rem;
+      padding: 0.45rem 6vw;
+      background: rgba(5, 5, 5, 0.95);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.34);
+    }
+
+    .brand {
+      justify-self: start;
+      display: inline-flex;
+      align-items: center;
+      color: white;
+      font-size: 0.88rem;
+      font-weight: 650;
+      letter-spacing: 0.01em;
+      opacity: 0.92;
+    }
+
+    nav {
+      justify-self: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.1rem;
+    }
+
+    .nav-link {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.46rem 0.82rem;
+      border-radius: 8px;
+      color: white;
+      font-size: 0.84rem;
+      opacity: 0.9;
+      transition: background 180ms ease, opacity 180ms ease;
+    }
+
+    .nav-link:hover,
+    .nav-link:focus-visible {
+      background: rgba(255, 255, 255, 0.09);
+      opacity: 1;
+      outline: none;
+    }
+
+    .nav-item {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .nav-dropdown {
+      position: absolute;
+      top: calc(100% + 0.45rem);
+      left: 50%;
+      transform: translateX(-50%) translateY(-6px);
+      min-width: 235px;
+      padding: 0.45rem;
+      display: grid;
+      gap: 0.12rem;
+      background: rgba(5, 5, 5, 0.96);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 12px;
+      box-shadow: 0 18px 60px rgba(0, 0, 0, 0.55);
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transition: opacity 180ms ease, transform 180ms ease, visibility 180ms ease;
+    }
+
+    .nav-item:hover .nav-dropdown,
+    .nav-item:focus-within .nav-dropdown {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .dropdown-link {
+      display: block;
+      padding: 0.52rem 0.68rem;
+      border-radius: 8px;
+      color: rgba(255, 255, 255, 0.88);
+      font-size: 0.80rem;
+      line-height: 1.2;
+      white-space: nowrap;
+      transition: background 180ms ease, color 180ms ease;
+    }
+
+    .dropdown-link:hover,
+    .dropdown-link:focus-visible {
+      background: rgba(255, 255, 255, 0.09);
+      color: white;
+      outline: none;
+    }
+
+    main {
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: end;
+      padding: calc(var(--topbar-h) + 2rem) 6vw 3.5rem;
+      background: transparent;
+    }
+
+    .hero-card {
+      width: min(920px, 88vw);
+      padding: 1.0rem 1.15rem;
+      color: rgba(255, 255, 255, 0.94);
+      background: rgba(5, 5, 5, 0.50);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 16px;
+      backdrop-filter: blur(14px);
+      box-shadow: 0 18px 60px rgba(0, 0, 0, 0.46);
+    }
+
+    .hero-kicker,
+    .section-kicker {
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      font-size: 0.70rem;
+      font-weight: 760;
+      margin-bottom: 0.26rem;
+    }
+
+    .hero-card h1 {
+      color: white;
+      font-size: clamp(1.65rem, 3.2vw, 3.0rem);
+      font-weight: 760;
+      letter-spacing: -0.055em;
+      line-height: 1.0;
+      margin-bottom: 0.38rem;
+    }
+
+    .hero-subtitle {
+      color: rgba(255, 255, 255, 0.82);
+      font-size: clamp(0.86rem, 1.05vw, 1.08rem);
+      font-weight: 560;
+      letter-spacing: 0.01em;
+      line-height: 1.32;
+    }
+
+    .section {
+      min-height: 100vh;
+      padding: calc(var(--topbar-h) + 0.75rem) 2rem 0.9rem;
+      display: grid;
+      align-items: stretch;
+      background: rgba(0, 0, 0, 0.72);
+      backdrop-filter: blur(10px);
+    }
+
+    .section-inner {
+      width: min(1820px, 100%);
+      margin: 0 auto;
+    }
+
+    .project-panel {
+      min-height: calc(100vh - var(--topbar-h) - 1.65rem);
+      padding: clamp(1.2rem, 2.4vw, 2rem);
+      background: rgba(18, 18, 18, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 26px;
+      box-shadow: 0 28px 95px rgba(0, 0, 0, 0.5);
+      display: grid;
+      grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
+      gap: 1.1rem;
+      align-items: stretch;
+    }
+
+    .project-media-card {
+      min-width: 0;
+      min-height: 0;
+      overflow: hidden;
+      background: rgba(5, 5, 5, 0.78);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 22px;
+      box-shadow: 0 24px 90px var(--shadow);
+      display: grid;
+      grid-template-rows: minmax(0, 1fr) auto;
+    }
+
+    .project-media-card img,
+    .project-media-card video {
+      width: 100%;
+      height: 100%;
+      min-height: 0;
+      object-fit: cover;
+      object-position: center center;
+      display: block;
+      background: rgba(30, 30, 30, 0.82);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .media-caption {
+      padding: 0.42rem 0.76rem;
+      color: rgba(255, 255, 255, 0.82);
+      background: rgba(5, 5, 5, 0.88);
+      font-size: 0.78rem;
+      line-height: 1.2;
+    }
+
+    .project-text-box {
+      min-height: 0;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 0.62rem;
+      padding: 1.0rem 1.15rem;
+      background: rgba(18, 18, 18, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 20px;
+      box-shadow: 0 22px 70px rgba(0, 0, 0, 0.42);
+    }
+
+    .project-text-box h2 {
+      color: white;
+      font-size: clamp(1.55rem, 2.4vw, 2.65rem);
+      line-height: 1.0;
+      letter-spacing: -0.055em;
+      margin-bottom: 0.2rem;
+    }
+
+    .project-text-box p {
+      color: rgba(255, 255, 255, 0.74);
+      font-size: clamp(0.84rem, 0.95vw, 1.02rem);
+      line-height: 1.38;
+      margin: 0;
+    }
+
+    .project-text-box p + p {
+      margin-top: 0.32rem;
+      padding-top: 0.45rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.10);
+    }
+
+    .details-grid {
+      margin-top: 0.55rem;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.65rem;
+    }
+
+    .detail-card {
+      padding: 0.72rem 0.82rem;
+      background: rgba(5, 5, 5, 0.34);
+      border: 1px solid rgba(255, 255, 255, 0.10);
+      border-radius: 14px;
+    }
+
+    .detail-card h3 {
+      color: var(--muted);
+      font-size: clamp(0.88rem, 1vw, 1.02rem);
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.25rem;
+    }
+
+    .detail-card p {
+      font-size: 0.82rem;
+      line-height: 1.28;
+    }
+
+    .gallery-section {
+      margin-top: 1rem;
+      padding-top: 0.75rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.10);
+    }
+
+    .gallery-section h2 {
+      color: white;
+      text-align: center;
+      font-size: clamp(1.45rem, 2.1vw, 2.2rem);
+      line-height: 1;
+      letter-spacing: -0.045em;
+      margin-bottom: 0.75rem;
+    }
+
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 0.75rem;
+    }
+
+    .gallery-tile {
+      overflow: hidden;
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(5, 5, 5, 0.50);
+      min-height: 180px;
+    }
+
+    .gallery-tile img {
+      width: 100%;
+      height: 100%;
+      min-height: 180px;
+      object-fit: cover;
+      object-position: center center;
+      display: block;
+    }
+
+
+    .vehicle-overview-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.8rem;
+      margin-top: 0.35rem;
+    }
+
+    .vehicle-overview-column {
+      padding: 0.85rem 0.95rem;
+      background: rgba(5, 5, 5, 0.34);
+      border: 1px solid rgba(255, 255, 255, 0.10);
+      border-radius: 14px;
+    }
+
+    .vehicle-overview-column p {
+      border-top: none !important;
+      padding-top: 0 !important;
+      margin-top: 0 !important;
+    }
+
+    .vehicle-overview-image {
+      margin-top: 0.85rem;
+      overflow: hidden;
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(5, 5, 5, 0.50);
+      min-height: 260px;
+    }
+
+    .vehicle-overview-image img {
+      width: 100%;
+      height: 100%;
+      min-height: 260px;
+      object-fit: cover;
+      object-position: center center;
+      display: block;
+    }
+
+
+    /* Airfoil Optimization and Wing Design segment */
+    .airfoil-section {
+      margin-top: 1.1rem;
+      padding: clamp(1.2rem, 2.4vw, 2rem);
+      background: rgba(18, 18, 18, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 26px;
+      box-shadow: 0 28px 95px rgba(0, 0, 0, 0.5);
+    }
+
+    .airfoil-section h2 {
+      color: white;
+      font-size: clamp(1.55rem, 2.4vw, 2.65rem);
+      line-height: 1.0;
+      letter-spacing: -0.055em;
+      margin-bottom: 0.9rem;
+      text-align: center;
+    }
+
+    .airfoil-top-layout {
+      display: grid;
+      grid-template-columns: minmax(280px, 0.70fr) minmax(0, 1.30fr);
+      gap: 1.1rem;
+      align-items: stretch;
+    }
+
+    .airfoil-text-box {
+      min-height: 0;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 1.0rem 1.15rem;
+      background: rgba(18, 18, 18, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 20px;
+      box-shadow: 0 22px 70px rgba(0, 0, 0, 0.42);
+    }
+
+    .airfoil-text-box p,
+    .airfoil-bottom-text p {
+      color: rgba(255, 255, 255, 0.74);
+      font-size: clamp(0.84rem, 0.95vw, 1.02rem);
+      line-height: 1.38;
+      margin: 0;
+    }
+
+    .airfoil-media-rows {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 0.85rem;
+      min-width: 0;
+    }
+
+    .airfoil-media-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 0.75rem;
+      align-items: stretch;
+    }
+
+    .airfoil-media-tile {
+      overflow: hidden;
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(5, 5, 5, 0.50);
+      min-height: 210px;
+    }
+
+    .airfoil-media-tile img,
+    .airfoil-media-tile video {
+      width: 100%;
+      height: 100%;
+      min-height: 210px;
+      object-fit: cover;
+      object-position: center center;
+      display: block;
+      background: rgba(30, 30, 30, 0.82);
+    }
+
+    .airfoil-row-caption {
+      grid-column: 1 / -1;
+      color: rgba(255, 255, 255, 0.74);
+      font-size: 0.84rem;
+      line-height: 1.28;
+      text-align: center;
+      padding: 0.45rem 0.65rem;
+      background: rgba(5, 5, 5, 0.38);
+      border: 1px solid rgba(255, 255, 255, 0.10);
+      border-radius: 12px;
+    }
+
+    .airfoil-bottom-layout {
+      margin-top: 1.1rem;
+      padding-top: 1.1rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.10);
+      display: grid;
+      grid-template-columns: minmax(280px, 0.80fr) minmax(0, 1.20fr);
+      gap: 1.1rem;
+      align-items: stretch;
+    }
+
+    .airfoil-bottom-text {
+      min-height: 0;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 1.0rem 1.15rem;
+      background: rgba(18, 18, 18, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 20px;
+      box-shadow: 0 22px 70px rgba(0, 0, 0, 0.42);
+    }
+
+    .airfoil-bottom-image {
+      overflow: hidden;
+      border-radius: 22px;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      background: rgba(5, 5, 5, 0.50);
+      min-height: 320px;
+      box-shadow: 0 24px 90px var(--shadow);
+    }
+
+    .airfoil-bottom-image img {
+      width: 100%;
+      height: 100%;
+      min-height: 320px;
+      object-fit: cover;
+      object-position: center center;
+      display: block;
+    }
+
+    @media (max-width: 1050px) {
+      .airfoil-top-layout,
+      .airfoil-media-row,
+      .airfoil-bottom-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+
+    /* Aerodynamic Analysis segment */
+    .aero-section {
+      margin-top: 1.1rem;
+      padding: clamp(1.2rem, 2.4vw, 2rem);
+      background: rgba(18, 18, 18, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 26px;
+      box-shadow: 0 28px 95px rgba(0, 0, 0, 0.5);
+    }
+
+    .aero-section h2 {
+      color: white;
+      font-size: clamp(1.55rem, 2.4vw, 2.65rem);
+      line-height: 1.0;
+      letter-spacing: -0.055em;
+      margin-bottom: 1rem;
+      text-align: center;
+    }
+
+    .aero-row {
+      display: grid;
+      gap: 1.1rem;
+      align-items: stretch;
+      margin-top: 1.1rem;
+      padding-top: 1.1rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.10);
+    }
+
+    .aero-row:first-of-type {
+      margin-top: 0;
+      padding-top: 0;
+      border-top: none;
+    }
+
+    .aero-row.text-left {
+      grid-template-columns: minmax(320px, 0.85fr) minmax(0, 1.15fr);
+    }
+
+    .aero-row.text-right {
+      grid-template-columns: minmax(0, 1.15fr) minmax(320px, 0.85fr);
+    }
+
+    .aero-text-box {
+      min-height: 0;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 1.0rem 1.15rem;
+      background: rgba(18, 18, 18, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 20px;
+      box-shadow: 0 22px 70px rgba(0, 0, 0, 0.42);
+    }
+
+    .aero-text-box p {
+      color: rgba(255, 255, 255, 0.74);
+      font-size: clamp(0.84rem, 0.95vw, 1.02rem);
+      line-height: 1.38;
+      margin: 0;
+    }
+
+    .aero-stack {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 0.75rem;
+      min-width: 0;
+    }
+
+    .aero-side-by-side {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.75rem;
+      min-width: 0;
+    }
+
+    .aero-four-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 0.75rem;
+      margin-top: 1.1rem;
+      padding-top: 1.1rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.10);
+    }
+
+    .aero-media-tile {
+      overflow: hidden;
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(5, 5, 5, 0.50);
+      min-height: 210px;
+    }
+
+    .aero-stack .aero-media-tile {
+      min-height: 185px;
+    }
+
+    .aero-four-grid .aero-media-tile {
+      min-height: 190px;
+    }
+
+    .aero-media-tile img,
+    .aero-media-tile video {
+      width: 100%;
+      height: 100%;
+      min-height: inherit;
+      object-fit: cover;
+      object-position: center center;
+      display: block;
+      background: rgba(30, 30, 30, 0.82);
+    }
+
+    @media (max-width: 1050px) {
+      .aero-row.text-left,
+      .aero-row.text-right,
+      .aero-side-by-side,
+      .aero-four-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+
+    /* Tiltrotor Mechanism Design segment */
+    .tilt-section {
+      margin-top: 1.1rem;
+      padding: clamp(1.2rem, 2.4vw, 2rem);
+      background: rgba(18, 18, 18, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 26px;
+      box-shadow: 0 28px 95px rgba(0, 0, 0, 0.5);
+    }
+
+    .tilt-row {
+      display: grid;
+      gap: 1.1rem;
+      align-items: stretch;
+    }
+
+    .tilt-row + .tilt-row {
+      margin-top: 1.1rem;
+      padding-top: 1.1rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.10);
+    }
+
+    .tilt-row-1 {
+      grid-template-columns: minmax(0, 1.15fr) minmax(320px, 0.85fr);
+    }
+
+    .tilt-text-box {
+      min-height: 0;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 1.0rem 1.15rem;
+      background: rgba(18, 18, 18, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 20px;
+      box-shadow: 0 22px 70px rgba(0, 0, 0, 0.42);
+    }
+
+    .tilt-text-box h2 {
+      color: white;
+      font-size: clamp(1.55rem, 2.4vw, 2.65rem);
+      line-height: 1.0;
+      letter-spacing: -0.055em;
+      margin-bottom: 0.75rem;
+      text-align: left;
+    }
+
+    .tilt-text-box p {
+      color: rgba(255, 255, 255, 0.74);
+      font-size: clamp(0.84rem, 0.95vw, 1.02rem);
+      line-height: 1.38;
+      margin: 0;
+    }
+
+    .tilt-image-pair {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.75rem;
+      min-width: 0;
+    }
+
+    .tilt-media-tile {
+      overflow: hidden;
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(5, 5, 5, 0.50);
+      min-height: 250px;
+      display: grid;
+      grid-template-rows: minmax(0, 1fr) auto;
+    }
+
+    .tilt-media-tile img,
+    .tilt-media-tile video {
+      width: 100%;
+      height: 100%;
+      min-height: 210px;
+      object-fit: cover;
+      object-position: center center;
+      display: block;
+      background: rgba(30, 30, 30, 0.82);
+    }
+
+    .tilt-image-caption {
+      padding: 0.42rem 0.65rem;
+      color: rgba(255, 255, 255, 0.78);
+      background: rgba(5, 5, 5, 0.82);
+      border-top: 1px solid rgba(255, 255, 255, 0.10);
+      font-size: 0.78rem;
+      line-height: 1.22;
+      text-align: center;
+    }
+
+    @media (max-width: 1050px) {
+      .tilt-row-1,
+      .tilt-image-pair {
+        grid-template-columns: 1fr;
+      }
+    }
+
+
+    /* Manufacturing segment */
+    .manufacturing-section {
+      margin-top: 1.1rem;
+      padding: clamp(1.2rem, 2.4vw, 2rem);
+      background: rgba(18, 18, 18, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 26px;
+      box-shadow: 0 28px 95px rgba(0, 0, 0, 0.5);
+    }
+
+    .manufacturing-row {
+      display: grid;
+      gap: 1.1rem;
+      align-items: stretch;
+    }
+
+    .manufacturing-row + .manufacturing-row {
+      margin-top: 1.1rem;
+      padding-top: 1.1rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.10);
+    }
+
+    .manufacturing-row-1 {
+      grid-template-columns: minmax(340px, 0.82fr) minmax(0, 1.18fr);
+    }
+
+    .manufacturing-text-box {
+      min-height: 0;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 1.0rem 1.15rem;
+      background: rgba(18, 18, 18, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 20px;
+      box-shadow: 0 22px 70px rgba(0, 0, 0, 0.42);
+    }
+
+    .manufacturing-text-box h2 {
+      color: white;
+      font-size: clamp(1.55rem, 2.4vw, 2.65rem);
+      line-height: 1.0;
+      letter-spacing: -0.055em;
+      margin-bottom: 0.75rem;
+      text-align: left;
+    }
+
+    .manufacturing-text-box p {
+      color: rgba(255, 255, 255, 0.74);
+      font-size: clamp(0.84rem, 0.95vw, 1.02rem);
+      line-height: 1.38;
+      margin: 0;
+    }
+
+    .manufacturing-image-pair {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.75rem;
+      min-width: 0;
+    }
+
+    .manufacturing-five-grid {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 0.75rem;
+      min-width: 0;
+    }
+
+    .manufacturing-media-tile {
+      overflow: hidden;
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(5, 5, 5, 0.50);
+      min-height: 235px;
+      display: grid;
+      grid-template-rows: minmax(0, 1fr) auto;
+    }
+
+    .manufacturing-five-grid .manufacturing-media-tile {
+      min-height: 190px;
+    }
+
+    .manufacturing-media-tile img,
+    .manufacturing-media-tile video {
+      width: 100%;
+      height: 100%;
+      min-height: inherit;
+      object-fit: cover;
+      object-position: center center;
+      display: block;
+      background: rgba(30, 30, 30, 0.82);
+    }
+
+    .manufacturing-image-caption {
+      padding: 0.42rem 0.65rem;
+      color: rgba(255, 255, 255, 0.78);
+      background: rgba(5, 5, 5, 0.82);
+      border-top: 1px solid rgba(255, 255, 255, 0.10);
+      font-size: 0.78rem;
+      line-height: 1.22;
+      text-align: center;
+    }
+
+    @media (max-width: 1050px) {
+      .manufacturing-row-1,
+      .manufacturing-image-pair,
+      .manufacturing-five-grid {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    /* Flight Test and Final Demonstration segment */
+    .flight-section {
+      margin-top: 1.1rem;
+      padding: clamp(1.2rem, 2.4vw, 2rem);
+      background: rgba(18, 18, 18, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 26px;
+      box-shadow: 0 28px 95px rgba(0, 0, 0, 0.5);
+    }
+
+    .flight-row {
+      display: grid;
+      gap: 1.1rem;
+      align-items: stretch;
+    }
+
+    .flight-row + .flight-row {
+      margin-top: 1.1rem;
+      padding-top: 1.1rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.10);
+    }
+
+    .flight-row.text-left {
+      grid-template-columns: minmax(340px, 0.85fr) minmax(0, 1.15fr);
+    }
+
+    .flight-row.text-right {
+      grid-template-columns: minmax(0, 1.15fr) minmax(340px, 0.85fr);
+    }
+
+    .flight-text-box {
+      min-height: 0;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 1.0rem 1.15rem;
+      background: rgba(18, 18, 18, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 20px;
+      box-shadow: 0 22px 70px rgba(0, 0, 0, 0.42);
+    }
+
+    .flight-text-box h2 {
+      color: white;
+      font-size: clamp(1.55rem, 2.4vw, 2.65rem);
+      line-height: 1.0;
+      letter-spacing: -0.055em;
+      margin-bottom: 0.75rem;
+      text-align: left;
+    }
+
+    .flight-subheading {
+      color: var(--muted);
+      font-size: clamp(1.0rem, 1.2vw, 1.22rem);
+      line-height: 1.15;
+      letter-spacing: -0.025em;
+      font-weight: 760;
+      margin-bottom: 0.45rem;
+    }
+
+    .flight-text-box p {
+      color: rgba(255, 255, 255, 0.74);
+      font-size: clamp(0.84rem, 0.95vw, 1.02rem);
+      line-height: 1.38;
+      margin: 0;
+    }
+
+    .flight-media-tile {
+      overflow: hidden;
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(5, 5, 5, 0.50);
+      min-height: 310px;
+      display: grid;
+      grid-template-rows: minmax(0, 1fr) auto;
+    }
+
+    .flight-media-tile video,
+    .flight-media-tile img {
+      width: 100%;
+      height: 100%;
+      min-height: 270px;
+      object-fit: cover;
+      object-position: center center;
+      display: block;
+      background: rgba(30, 30, 30, 0.82);
+    }
+
+    .flight-image-caption {
+      padding: 0.42rem 0.65rem;
+      color: rgba(255, 255, 255, 0.78);
+      background: rgba(5, 5, 5, 0.82);
+      border-top: 1px solid rgba(255, 255, 255, 0.10);
+      font-size: 0.78rem;
+      line-height: 1.22;
+      text-align: center;
+    }
+
+    @media (max-width: 1050px) {
+      .flight-row.text-left,
+      .flight-row.text-right {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    /* Gallery final section */
+    .final-gallery-section {
+      margin-top: 1.1rem;
+      padding: clamp(1.2rem, 2.4vw, 2rem);
+      background: rgba(18, 18, 18, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 26px;
+      box-shadow: 0 28px 95px rgba(0, 0, 0, 0.5);
+    }
+
+    .final-gallery-section h2 {
+      color: white;
+      text-align: center;
+      font-size: clamp(1.55rem, 2.4vw, 2.65rem);
+      line-height: 1.0;
+      letter-spacing: -0.055em;
+      margin-bottom: 1.1rem;
+    }
+
+    .final-gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 0.75rem;
+      min-width: 0;
+    }
+
+    .final-gallery-tile {
+      overflow: hidden;
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(5, 5, 5, 0.50);
+      min-height: 230px;
+    }
+
+    .final-gallery-tile img,
+    .final-gallery-tile video {
+      width: 100%;
+      height: 100%;
+      min-height: 230px;
+      object-fit: cover;
+      object-position: center center;
+      display: block;
+      background: rgba(30, 30, 30, 0.82);
+    }
+
+    @media (max-width: 1050px) {
+      .final-gallery-grid {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+
+    /* ESP1 Testing section */
+    .esp1-testing-section {
+      margin-top: 1.1rem;
+      padding: clamp(1.2rem, 2.4vw, 2rem);
+      background: rgba(18, 18, 18, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 26px;
+      box-shadow: 0 28px 95px rgba(0, 0, 0, 0.5);
+    }
+
+    .esp1-testing-section > h2 {
+      display: none !important;
+    }
+
+    .esp1-testing-row {
+      display: grid;
+      gap: 1.1rem;
+      align-items: stretch;
+    }
+
+    .esp1-testing-row + .esp1-testing-row {
+      margin-top: 1.1rem;
+      padding-top: 1.1rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.10);
+    }
+
+    .esp1-testing-row.text-left {
+      grid-template-columns: minmax(420px, 0.92fr) minmax(0, 1.08fr);
+    }
+
+    .esp1-testing-row.text-right {
+      grid-template-columns: minmax(0, 1.08fr) minmax(420px, 0.92fr);
+    }
+
+    .esp1-testing-text-box {
+      min-height: 0;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 1.0rem 1.15rem;
+      background: rgba(18, 18, 18, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 20px;
+      box-shadow: 0 22px 70px rgba(0, 0, 0, 0.42);
+    }
+
+    .esp1-testing-text-box h2 {
+      color: white;
+      font-size: clamp(1.55rem, 2.4vw, 2.65rem);
+      line-height: 1.0;
+      letter-spacing: -0.055em;
+      margin-bottom: 0.75rem;
+      text-align: left;
+    }
+
+    .esp1-testing-subheading {
+      color: var(--muted);
+      font-size: clamp(1.0rem, 1.2vw, 1.22rem);
+      line-height: 1.15;
+      letter-spacing: -0.025em;
+      font-weight: 760;
+      margin-bottom: 0.45rem;
+    }
+
+    .esp1-testing-text-box p {
+      color: rgba(255, 255, 255, 0.74);
+      font-size: clamp(0.84rem, 0.95vw, 1.02rem);
+      line-height: 1.38;
+      margin: 0;
+    }
+
+    .esp1-testing-media-tile {
+      overflow: hidden;
+      border-radius: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      background: rgba(5, 5, 5, 0.78);
+      min-height: 320px;
+      box-shadow: 0 24px 90px rgba(0, 0, 0, 0.48);
+      display: block;
+    }
+
+    .esp1-testing-media-tile video,
+    .esp1-testing-media-tile img {
+      width: 100%;
+      height: 100%;
+      min-height: 320px;
+      object-fit: cover;
+      object-position: center center;
+      display: block;
+      background: rgba(30, 30, 30, 0.82);
+      border: none;
+    }
+
+    @media (max-width: 1050px) {
+      .esp1-testing-row.text-left,
+      .esp1-testing-row.text-right {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    /* System Integration ad Demonstration section */
+    .system-demo-section {
+      margin-top: 1.1rem;
+      padding: clamp(1.2rem, 2.4vw, 2rem);
+      background: rgba(18, 18, 18, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 26px;
+      box-shadow: 0 28px 95px rgba(0, 0, 0, 0.5);
+    }
+
+    .system-demo-section > h2 {
+      display: none !important;
+    }
+
+    .system-demo-row {
+      display: grid;
+      grid-template-columns: minmax(300px, 0.65fr) minmax(0, 1.35fr);
+      gap: 1.1rem;
+      align-items: stretch;
+    }
+
+    .system-demo-text-box {
+      min-height: 0;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 1.0rem 1.15rem;
+      background: rgba(18, 18, 18, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 20px;
+      box-shadow: 0 22px 70px rgba(0, 0, 0, 0.42);
+    }
+
+    .system-demo-text-box h2 {
+      color: white;
+      font-size: clamp(1.55rem, 2.4vw, 2.65rem);
+      line-height: 1.0;
+      letter-spacing: -0.055em;
+      margin-bottom: 0.75rem;
+      text-align: left;
+    }
+
+    .system-demo-text-box p {
+      color: rgba(255, 255, 255, 0.74);
+      font-size: clamp(0.84rem, 0.95vw, 1.02rem);
+      line-height: 1.38;
+      margin: 0;
+    }
+
+    .system-demo-media-tile {
+      overflow: hidden;
+      border-radius: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      background: rgba(5, 5, 5, 0.78);
+      min-height: 320px;
+      box-shadow: 0 24px 90px rgba(0, 0, 0, 0.48);
+      display: block;
+    }
+
+    .system-demo-media-tile video,
+    .system-demo-media-tile img {
+      width: 100%;
+      height: 100%;
+      min-height: 320px;
+      object-fit: cover;
+      object-position: center center;
+      display: block;
+      background: rgba(30, 30, 30, 0.82);
+      border: none;
+    }
+
+    @media (max-width: 1050px) {
+      .system-demo-row {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    /* Project Submission Video section */
+    .submission-video-section {
+      margin-top: 1.1rem;
+      padding: clamp(1.2rem, 2.4vw, 2rem);
+      background: rgba(18, 18, 18, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 26px;
+      box-shadow: 0 28px 95px rgba(0, 0, 0, 0.5);
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1.1rem;
+      align-items: stretch;
+    }
+
+    .submission-video-section > h2 {
+      display: none !important;
+    }
+
+    .submission-video-text-box {
+      min-height: 0;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 1.0rem 1.15rem;
+      background: rgba(18, 18, 18, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 20px;
+      box-shadow: 0 22px 70px rgba(0, 0, 0, 0.42);
+    }
+
+    .submission-video-text-box h2 {
+      color: white;
+      font-size: clamp(1.55rem, 2.4vw, 2.65rem);
+      line-height: 1.0;
+      letter-spacing: -0.055em;
+      margin-bottom: 0.75rem;
+      text-align: left;
+    }
+
+    .submission-video-text-box p {
+      color: rgba(255, 255, 255, 0.74);
+      font-size: clamp(0.84rem, 0.95vw, 1.02rem);
+      line-height: 1.38;
+      margin: 0;
+    }
+
+    .submission-video-media-tile {
+      overflow: hidden;
+      border-radius: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      background: rgba(5, 5, 5, 0.78);
+      min-height: 520px;
+      box-shadow: 0 24px 90px rgba(0, 0, 0, 0.48);
+      display: block;
+    }
+
+    .submission-video-media-tile video,
+    .submission-video-media-tile iframe {
+      width: 100%;
+      height: 100%;
+      min-height: 520px;
+      object-fit: cover;
+      object-position: center center;
+      display: block;
+      background: rgba(30, 30, 30, 0.82);
+      border: none;
+    }
+
+    .submission-video-media-tile iframe {
+      aspect-ratio: 16 / 9;
+    }
+
+    @media (max-width: 1050px) {
+      .submission-video-media-tile,
+      .submission-video-media-tile video,
+      .submission-video-media-tile iframe {
+        min-height: 340px;
+      }
+    }
+
+
+
+    /* FINAL OVERRIDE: widen Communication Architecture paragraph section slightly. */
+    .alarm-architecture-section .alarm-architecture-row:nth-of-type(1) {
+      grid-template-columns: minmax(470px, 0.98fr) minmax(0, 1.02fr) !important;
+    }
+
+    @media (max-width: 1050px) {
+      .alarm-architecture-section .alarm-architecture-row:nth-of-type(1) {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+
+
+    /* FINAL OVERRIDE: YouTube submission video uses a clickable thumbnail tile instead of an iframe.
+       This avoids YouTube iframe Error 153 in local previews while preserving the same media-tile look. */
+    .submission-video-media-tile.youtube-link-tile {
+      position: relative !important;
+      display: block !important;
+      min-height: 610px !important;
+      text-decoration: none !important;
+      cursor: pointer !important;
+      background: rgba(5, 5, 5, 0.78) !important;
+    }
+
+    .submission-video-media-tile.youtube-link-tile img {
+      width: 100% !important;
+      height: 100% !important;
+      min-height: 610px !important;
+      object-fit: cover !important;
+      object-position: center center !important;
+      display: block !important;
+      border: none !important;
+      filter: brightness(0.78) saturate(0.95) !important;
+    }
+
+    .youtube-play-overlay {
+      position: absolute !important;
+      inset: 0 !important;
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: center !important;
+      justify-content: center !important;
+      gap: 0.9rem !important;
+      color: white !important;
+      background: linear-gradient(to bottom, rgba(0,0,0,0.12), rgba(0,0,0,0.30)) !important;
+      text-align: center !important;
+    }
+
+    .youtube-play-button {
+      width: 82px !important;
+      height: 82px !important;
+      border-radius: 999px !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      padding-left: 0.22rem !important;
+      background: rgba(255, 255, 255, 0.92) !important;
+      color: rgba(5, 5, 5, 0.96) !important;
+      font-size: 2.1rem !important;
+      line-height: 1 !important;
+      box-shadow: 0 18px 50px rgba(0, 0, 0, 0.48) !important;
+      transition: transform 180ms ease, background 180ms ease !important;
+    }
+
+    .youtube-play-text {
+      display: inline-block !important;
+      padding: 0.48rem 0.78rem !important;
+      border-radius: 999px !important;
+      background: rgba(5, 5, 5, 0.68) !important;
+      border: 1px solid rgba(255, 255, 255, 0.16) !important;
+      color: rgba(255, 255, 255, 0.90) !important;
+      font-size: clamp(0.88rem, 1vw, 1.05rem) !important;
+      font-weight: 700 !important;
+      letter-spacing: -0.01em !important;
+    }
+
+    .submission-video-media-tile.youtube-link-tile:hover .youtube-play-button,
+    .submission-video-media-tile.youtube-link-tile:focus-visible .youtube-play-button {
+      transform: scale(1.06) !important;
+      background: white !important;
+    }
+
+    @media (max-width: 1050px) {
+      .submission-video-media-tile.youtube-link-tile,
+      .submission-video-media-tile.youtube-link-tile img {
+        min-height: 390px !important;
+      }
+    }
+
+
+    footer {
+      position: relative;
+      z-index: 2;
+      border-top: 1px solid rgba(255, 255, 255, 0.13);
+      padding: 2rem 6vw;
+      color: var(--subtle);
+      background: rgba(5, 5, 5, 0.92);
+      backdrop-filter: blur(18px);
+      font-size: 0.9rem;
+    }
+
+    @media (max-width: 1050px) {
+      .topbar {
+        grid-template-columns: 1fr;
+        justify-items: center;
+        gap: 0.3rem;
+        padding: 0.55rem 4vw;
+      }
+
+      .brand {
+        justify-self: center;
+      }
+
+      nav {
+        width: 100%;
+        overflow-x: auto;
+        justify-content: center;
+        padding-bottom: 0.1rem;
+      }
+
+      :root {
+        --topbar-h: 88px;
+      }
+
+      .project-panel,
+      .gallery-grid,
+      .vehicle-overview-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .project-panel {
+        min-height: auto;
+      }
+
+      .project-media-card {
+        min-height: 420px;
+      }
+
+      .details-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .section {
+        padding-left: 1rem;
+        padding-right: 1rem;
+      }
+
+      .hero {
+        padding-left: 1rem;
+        padding-right: 1rem;
+      }
+
+      .project-media-card {
+        min-height: 300px;
+      }
+    }
+
+    /* FINAL OVERRIDE: Vehicle Overview section with text on the left and image on the right. */
+    .project-panel {
+      grid-template-columns: minmax(260px, 0.55fr) minmax(0, 1.45fr) !important;
+      align-items: stretch !important;
+    }
+
+    .project-text-box {
+      width: 100% !important;
+      height: 100% !important;
+      justify-content: center !important;
+    }
+
+    .project-text-box .section-kicker {
+      display: none !important;
+    }
+
+    .project-text-box h2 {
+      text-align: left !important;
+    }
+
+    .project-text-box p {
+      text-align: left !important;
+    }
+
+    .vehicle-overview-grid {
+      display: block !important;
+      margin-top: 0 !important;
+    }
+
+    .vehicle-overview-column {
+      padding: 0 !important;
+      background: transparent !important;
+      border: none !important;
+      border-radius: 0 !important;
+    }
+
+    .vehicle-overview-column + .vehicle-overview-column {
+      display: none !important;
+    }
+
+    .vehicle-overview-column p {
+      border-top: none !important;
+      padding-top: 0 !important;
+      margin-top: 0 !important;
+    }
+
+    .vehicle-overview-image {
+      margin-top: 0 !important;
+      overflow: hidden !important;
+      border-radius: 22px !important;
+      border: 1px solid rgba(255, 255, 255, 0.16) !important;
+      background: rgba(5, 5, 5, 0.50) !important;
+      min-height: 0 !important;
+      height: 100% !important;
+      box-shadow: 0 24px 90px var(--shadow);
+    }
+
+    .vehicle-overview-image img {
+      width: 100% !important;
+      height: 100% !important;
+      min-height: 0 !important;
+      object-fit: contain !important;
+      object-position: center center !important;
+      display: block !important;
+    }
+
+    @media (max-width: 1050px) {
+      .project-panel {
+        grid-template-columns: 1fr !important;
+      }
+
+      .vehicle-overview-image {
+        min-height: 340px !important;
+      }
+    }
+
+
+    /* FINAL OVERRIDE: make the BEAR overview image fully visible and give it more width. */
+    .vehicle-overview-image {
+      background: #ffffff !important;
+    }
+
+    .vehicle-overview-image img {
+      object-fit: contain !important;
+      object-position: center center !important;
+      background: #ffffff !important;
+    }
+
+    /* FINAL OVERRIDE: make ME100 overview image box behave like the normal dark media tiles. */
+    .vehicle-overview-image {
+      background: rgba(5, 5, 5, 0.50) !important;
+      border-radius: 22px !important;
+      overflow: hidden !important;
+    }
+
+    .vehicle-overview-image img {
+      width: 100% !important;
+      height: 100% !important;
+      min-height: 0 !important;
+      object-fit: cover !important;
+      object-position: center center !important;
+      background: rgba(30, 30, 30, 0.82) !important;
+      display: block !important;
+    }
+
+
+
+    /* FINAL OVERRIDE: Airfoil section layout adjustments. */
+    .airfoil-section > h2 {
+      display: none !important;
+    }
+
+    .airfoil-text-box h2 {
+      color: white;
+      font-size: clamp(1.55rem, 2.4vw, 2.65rem);
+      line-height: 1.0;
+      letter-spacing: -0.055em;
+      margin-bottom: 0.75rem;
+      text-align: left;
+    }
+
+    .airfoil-top-layout {
+      grid-template-columns: minmax(420px, 1.15fr) minmax(0, 0.85fr) !important;
+    }
+
+    .airfoil-bottom-layout {
+      grid-template-columns: minmax(0, 0.95fr) minmax(420px, 1.05fr) !important;
+    }
+
+    .airfoil-bottom-text {
+      justify-content: center !important;
+    }
+
+    .airfoil-media-tile {
+      min-height: 180px !important;
+    }
+
+    .airfoil-media-tile img,
+    .airfoil-media-tile video {
+      min-height: 180px !important;
+    }
+
+    @media (max-width: 1050px) {
+      .airfoil-top-layout,
+      .airfoil-bottom-layout {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    /* FINAL OVERRIDE: Aerodynamic Analysis heading lives inside the first paragraph box. */
+    .aero-section > h2 {
+      display: none !important;
+    }
+
+    .aero-text-box h2 {
+      color: white;
+      font-size: clamp(1.55rem, 2.4vw, 2.65rem);
+      line-height: 1.0;
+      letter-spacing: -0.055em;
+      margin-bottom: 0.75rem;
+      text-align: left;
+    }
+
+
+    /* FINAL OVERRIDE: Aerodynamic Analysis image layout and captions. */
+    .aero-section .aero-stack {
+      grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    }
+
+    .aero-section .aero-media-tile {
+      display: grid !important;
+      grid-template-rows: minmax(0, 1fr) auto !important;
+      min-height: 230px !important;
+    }
+
+    .aero-section .aero-media-tile img,
+    .aero-section .aero-media-tile video {
+      width: 100% !important;
+      height: 100% !important;
+      min-height: 190px !important;
+      object-fit: cover !important;
+      object-position: center center !important;
+      display: block !important;
+    }
+
+    .aero-image-caption {
+      padding: 0.42rem 0.65rem;
+      color: rgba(255, 255, 255, 0.78);
+      background: rgba(5, 5, 5, 0.82);
+      border-top: 1px solid rgba(255, 255, 255, 0.10);
+      font-size: 0.78rem;
+      line-height: 1.22;
+      text-align: center;
+    }
+
+    @media (max-width: 1050px) {
+      .aero-section .aero-stack {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    /* FINAL OVERRIDE: third Aerodynamic Analysis row images stacked vertically. */
+    .aero-section .aero-row:nth-of-type(3) .aero-side-by-side {
+      grid-template-columns: 1fr !important;
+    }
+
+
+    /* FINAL OVERRIDE: Aerodynamic Analysis row-specific width tuning. */
+
+    /* Row 2:
+       Make the left image group slightly narrower and the right paragraph box slightly narrower,
+       giving more usable room to the second image/residual plot inside the left group. */
+    .aero-section .aero-row:nth-of-type(2) {
+      grid-template-columns: minmax(0, 1.28fr) minmax(260px, 0.72fr) !important;
+    }
+
+    .aero-section .aero-row:nth-of-type(2) .aero-stack {
+      grid-template-columns: minmax(0, 0.88fr) minmax(0, 1.12fr) !important;
+    }
+
+    /* Row 3:
+       Make the paragraph box wider and the image column narrower. */
+    .aero-section .aero-row:nth-of-type(3) {
+      grid-template-columns: minmax(420px, 1.10fr) minmax(0, 0.90fr) !important;
+    }
+
+    .aero-section .aero-row:nth-of-type(3) .aero-side-by-side {
+      grid-template-columns: 1fr !important;
+    }
+
+    @media (max-width: 1050px) {
+      .aero-section .aero-row:nth-of-type(2),
+      .aero-section .aero-row:nth-of-type(3),
+      .aero-section .aero-row:nth-of-type(2) .aero-stack {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    /* FINAL OVERRIDE: widen third-row paragraph section more, shrinking the image column further. */
+    .aero-section .aero-row:nth-of-type(3) {
+      grid-template-columns: minmax(520px, 1.30fr) minmax(0, 0.70fr) !important;
+    }
+
+    @media (max-width: 1050px) {
+      .aero-section .aero-row:nth-of-type(3) {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    /* FINAL OVERRIDE: return third-row Aerodynamic Analysis images to horizontal layout. */
+    .aero-section .aero-row:nth-of-type(3) .aero-side-by-side {
+      grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    }
+
+    @media (max-width: 1050px) {
+      .aero-section .aero-row:nth-of-type(3) .aero-side-by-side {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    /* FINAL OVERRIDE: restore third-row paragraph/image widths to original horizontal-image layout. */
+    .aero-section .aero-row:nth-of-type(3) {
+      grid-template-columns: minmax(320px, 0.85fr) minmax(0, 1.15fr) !important;
+    }
+
+    .aero-section .aero-row:nth-of-type(3) .aero-side-by-side {
+      grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    }
+
+    @media (max-width: 1050px) {
+      .aero-section .aero-row:nth-of-type(3),
+      .aero-section .aero-row:nth-of-type(3) .aero-side-by-side {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    /* FINAL OVERRIDE: Aerodynamic Analysis paragraph subtitles. */
+    .aero-subheading {
+      color: var(--muted);
+      font-size: clamp(1.0rem, 1.2vw, 1.22rem);
+      line-height: 1.15;
+      letter-spacing: -0.025em;
+      font-weight: 760;
+      margin-bottom: 0.45rem;
+    }
+
+
+    /* FINAL OVERRIDE: Tiltrotor section width tuning and video crop controls. */
+
+    /* Give the top-row image area more width by narrowing the paragraph section slightly. */
+    .tilt-section .tilt-row-1 {
+      grid-template-columns: minmax(300px, 0.78fr) minmax(0, 1.22fr) !important;
+    }
+
+    /* In the top row image pair, make the left image wider than the right image. */
+    .tilt-section .tilt-row-1 .tilt-image-pair {
+      grid-template-columns: minmax(0, 1.28fr) minmax(0, 0.72fr) !important;
+    }
+
+    /* In the bottom row, make the left image wider than the video tile. */
+    .tilt-section .tilt-row:not(.tilt-row-1) .tilt-image-pair {
+      grid-template-columns: minmax(0, 1.20fr) minmax(0, 0.80fr) !important;
+    }
+
+    /* Position/scale controls for the tiltrotor MP4 tile.
+       Edit these inline variables on the video tile:
+       --tilt-video-x: 50%;     left/right crop focus
+       --tilt-video-y: 50%;     up/down crop focus
+       --tilt-video-zoom: 1;    larger = more zoomed/cropped
+    */
+    .tilt-video-crop video {
+      object-fit: cover !important;
+      object-position: var(--tilt-video-x, 50%) var(--tilt-video-y, 50%) !important;
+      transform: scale(var(--tilt-video-zoom, 1)) !important;
+      transform-origin: var(--tilt-video-x, 50%) var(--tilt-video-y, 50%) !important;
+    }
+
+    @media (max-width: 1050px) {
+      .tilt-section .tilt-row-1,
+      .tilt-section .tilt-row-1 .tilt-image-pair,
+      .tilt-section .tilt-row:not(.tilt-row-1) .tilt-image-pair {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    /* FINAL OVERRIDE: corrected Tiltrotor image widths and center-only video crop. */
+
+    /* Top row: keep the paragraph on the left, but give the image area more room. */
+    .tilt-section .tilt-row-1 {
+      grid-template-columns: minmax(280px, 0.72fr) minmax(0, 1.28fr) !important;
+    }
+
+    /* Top row image pair: make the RIGHT image wider than the left image. */
+    .tilt-section .tilt-row-1 .tilt-image-pair {
+      grid-template-columns: minmax(0, 0.72fr) minmax(0, 1.28fr) !important;
+    }
+
+    /* Bottom row: make the left bottom image wider and the video tile narrower. */
+    .tilt-section .tilt-row:not(.tilt-row-1) .tilt-image-pair {
+      grid-template-columns: minmax(0, 1.45fr) minmax(0, 0.55fr) !important;
+    }
+
+    /* Spatial crop for the MP4: focus on the center and chop off top/bottom.
+       Increase --tilt-video-crop-y to crop more from the top and bottom.
+       Use --tilt-video-y to shift the cropped center up/down if needed.
+    */
+    .tilt-video-crop {
+      overflow: hidden !important;
+    }
+
+    .tilt-video-crop video {
+      object-fit: cover !important;
+      object-position: 50% var(--tilt-video-y, 50%) !important;
+      transform: scaleY(var(--tilt-video-crop-y, 1.35)) !important;
+      transform-origin: 50% var(--tilt-video-y, 50%) !important;
+    }
+
+    @media (max-width: 1050px) {
+      .tilt-section .tilt-row-1,
+      .tilt-section .tilt-row-1 .tilt-image-pair,
+      .tilt-section .tilt-row:not(.tilt-row-1) .tilt-image-pair {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    /* FINAL OVERRIDE: corrected Tiltrotor top-right image width and real top/bottom video crop. */
+
+    /* Top row: paragraph a bit narrower so the two image tiles get more total width. */
+    .tilt-section .tilt-row-1 {
+      grid-template-columns: minmax(260px, 0.62fr) minmax(0, 1.38fr) !important;
+    }
+
+    /* Top row image pair: make the RIGHT image tile much wider than the left tile. */
+    .tilt-section .tilt-row-1 .tilt-image-pair {
+      grid-template-columns: minmax(0, 0.48fr) minmax(0, 1.52fr) !important;
+    }
+
+    /* Top-right image: show more of the CAD by containing it instead of cropping it. */
+    .tilt-section .tilt-row-1 .tilt-image-pair .tilt-media-tile:nth-child(2) {
+      background: #ffffff !important;
+    }
+
+    .tilt-section .tilt-row-1 .tilt-image-pair .tilt-media-tile:nth-child(2) img {
+      object-fit: contain !important;
+      object-position: center center !important;
+      background: #ffffff !important;
+    }
+
+    /* Bottom row: make the left image wider and the video tile narrower. */
+    .tilt-section .tilt-row:not(.tilt-row-1) .tilt-image-pair {
+      grid-template-columns: minmax(0, 1.45fr) minmax(0, 0.55fr) !important;
+    }
+
+    /* Actual spatial crop for the MP4:
+       the video is made taller than its tile and clipped by overflow hidden,
+       so the top and bottom are chopped off while the center remains visible.
+       Increase --tilt-video-height for more top/bottom crop.
+       Adjust --tilt-video-y if the center needs to move up/down.
+    */
+    .tilt-video-crop {
+      overflow: hidden !important;
+      position: relative !important;
+    }
+
+    .tilt-video-crop video {
+      position: absolute !important;
+      left: 50% !important;
+      top: var(--tilt-video-y, 50%) !important;
+      width: 100% !important;
+      height: var(--tilt-video-height, 180%) !important;
+      min-height: 0 !important;
+      object-fit: cover !important;
+      object-position: center center !important;
+      transform: translate(-50%, -50%) !important;
+      transform-origin: center center !important;
+    }
+
+    @media (max-width: 1050px) {
+      .tilt-section .tilt-row-1,
+      .tilt-section .tilt-row-1 .tilt-image-pair,
+      .tilt-section .tilt-row:not(.tilt-row-1) .tilt-image-pair {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    /* FINAL OVERRIDE: clean top-right tiltrotor image border and zoom it out slightly. */
+
+    /* Remove the bright/white-looking tile outline from the top-right image tile. */
+    .tilt-section .tilt-row-1 .tilt-image-pair .tilt-media-tile:nth-child(2) {
+      border-color: rgba(255, 255, 255, 0.06) !important;
+      background: #ffffff !important;
+    }
+
+    /* Zoom the top-right image out so the mechanism fits better inside the tile. */
+    .tilt-section .tilt-row-1 .tilt-image-pair .tilt-media-tile:nth-child(2) img {
+      object-fit: contain !important;
+      object-position: center center !important;
+      background: #ffffff !important;
+      transform: scale(0.88) !important;
+      transform-origin: center center !important;
+    }
+
+
+    /* FINAL OVERRIDE: top-right tiltrotor image uses the same centered/absolute sizing approach
+       as the portfolio poppet tile, so it actually zooms out and does not leave a bright
+       white edge touching the caption. */
+    .tilt-section .tilt-row-1 .tilt-image-pair .tilt-media-tile:nth-child(2) {
+      position: relative !important;
+      overflow: hidden !important;
+      background: rgba(5, 5, 5, 0.50) !important;
+      border-color: rgba(255, 255, 255, 0.12) !important;
+      display: grid !important;
+      grid-template-rows: minmax(0, 1fr) auto !important;
+    }
+
+    .tilt-section .tilt-row-1 .tilt-image-pair .tilt-media-tile:nth-child(2) img {
+      position: absolute !important;
+      top: calc(50% - 12px) !important;
+      left: 50% !important;
+      width: 88% !important;
+      height: 82% !important;
+      min-height: 0 !important;
+      object-fit: contain !important;
+      object-position: center center !important;
+      background: #ffffff !important;
+      transform: translate(-50%, -50%) !important;
+      transform-origin: center center !important;
+      border-radius: 0 !important;
+    }
+
+    .tilt-section .tilt-row-1 .tilt-image-pair .tilt-media-tile:nth-child(2) .tilt-image-caption {
+      position: relative !important;
+      z-index: 2 !important;
+      border-top: 1px solid rgba(255, 255, 255, 0.10) !important;
+    }
+
+    /* Bottom row: make the bottom-left image slightly less wide than before. */
+    .tilt-section .tilt-row:not(.tilt-row-1) .tilt-image-pair {
+      grid-template-columns: minmax(0, 1.35fr) minmax(0, 0.65fr) !important;
+    }
+
+    @media (max-width: 1050px) {
+      .tilt-section .tilt-row:not(.tilt-row-1) .tilt-image-pair {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    /* FINAL OVERRIDE: revert ONLY the top-right tiltrotor image behavior.
+       Keep the widened top-right tile, but remove the later zoom/absolute-position tricks.
+       Bottom-row sizing and video crop settings are left unchanged. */
+    .tilt-section .tilt-row-1 {
+      grid-template-columns: minmax(260px, 0.62fr) minmax(0, 1.38fr) !important;
+    }
+
+    .tilt-section .tilt-row-1 .tilt-image-pair {
+      grid-template-columns: minmax(0, 0.48fr) minmax(0, 1.52fr) !important;
+    }
+
+    .tilt-section .tilt-row-1 .tilt-image-pair .tilt-media-tile:nth-child(2) {
+      position: static !important;
+      overflow: hidden !important;
+      display: grid !important;
+      grid-template-rows: minmax(0, 1fr) auto !important;
+      background: #ffffff !important;
+      border: 1px solid rgba(255, 255, 255, 0.12) !important;
+    }
+
+    .tilt-section .tilt-row-1 .tilt-image-pair .tilt-media-tile:nth-child(2) img {
+      position: static !important;
+      top: auto !important;
+      left: auto !important;
+      width: 100% !important;
+      height: 100% !important;
+      min-height: 210px !important;
+      object-fit: contain !important;
+      object-position: center center !important;
+      background: #ffffff !important;
+      transform: none !important;
+      transform-origin: center center !important;
+      border-radius: 0 !important;
+    }
+
+    .tilt-section .tilt-row-1 .tilt-image-pair .tilt-media-tile:nth-child(2) .tilt-image-caption {
+      position: static !important;
+      z-index: auto !important;
+    }
+
+    @media (max-width: 1050px) {
+      .tilt-section .tilt-row-1,
+      .tilt-section .tilt-row-1 .tilt-image-pair {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    /* FINAL OVERRIDE: Tiltrotor top row uses one image only; video caption is visible. */
+    .tilt-section .tilt-row-1 .tilt-image-pair {
+      grid-template-columns: 1fr !important;
+    }
+
+    .tilt-section .tilt-row-1 .tilt-image-pair .tilt-media-tile {
+      min-height: 300px !important;
+    }
+
+    /* Ensure the bottom-right MP4 tile keeps a normal caption underneath it. */
+    .tilt-section .tilt-video-crop {
+      display: grid !important;
+      grid-template-rows: minmax(0, 1fr) auto !important;
+    }
+
+    .tilt-section .tilt-video-crop .tilt-image-caption {
+      position: relative !important;
+      z-index: 3 !important;
+      display: block !important;
+    }
+
+    @media (max-width: 1050px) {
+      .tilt-section .tilt-row-1 .tilt-image-pair {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    /* FINAL OVERRIDE: Tiltrotor layout + cropped video with normal caption. */
+
+    /* Top row: widen paragraph section and shrink the single image section. */
+    .tilt-section .tilt-row-1 {
+      grid-template-columns: minmax(380px, 0.95fr) minmax(0, 1.05fr) !important;
+    }
+
+    .tilt-section .tilt-row-1 .tilt-image-pair {
+      grid-template-columns: 1fr !important;
+    }
+
+    /* Bottom row: keep the calculation image wide and the video tile narrower. */
+    .tilt-section .tilt-row:not(.tilt-row-1) .tilt-image-pair {
+      grid-template-columns: minmax(0, 1.65fr) minmax(0, 0.35fr) !important;
+    }
+
+    /* Video tile acts like every other media tile: media on top, caption underneath. */
+    .tilt-section .tilt-video-crop {
+      display: grid !important;
+      grid-template-rows: minmax(0, 1fr) auto !important;
+      overflow: hidden !important;
+      position: static !important;
+      background: rgba(5, 5, 5, 0.50) !important;
+      border: 1px solid rgba(255, 255, 255, 0.12) !important;
+      border-radius: 16px !important;
+    }
+
+    /* This frame is the cropped viewport. It clips the top and bottom of the MP4. */
+    .tilt-section .tilt-video-frame {
+      position: relative !important;
+      overflow: hidden !important;
+      width: 100% !important;
+      height: 100% !important;
+      min-height: 210px !important;
+      background: rgba(30, 30, 30, 0.82) !important;
+    }
+
+    /* Real spatial crop: video is taller than the visible frame and clipped by the frame. */
+    .tilt-section .tilt-video-frame video {
+      position: absolute !important;
+      left: 50% !important;
+      top: var(--tilt-video-y, 50%) !important;
+      width: 100% !important;
+      height: var(--tilt-video-height, 180%) !important;
+      min-height: 0 !important;
+      object-fit: cover !important;
+      object-position: center center !important;
+      transform: translate(-50%, -50%) !important;
+      transform-origin: center center !important;
+      display: block !important;
+      background: rgba(30, 30, 30, 0.82) !important;
+    }
+
+    /* Caption remains below the cropped video, same behavior as image captions. */
+    .tilt-section .tilt-video-crop .tilt-image-caption {
+      position: static !important;
+      z-index: auto !important;
+      display: block !important;
+      padding: 0.42rem 0.65rem !important;
+      color: rgba(255, 255, 255, 0.78) !important;
+      background: rgba(5, 5, 5, 0.82) !important;
+      border-top: 1px solid rgba(255, 255, 255, 0.10) !important;
+      font-size: 0.78rem !important;
+      line-height: 1.22 !important;
+      text-align: center !important;
+    }
+
+    @media (max-width: 1050px) {
+      .tilt-section .tilt-row-1,
+      .tilt-section .tilt-row-1 .tilt-image-pair,
+      .tilt-section .tilt-row:not(.tilt-row-1) .tilt-image-pair {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    /* FINAL FINAL OVERRIDE: make top paragraph wider and bottom-left image less wide. */
+
+    /* Top row: paragraph/title box gets more width, image area gets less width. */
+    .tilt-section .tilt-row-1 {
+      grid-template-columns: minmax(520px, 1.35fr) minmax(0, 0.65fr) !important;
+    }
+
+    /* Top row now only has one image, so keep that image tile as one column. */
+    .tilt-section .tilt-row-1 .tilt-image-pair {
+      grid-template-columns: 1fr !important;
+    }
+
+    /* Bottom row: reduce the bottom-left image width and give more width back to the video tile. */
+    .tilt-section .tilt-row:not(.tilt-row-1) .tilt-image-pair {
+      grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr) !important;
+    }
+
+    @media (max-width: 1050px) {
+      .tilt-section .tilt-row-1,
+      .tilt-section .tilt-row-1 .tilt-image-pair,
+      .tilt-section .tilt-row:not(.tilt-row-1) .tilt-image-pair {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    /* FINAL FINAL OVERRIDE: make the bottom-right video/image tile narrower, closer to the red-box width. */
+    .tilt-section .tilt-row:not(.tilt-row-1) .tilt-image-pair {
+      grid-template-columns: minmax(0, 1.55fr) minmax(0, 0.45fr) !important;
+    }
+
+    @media (max-width: 1050px) {
+      .tilt-section .tilt-row:not(.tilt-row-1) .tilt-image-pair {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    /* FINAL OVERRIDE: make all Flight Test paragraph boxes wider and video columns narrower. */
+
+    /* Rows 1 and 3: paragraph on left gets more width, video on right gets less width. */
+    .flight-section .flight-row.text-left {
+      grid-template-columns: minmax(520px, 1.25fr) minmax(0, 0.75fr) !important;
+    }
+
+    /* Row 2: video on left gets less width, paragraph on right gets more width. */
+    .flight-section .flight-row.text-right {
+      grid-template-columns: minmax(0, 0.75fr) minmax(520px, 1.25fr) !important;
+    }
+
+    @media (max-width: 1050px) {
+      .flight-section .flight-row.text-left,
+      .flight-section .flight-row.text-right {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    /* FINAL OVERRIDE: updated Tiltrotor section is one row with image + video on the right. */
+    .tilt-section .tilt-row-1 {
+      grid-template-columns: minmax(520px, 1.25fr) minmax(0, 0.95fr) !important;
+    }
+
+    .tilt-section .tilt-row-1 .tilt-image-pair {
+      grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+      align-items: stretch !important;
+    }
+
+    .tilt-section .tilt-row-1 .tilt-media-tile {
+      min-height: 300px !important;
+    }
+
+    /* Keep the moved TiltTest video spatially cropped while still keeping its caption below. */
+    .tilt-section .tilt-video-crop {
+      display: grid !important;
+      grid-template-rows: minmax(0, 1fr) auto !important;
+      overflow: hidden !important;
+      position: static !important;
+      background: rgba(5, 5, 5, 0.50) !important;
+      border: 1px solid rgba(255, 255, 255, 0.12) !important;
+      border-radius: 16px !important;
+    }
+
+    .tilt-section .tilt-video-frame {
+      position: relative !important;
+      overflow: hidden !important;
+      width: 100% !important;
+      height: 100% !important;
+      min-height: 210px !important;
+      background: rgba(30, 30, 30, 0.82) !important;
+    }
+
+    .tilt-section .tilt-video-frame video {
+      position: absolute !important;
+      left: 50% !important;
+      top: var(--tilt-video-y, 50%) !important;
+      width: 100% !important;
+      height: var(--tilt-video-height, 180%) !important;
+      min-height: 0 !important;
+      object-fit: cover !important;
+      object-position: center center !important;
+      transform: translate(-50%, -50%) !important;
+      transform-origin: center center !important;
+      display: block !important;
+    }
+
+    /* FINAL OVERRIDE: updated Manufacturing section is one row with paragraph, 2x2 grid, and fifth image. */
+    .manufacturing-section .manufacturing-row-1 {
+      grid-template-columns: minmax(300px, 0.52fr) minmax(0, 1.48fr) !important;
+    }
+
+    .manufacturing-media-combo {
+      display: grid !important;
+      grid-template-columns: minmax(0, 1.25fr) minmax(0, 0.75fr) !important;
+      gap: 0.75rem !important;
+      min-width: 0 !important;
+      align-items: stretch !important;
+    }
+
+    .manufacturing-two-by-two-grid {
+      display: grid !important;
+      grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+      grid-template-rows: repeat(2, minmax(0, 1fr)) !important;
+      gap: 0.75rem !important;
+      min-width: 0 !important;
+    }
+
+    .manufacturing-media-combo .manufacturing-media-tile {
+      min-height: 165px !important;
+    }
+
+    .manufacturing-media-combo .manufacturing-media-tile img,
+    .manufacturing-media-combo .manufacturing-media-tile video {
+      min-height: 125px !important;
+      object-fit: cover !important;
+      object-position: center center !important;
+    }
+
+    .manufacturing-wide-tile {
+      height: 100% !important;
+      min-height: 340px !important;
+    }
+
+    @media (max-width: 1050px) {
+      .tilt-section .tilt-row-1,
+      .tilt-section .tilt-row-1 .tilt-image-pair,
+      .manufacturing-section .manufacturing-row-1,
+      .manufacturing-media-combo,
+      .manufacturing-two-by-two-grid {
+        grid-template-columns: 1fr !important;
+      }
+
+      .manufacturing-two-by-two-grid {
+        grid-template-rows: auto !important;
+      }
+    }
+
+
+    /* FINAL OVERRIDE: Airfoil/Wing Design paragraph subheadings. */
+    .airfoil-subheading {
+      color: var(--muted);
+      font-size: clamp(1.0rem, 1.2vw, 1.22rem);
+      line-height: 1.15;
+      letter-spacing: -0.025em;
+      font-weight: 760;
+      margin-bottom: 0.45rem;
+    }
+
+
+    /* FINAL OVERRIDE: Gallery is now a 3x3 grid. */
+    .final-gallery-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    }
+
+
+    /* FINAL OVERRIDE: paragraph indentation for all main text boxes. */
+    .project-text-box p,
+    .airfoil-text-box p,
+    .airfoil-bottom-text p,
+    .aero-text-box p,
+    .tilt-text-box p,
+    .manufacturing-text-box p,
+    .flight-text-box p {
+      text-indent: 1.75em !important;
+    }
+
+    /* Keep paragraph breaks readable when multiple paragraphs are stacked. */
+    .project-text-box p + p,
+    .airfoil-text-box p + p,
+    .airfoil-bottom-text p + p,
+    .aero-text-box p + p,
+    .tilt-text-box p + p,
+    .manufacturing-text-box p + p,
+    .flight-text-box p + p {
+      margin-top: 0.55rem !important;
+    }
+
+    /* FINAL OVERRIDE: make the CONOPS text side wider so its text box height better matches the image. */
+    .project-panel {
+      grid-template-columns: minmax(520px, 1.10fr) minmax(0, 0.90fr) !important;
+      align-items: stretch !important;
+    }
+
+    .project-text-box,
+    .vehicle-overview-image {
+      height: 100% !important;
+    }
+
+    @media (max-width: 1050px) {
+      .project-panel {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    /* FINAL OVERRIDE: CONOPS/Vehicle Overview width and top alignment.
+       This makes the text column wider and starts the heading at the top of the box
+       instead of vertically centering the whole text block. */
+    .project-panel {
+      grid-template-columns: minmax(620px, 1.28fr) minmax(0, 0.72fr) !important;
+      align-items: stretch !important;
+    }
+
+    .project-panel .project-text-box {
+      justify-content: flex-start !important;
+      padding-top: 1.35rem !important;
+    }
+
+    .project-panel .project-text-box h2 {
+      margin-top: 0 !important;
+      margin-bottom: 0.85rem !important;
+    }
+
+    @media (max-width: 1050px) {
+      .project-panel {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    /* FINAL OVERRIDE: CONOPS width-only correction.
+       Restore the original vertically-centered text behavior, then make the text column narrower
+       so the wrapped paragraph block becomes taller and the heading naturally sits near the top. */
+    .project-panel {
+      grid-template-columns: minmax(420px, 0.68fr) minmax(0, 1.32fr) !important;
+      align-items: stretch !important;
+    }
+
+    .project-panel .project-text-box {
+      justify-content: center !important;
+      padding-top: 1.0rem !important;
+      padding-bottom: 1.0rem !important;
+    }
+
+    .project-panel .project-text-box h2 {
+      margin-top: 0 !important;
+      margin-bottom: 0.85rem !important;
+    }
+
+    @media (max-width: 1050px) {
+      .project-panel {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    /* FINAL OVERRIDE: make the CONOPS paragraph section slightly wider. */
+    .project-panel {
+      grid-template-columns: minmax(460px, 0.76fr) minmax(0, 1.24fr) !important;
+      align-items: stretch !important;
+    }
+
+    .project-panel .project-text-box {
+      justify-content: center !important;
+    }
+
+    @media (max-width: 1050px) {
+      .project-panel {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    /* FINAL OVERRIDE: Simulation Results section layout only. */
+    .aero-section .aero-results-row {
+      grid-template-columns: minmax(420px, 0.92fr) minmax(0, 1.08fr) !important;
+      align-items: stretch !important;
+    }
+
+    .aero-section .aero-results-images {
+      display: grid !important;
+      grid-template-columns: 1fr !important;
+      gap: 0.75rem !important;
+      min-width: 0 !important;
+    }
+
+    .aero-section .aero-results-images .aero-media-tile {
+      min-height: 255px !important;
+    }
+
+    .aero-section .aero-results-images .aero-media-tile img {
+      min-height: 215px !important;
+      object-fit: cover !important;
+      object-position: center center !important;
+    }
+
+    .aero-section .aero-results-graphs {
+      display: grid !important;
+      grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+      gap: 0.75rem !important;
+      margin-top: 1.1rem !important;
+      padding-top: 1.1rem !important;
+      border-top: 1px solid rgba(255, 255, 255, 0.10) !important;
+    }
+
+    .aero-section .aero-results-graphs .aero-media-tile {
+      min-height: 280px !important;
+    }
+
+    .aero-section .aero-results-graphs .aero-media-tile img {
+      min-height: 235px !important;
+      object-fit: cover !important;
+      object-position: center center !important;
+    }
+
+    /* Simple HTML math formatting. No stacked fractions. */
+    .math {
+      font-family: "Times New Roman", Times, serif;
+      font-style: italic;
+      white-space: nowrap;
+      display: inline;
+      line-height: inherit;
+      vertical-align: baseline;
+    }
+
+    .math sub,
+    .math sup {
+      font-size: 0.72em;
+      line-height: 0;
+    }
+
+    @media (max-width: 1050px) {
+      .aero-section .aero-results-row,
+      .aero-section .aero-results-images,
+      .aero-section .aero-results-graphs {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    /* FINAL OVERRIDE: keep Tiltrotor and following sections as separate normal bounding boxes. */
+    .tilt-section,
+    .manufacturing-section,
+    .flight-section,
+    .final-gallery-section {
+      margin-top: 1.1rem !important;
+      background: rgba(18, 18, 18, 0.92) !important;
+      border: 1px solid rgba(255, 255, 255, 0.16) !important;
+      border-radius: 26px !important;
+      box-shadow: 0 28px 95px rgba(0, 0, 0, 0.5) !important;
+    }
+
+
+    /* FINAL OVERRIDE: remove outline/border from only the tiltrotor video tile. */
+    .tilt-section .tilt-media-tile.tilt-video-crop {
+      border: none !important;
+      outline: none !important;
+      box-shadow: none !important;
+      background: rgba(5, 5, 5, 0.50) !important;
+    }
+
+    .tilt-section .tilt-media-tile.tilt-video-crop .tilt-video-frame {
+      border: none !important;
+      outline: none !important;
+      box-shadow: none !important;
+      overflow: hidden !important;
+    }
+
+    .tilt-section .tilt-media-tile.tilt-video-crop video {
+      border: none !important;
+      outline: none !important;
+      box-shadow: none !important;
+    }
+
+    .tilt-section .tilt-media-tile.tilt-video-crop .tilt-image-caption {
+      border-top: none !important;
+      outline: none !important;
+      box-shadow: none !important;
+    }
+
+
+    /* FINAL OVERRIDE: force-hide the visible white perimeter on the tiltrotor video tile.
+       This does NOT change the page/section backgrounds or the video crop logic. */
+    .tilt-section .tilt-media-tile.tilt-video-crop {
+      position: relative !important;
+      isolation: isolate !important;
+      border: 0 !important;
+      outline: 0 !important;
+      box-shadow: none !important;
+      background: #050505 !important;
+      overflow: hidden !important;
+      border-radius: 16px !important;
+    }
+
+    /* Dark inset mask that covers any white edge coming from the video frame or inherited border. */
+    .tilt-section .tilt-media-tile.tilt-video-crop::after {
+      content: "" !important;
+      position: absolute !important;
+      inset: 0 !important;
+      z-index: 5 !important;
+      pointer-events: none !important;
+      border-radius: 16px !important;
+      box-shadow: inset 0 0 0 3px #050505 !important;
+    }
+
+    .tilt-section .tilt-video-frame {
+      position: relative !important;
+      overflow: hidden !important;
+      border: 0 !important;
+      outline: 0 !important;
+      box-shadow: none !important;
+      background: #050505 !important;
+    }
+
+    /* Overscan the video slightly so any light edge inside the MP4 itself is pushed outside the tile. */
+    .tilt-section .tilt-video-frame video {
+      width: 106% !important;
+      left: 50% !important;
+      transform: translate(-50%, -50%) !important;
+      border: 0 !important;
+      outline: 0 !important;
+      box-shadow: none !important;
+      background: #050505 !important;
+    }
+
+    .tilt-section .tilt-media-tile.tilt-video-crop .tilt-image-caption {
+      position: relative !important;
+      z-index: 2 !important;
+      border: 0 !important;
+      outline: 0 !important;
+      box-shadow: none !important;
+      background: rgba(5, 5, 5, 0.92) !important;
+    }
+
+
+    /* FINAL OVERRIDE: use a dedicated video tile class so the normal image-tile border
+       is not applied to the tiltrotor video at all. */
+    .tilt-section .tilt-video-tile {
+      overflow: hidden !important;
+      border: 0 !important;
+      outline: 0 !important;
+      box-shadow: none !important;
+      background: rgba(5, 5, 5, 0.50) !important;
+      border-radius: 16px !important;
+      min-height: 250px !important;
+      display: grid !important;
+      grid-template-rows: minmax(0, 1fr) auto !important;
+      padding: 0 !important;
+      position: relative !important;
+    }
+
+    .tilt-section .tilt-video-tile::before,
+    .tilt-section .tilt-video-tile::after {
+      content: none !important;
+      display: none !important;
+    }
+
+    .tilt-section .tilt-video-tile .tilt-video-frame {
+      position: relative !important;
+      overflow: hidden !important;
+      width: 100% !important;
+      height: 100% !important;
+      min-height: 210px !important;
+      border: 0 !important;
+      outline: 0 !important;
+      box-shadow: none !important;
+      background: #050505 !important;
+      border-radius: 16px 16px 0 0 !important;
+      padding: 0 !important;
+      margin: 0 !important;
+    }
+
+    .tilt-section .tilt-video-tile video {
+      position: absolute !important;
+      left: 50% !important;
+      top: var(--tilt-video-y, 50%) !important;
+      width: 106% !important;
+      height: var(--tilt-video-height, 180%) !important;
+      min-height: 0 !important;
+      object-fit: cover !important;
+      object-position: center center !important;
+      transform: translate(-50%, -50%) !important;
+      transform-origin: center center !important;
+      display: block !important;
+      border: 0 !important;
+      outline: 0 !important;
+      box-shadow: none !important;
+      background: #050505 !important;
+    }
+
+    .tilt-section .tilt-video-tile .tilt-image-caption {
+      padding: 0.42rem 0.65rem !important;
+      color: rgba(255, 255, 255, 0.78) !important;
+      background: rgba(5, 5, 5, 0.82) !important;
+      border: 0 !important;
+      border-top: 0 !important;
+      outline: 0 !important;
+      box-shadow: none !important;
+      font-size: 0.78rem !important;
+      line-height: 1.22 !important;
+      text-align: center !important;
+      border-radius: 0 0 16px 16px !important;
+    }
+
+    /* Keep the remaining still image tile unchanged. */
+    .tilt-section .tilt-media-tile {
+      border: 1px solid rgba(255, 255, 255, 0.12) !important;
+    }
+
+
+
+    /* Alarm System Architecture section */
+    .alarm-architecture-section {
+      margin-top: 1.1rem;
+      padding: clamp(1.2rem, 2.4vw, 2rem);
+      background: rgba(18, 18, 18, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 26px;
+      box-shadow: 0 28px 95px rgba(0, 0, 0, 0.5);
+    }
+
+    .alarm-architecture-section > h2 {
+      display: none !important;
+    }
+
+    .alarm-architecture-row {
+      display: grid;
+      gap: 1.1rem;
+      align-items: stretch;
+    }
+
+    .alarm-architecture-row + .alarm-architecture-row {
+      margin-top: 1.1rem;
+      padding-top: 1.1rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.10);
+    }
+
+    .alarm-architecture-row.text-left {
+      grid-template-columns: minmax(420px, 0.85fr) minmax(0, 1.15fr);
+    }
+
+    .alarm-architecture-row.text-right {
+      grid-template-columns: minmax(0, 1.15fr) minmax(420px, 0.85fr);
+    }
+
+    .alarm-architecture-text-box {
+      min-height: 0;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 1.0rem 1.15rem;
+      background: rgba(18, 18, 18, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 20px;
+      box-shadow: 0 22px 70px rgba(0, 0, 0, 0.42);
+    }
+
+    .alarm-architecture-text-box h2 {
+      color: white;
+      font-size: clamp(1.55rem, 2.4vw, 2.65rem);
+      line-height: 1.0;
+      letter-spacing: -0.055em;
+      margin-bottom: 0.75rem;
+      text-align: left;
+    }
+
+    .alarm-subheading {
+      color: var(--muted);
+      font-size: clamp(1.0rem, 1.2vw, 1.22rem);
+      line-height: 1.15;
+      letter-spacing: -0.025em;
+      font-weight: 760;
+      margin-bottom: 0.45rem;
+    }
+
+    .alarm-architecture-text-box p {
+      color: rgba(255, 255, 255, 0.74);
+      font-size: clamp(0.84rem, 0.95vw, 1.02rem);
+      line-height: 1.38;
+      margin: 0;
+    }
+
+    .alarm-architecture-text-box p + p {
+      margin-top: 0.32rem;
+      padding-top: 0.45rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.10);
+    }
+
+    .alarm-two-image-row {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.75rem;
+      min-width: 0;
+      align-items: stretch;
+    }
+
+    .alarm-single-image-row {
+      min-width: 0;
+      display: grid;
+      align-items: stretch;
+    }
+
+    .alarm-three-image-row {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 0.75rem;
+      min-width: 0;
+      align-items: stretch;
+    }
+
+    .alarm-media-tile {
+      overflow: hidden;
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(5, 5, 5, 0.50);
+      min-height: 285px;
+      display: grid;
+      grid-template-rows: minmax(0, 1fr) auto;
+    }
+
+    .alarm-three-image-row .alarm-media-tile {
+      min-height: 245px;
+    }
+
+    .alarm-media-tile img,
+    .alarm-media-tile video {
+      width: 100%;
+      height: 100%;
+      min-height: 0;
+      object-fit: cover;
+      object-position: center center;
+      display: block;
+      background: rgba(30, 30, 30, 0.82);
+    }
+
+    .alarm-image-caption {
+      padding: 0.42rem 0.65rem;
+      color: rgba(255, 255, 255, 0.78);
+      background: rgba(5, 5, 5, 0.82);
+      border-top: 1px solid rgba(255, 255, 255, 0.10);
+      font-size: 0.78rem;
+      line-height: 1.22;
+      text-align: center;
+    }
+
+    @media (max-width: 1050px) {
+      .alarm-architecture-row.text-left,
+      .alarm-architecture-row.text-right,
+      .alarm-two-image-row,
+      .alarm-three-image-row {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+
+
+    /* FINAL OVERRIDE: Alarm System Architecture width tuning requested after v2. */
+    /* Row 1: make the top paragraph less wide and give more room to the two-image group. */
+    .alarm-architecture-section .alarm-architecture-row.text-left {
+      grid-template-columns: minmax(300px, 0.62fr) minmax(0, 1.38fr) !important;
+    }
+
+    /* Row 2: make the Physical Layout paragraph wider and the left image column narrower. */
+    .alarm-architecture-section .alarm-architecture-row.text-right {
+      grid-template-columns: minmax(0, 0.72fr) minmax(500px, 1.28fr) !important;
+    }
+
+    /* Row 3: shrink the first image further and make the second image wider. */
+    .alarm-architecture-section .alarm-three-image-row {
+      grid-template-columns: minmax(0, 0.42fr) minmax(0, 1.42fr) minmax(0, 1.16fr) !important;
+    }
+
+    @media (max-width: 1050px) {
+      .alarm-architecture-section .alarm-architecture-row.text-left,
+      .alarm-architecture-section .alarm-architecture-row.text-right,
+      .alarm-architecture-section .alarm-three-image-row {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    /* FINAL OVERRIDE: contain only the top-right Alarm System Architecture image. */
+    .alarm-architecture-section .alarm-two-image-row .alarm-media-tile:nth-child(2) {
+      background: #ffffff !important;
+      border: 1px solid rgba(255, 255, 255, 0.12) !important;
+      overflow: hidden !important;
+    }
+
+    .alarm-architecture-section .alarm-two-image-row .alarm-media-tile:nth-child(2) img {
+      width: 100% !important;
+      height: 100% !important;
+      min-height: 0 !important;
+      object-fit: contain !important;
+      object-position: center center !important;
+      background: #ffffff !important;
+      display: block !important;
+    }
+
+    /* Keep the top-left Alarm System Architecture image using the normal cover behavior. */
+    .alarm-architecture-section .alarm-two-image-row .alarm-media-tile:nth-child(1) {
+      background: rgba(5, 5, 5, 0.50) !important;
+      border: 1px solid rgba(255, 255, 255, 0.12) !important;
+    }
+
+    .alarm-architecture-section .alarm-two-image-row .alarm-media-tile:nth-child(1) img {
+      object-fit: cover !important;
+      object-position: center center !important;
+      background: rgba(30, 30, 30, 0.82) !important;
+    }
+
+
+    /* FINAL OVERRIDE: top-right Alarm image is contained without creating a white border/outline.
+       The image viewport gets the white fill for unused space, but it is inset so the
+       outside card still shows the normal thin grey BEAR-style outline. */
+    .alarm-architecture-section .alarm-two-image-row .alarm-media-tile:nth-child(2) {
+      overflow: hidden !important;
+      border-radius: 16px !important;
+      border: 1px solid rgba(255, 255, 255, 0.16) !important;
+      outline: none !important;
+      background: rgba(5, 5, 5, 0.78) !important;
+      box-shadow: 0 24px 90px rgba(0, 0, 0, 0.48) !important;
+      display: grid !important;
+      grid-template-rows: minmax(0, 1fr) auto !important;
+    }
+
+    .alarm-architecture-section .alarm-two-image-row .alarm-media-tile:nth-child(2) img,
+    .alarm-architecture-section .alarm-two-image-row .alarm-media-tile:nth-child(2) video {
+      width: calc(100% - 2px) !important;
+      height: calc(100% - 2px) !important;
+      min-height: 0 !important;
+      margin: 1px !important;
+      object-fit: contain !important;
+      object-position: center center !important;
+      display: block !important;
+      background: #ffffff !important;
+      border: none !important;
+      border-bottom: none !important;
+      border-radius: 0 !important;
+    }
+
+    .alarm-architecture-section .alarm-two-image-row .alarm-media-tile:nth-child(2) .alarm-image-caption {
+      padding: 0.42rem 0.65rem !important;
+      color: rgba(255, 255, 255, 0.78) !important;
+      background: rgba(5, 5, 5, 0.82) !important;
+      border-top: 1px solid rgba(255, 255, 255, 0.10) !important;
+      font-size: 0.78rem !important;
+      line-height: 1.22 !important;
+      text-align: center !important;
+    }
+
+
+
+    /* ESP1 section */
+    .esp1-section {
+      margin-top: 1.1rem;
+      padding: clamp(1.2rem, 2.4vw, 2rem);
+      background: rgba(18, 18, 18, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 26px;
+      box-shadow: 0 28px 95px rgba(0, 0, 0, 0.5);
+    }
+
+    .esp1-section > h2 {
+      display: none !important;
+    }
+
+    .esp1-row {
+      display: grid;
+      gap: 1.1rem;
+      align-items: stretch;
+    }
+
+    .esp1-row + .esp1-row {
+      margin-top: 1.1rem;
+      padding-top: 1.1rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.10);
+    }
+
+    .esp1-row.text-left {
+      grid-template-columns: minmax(360px, 0.78fr) minmax(0, 1.22fr);
+    }
+
+    .esp1-row.text-right {
+      grid-template-columns: minmax(0, 1.22fr) minmax(360px, 0.78fr);
+    }
+
+    .esp1-text-box {
+      min-height: 0;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 1.0rem 1.15rem;
+      background: rgba(18, 18, 18, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 20px;
+      box-shadow: 0 22px 70px rgba(0, 0, 0, 0.42);
+    }
+
+    .esp1-text-box h2 {
+      color: white;
+      font-size: clamp(1.55rem, 2.4vw, 2.65rem);
+      line-height: 1.0;
+      letter-spacing: -0.055em;
+      margin-bottom: 0.75rem;
+      text-align: left;
+    }
+
+    .esp1-subheading {
+      color: var(--muted);
+      font-size: clamp(1.0rem, 1.2vw, 1.22rem);
+      line-height: 1.15;
+      letter-spacing: -0.025em;
+      font-weight: 760;
+      margin-bottom: 0.45rem;
+    }
+
+    .esp1-text-box p {
+      color: rgba(255, 255, 255, 0.74);
+      font-size: clamp(0.84rem, 0.95vw, 1.02rem);
+      line-height: 1.38;
+      margin: 0;
+    }
+
+    .esp1-single-image,
+    .esp1-image-pair,
+    .esp1-grid-2x2 {
+      min-width: 0;
+      display: grid;
+      align-items: stretch;
+    }
+
+    .esp1-image-pair {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.75rem;
+    }
+
+    .esp1-grid-2x2 {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-template-rows: auto auto;
+      gap: 0.75rem;
+    }
+
+    .esp1-grid-2x2 .esp1-media-tile:nth-child(3) {
+      grid-column: 1 / -1;
+    }
+
+    .esp1-media-tile {
+      overflow: hidden;
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(5, 5, 5, 0.50);
+      min-height: 285px;
+      display: grid;
+      grid-template-rows: minmax(0, 1fr) auto;
+    }
+
+    .esp1-grid-2x2 .esp1-media-tile {
+      min-height: 220px;
+    }
+
+    .esp1-media-tile img,
+    .esp1-media-tile video {
+      width: 100%;
+      height: 100%;
+      min-height: 0;
+      object-fit: cover;
+      object-position: center center;
+      display: block;
+      background: rgba(30, 30, 30, 0.82);
+    }
+
+    .esp1-image-caption {
+      padding: 0.42rem 0.65rem;
+      color: rgba(255, 255, 255, 0.78);
+      background: rgba(5, 5, 5, 0.82);
+      border-top: 1px solid rgba(255, 255, 255, 0.10);
+      font-size: 0.78rem;
+      line-height: 1.22;
+      text-align: center;
+    }
+
+    @media (max-width: 1050px) {
+      .esp1-row.text-left,
+      .esp1-row.text-right,
+      .esp1-image-pair,
+      .esp1-grid-2x2 {
+        grid-template-columns: 1fr !important;
+      }
+
+      .esp1-grid-2x2 {
+        grid-template-rows: none !important;
+      }
+
+      .esp1-grid-2x2 .esp1-media-tile:nth-child(3) {
+        grid-column: auto !important;
+      }
+    }
+
+
+    /* FINAL OVERRIDE: widen ESP1 first and second row paragraph sections. */
+    .esp1-section .esp1-row:nth-of-type(1) {
+      grid-template-columns: minmax(520px, 1.08fr) minmax(0, 0.92fr) !important;
+      gap: 1.0rem !important;
+    }
+
+    .esp1-section .esp1-row:nth-of-type(2) {
+      grid-template-columns: minmax(0, 0.92fr) minmax(520px, 1.08fr) !important;
+      gap: 1.0rem !important;
+    }
+
+    @media (max-width: 1050px) {
+      .esp1-section .esp1-row:nth-of-type(1),
+      .esp1-section .esp1-row:nth-of-type(2) {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+  
+
+    /* FINAL OVERRIDE: tune ESP1 first row only.
+       The paragraph column is thinner, the left image in the pair is wider,
+       and the right image is thinner. */
+    .esp1-section .esp1-row:nth-of-type(1) {
+      grid-template-columns: minmax(420px, 0.82fr) minmax(0, 1.18fr) !important;
+      gap: 1.0rem !important;
+    }
+
+    .esp1-section .esp1-row:nth-of-type(1) .esp1-image-pair {
+      grid-template-columns: minmax(0, 1.42fr) minmax(0, 0.58fr) !important;
+      gap: 0.75rem !important;
+    }
+
+    @media (max-width: 1050px) {
+      .esp1-section .esp1-row:nth-of-type(1),
+      .esp1-section .esp1-row:nth-of-type(1) .esp1-image-pair {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    /* FINAL OVERRIDE: tighten ESP1 first row more.
+       Paragraph is thinner, left image is wider, and right image is thinner. */
+    .esp1-section .esp1-row:nth-of-type(1) {
+      grid-template-columns: minmax(360px, 0.70fr) minmax(0, 1.30fr) !important;
+      gap: 1.0rem !important;
+    }
+
+    .esp1-section .esp1-row:nth-of-type(1) .esp1-image-pair {
+      grid-template-columns: minmax(0, 1.72fr) minmax(0, 0.28fr) !important;
+      gap: 0.75rem !important;
+    }
+
+    @media (max-width: 1050px) {
+      .esp1-section .esp1-row:nth-of-type(1),
+      .esp1-section .esp1-row:nth-of-type(1) .esp1-image-pair {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    /* FINAL OVERRIDE: first ESP1 row right image slightly wider.
+       The extra width comes from making the paragraph column thinner,
+       while keeping the left image wider than the right image. */
+    .esp1-section .esp1-row:nth-of-type(1) {
+      grid-template-columns: minmax(330px, 0.64fr) minmax(0, 1.36fr) !important;
+      gap: 1.0rem !important;
+    }
+
+    .esp1-section .esp1-row:nth-of-type(1) .esp1-image-pair {
+      grid-template-columns: minmax(0, 1.58fr) minmax(0, 0.42fr) !important;
+      gap: 0.75rem !important;
+    }
+
+    @media (max-width: 1050px) {
+      .esp1-section .esp1-row:nth-of-type(1),
+      .esp1-section .esp1-row:nth-of-type(1) .esp1-image-pair {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    /* FINAL OVERRIDE: first ESP1 row paragraph thinner and left image wider.
+       This only affects the first ESP1 row. */
+    .esp1-section .esp1-row:nth-of-type(1) {
+      grid-template-columns: minmax(300px, 0.56fr) minmax(0, 1.44fr) !important;
+      gap: 1.0rem !important;
+    }
+
+    .esp1-section .esp1-row:nth-of-type(1) .esp1-image-pair {
+      grid-template-columns: minmax(0, 1.74fr) minmax(0, 0.26fr) !important;
+      gap: 0.75rem !important;
+    }
+
+    @media (max-width: 1050px) {
+      .esp1-section .esp1-row:nth-of-type(1),
+      .esp1-section .esp1-row:nth-of-type(1) .esp1-image-pair {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+  
+
+    /* FINAL OVERRIDE: ESP1 second row image-width tuning.
+       Make the right image a bit wider and the left image a tad thinner. */
+    .esp1-section .esp1-row:nth-of-type(2) .esp1-image-pair {
+      grid-template-columns: minmax(0, 0.68fr) minmax(0, 1.32fr) !important;
+      gap: 0.75rem !important;
+      align-items: stretch !important;
+    }
+
+    @media (max-width: 1050px) {
+      .esp1-section .esp1-row:nth-of-type(2) .esp1-image-pair {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    /* FINAL OVERRIDE: shorten ESP1 second row without cropping images.
+       This uses the previous second-row image-width layout, reduces only the row/card height,
+       and switches the images to contain so the full images remain visible. */
+    .esp1-section .esp1-row:nth-of-type(2) {
+      gap: 0.85rem !important;
+      align-items: stretch !important;
+    }
+
+    .esp1-section .esp1-row:nth-of-type(2) .esp1-media-tile {
+      min-height: 225px !important;
+      height: auto !important;
+      background: rgba(5, 5, 5, 0.78) !important;
+      border: 1px solid rgba(255, 255, 255, 0.16) !important;
+      border-radius: 16px !important;
+      overflow: hidden !important;
+      display: grid !important;
+      grid-template-rows: minmax(0, 1fr) auto !important;
+    }
+
+    .esp1-section .esp1-row:nth-of-type(2) .esp1-media-tile img,
+    .esp1-section .esp1-row:nth-of-type(2) .esp1-media-tile video {
+      width: 100% !important;
+      height: 100% !important;
+      min-height: 0 !important;
+      object-fit: contain !important;
+      object-position: center center !important;
+      display: block !important;
+      background: rgba(30, 30, 30, 0.82) !important;
+      border: none !important;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+    }
+
+    .esp1-section .esp1-row:nth-of-type(2) .esp1-image-caption {
+      padding: 0.34rem 0.60rem !important;
+      font-size: 0.74rem !important;
+      line-height: 1.15 !important;
+    }
+
+    .esp1-section .esp1-row:nth-of-type(2) .esp1-text-box {
+      padding-top: 0.86rem !important;
+      padding-bottom: 0.86rem !important;
+    }
+
+    @media (max-width: 1050px) {
+      .esp1-section .esp1-row:nth-of-type(2) .esp1-media-tile {
+        min-height: 240px !important;
+      }
+    }
+
+
+    /* FINAL OVERRIDE: shorten ESP1 second row further without cropping.
+       Keep the image card dark with the normal grey outline, but make the
+       contained media viewport white so any unused contain-space is white
+       without turning the whole card into a white-bordered box. */
+    .esp1-section .esp1-row:nth-of-type(2) {
+      grid-template-columns: minmax(0, 1.02fr) minmax(430px, 0.98fr) !important;
+      gap: 0.75rem !important;
+      align-items: stretch !important;
+    }
+
+    .esp1-section .esp1-row:nth-of-type(2) .esp1-image-pair {
+      grid-template-columns: minmax(0, 0.82fr) minmax(0, 1.18fr) !important;
+      gap: 0.65rem !important;
+      align-items: stretch !important;
+      min-height: 0 !important;
+      height: 100% !important;
+    }
+
+    .esp1-section .esp1-row:nth-of-type(2) .esp1-media-tile {
+      min-height: 180px !important;
+      height: 100% !important;
+      background: rgba(5, 5, 5, 0.78) !important;
+      border: 1px solid rgba(255, 255, 255, 0.16) !important;
+      border-radius: 16px !important;
+      overflow: hidden !important;
+      box-shadow: 0 24px 90px rgba(0, 0, 0, 0.48) !important;
+      display: grid !important;
+      grid-template-rows: minmax(0, 1fr) auto !important;
+    }
+
+    .esp1-section .esp1-row:nth-of-type(2) .esp1-media-tile img,
+    .esp1-section .esp1-row:nth-of-type(2) .esp1-media-tile video {
+      width: 100% !important;
+      height: 100% !important;
+      min-height: 0 !important;
+      object-fit: contain !important;
+      object-position: center center !important;
+      display: block !important;
+      background: #ffffff !important;
+      border: none !important;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+    }
+
+    .esp1-section .esp1-row:nth-of-type(2) .esp1-image-caption {
+      padding: 0.30rem 0.58rem !important;
+      color: rgba(255, 255, 255, 0.82) !important;
+      background: rgba(5, 5, 5, 0.88) !important;
+      border-top: none !important;
+      font-size: 0.72rem !important;
+      line-height: 1.12 !important;
+      text-align: center !important;
+    }
+
+    .esp1-section .esp1-row:nth-of-type(2) .esp1-text-box {
+      padding-top: 0.74rem !important;
+      padding-bottom: 0.74rem !important;
+    }
+
+    .esp1-section .esp1-row:nth-of-type(2) .esp1-text-box p {
+      line-height: 1.30 !important;
+    }
+
+    @media (max-width: 1050px) {
+      .esp1-section .esp1-row:nth-of-type(2),
+      .esp1-section .esp1-row:nth-of-type(2) .esp1-image-pair {
+        grid-template-columns: 1fr !important;
+      }
+
+      .esp1-section .esp1-row:nth-of-type(2) .esp1-media-tile {
+        min-height: 220px !important;
+      }
+    }
+
+
+    /* FINAL OVERRIDE vFINAL: ACTUALLY shrink ESP1 row 2 height.
+       Explicitly caps the entire row height instead of only changing min-heights.
+       Images stay fully visible using contain; unused image viewport space is white.
+       The card itself remains dark with the normal thin grey outline so no white border is formed. */
+    .esp1-section .esp1-row:nth-of-type(2) {
+      grid-template-columns: minmax(0, 1.02fr) minmax(430px, 0.98fr) !important;
+      gap: 0.65rem !important;
+      align-items: stretch !important;
+      height: 205px !important;
+      min-height: 205px !important;
+      max-height: 205px !important;
+      overflow: visible !important;
+    }
+
+    .esp1-section .esp1-row:nth-of-type(2) .esp1-image-pair {
+      height: 205px !important;
+      min-height: 205px !important;
+      max-height: 205px !important;
+      grid-template-columns: minmax(0, 0.82fr) minmax(0, 1.18fr) !important;
+      gap: 0.65rem !important;
+      align-items: stretch !important;
+      min-width: 0 !important;
+    }
+
+    .esp1-section .esp1-row:nth-of-type(2) .esp1-media-tile {
+      height: 205px !important;
+      min-height: 0 !important;
+      max-height: 205px !important;
+      background: rgba(5, 5, 5, 0.78) !important;
+      border: 1px solid rgba(255, 255, 255, 0.16) !important;
+      border-radius: 16px !important;
+      overflow: hidden !important;
+      box-shadow: 0 24px 90px rgba(0, 0, 0, 0.48) !important;
+      display: grid !important;
+      grid-template-rows: minmax(0, 1fr) auto !important;
+    }
+
+    .esp1-section .esp1-row:nth-of-type(2) .esp1-media-tile img,
+    .esp1-section .esp1-row:nth-of-type(2) .esp1-media-tile video {
+      width: 100% !important;
+      height: 100% !important;
+      min-height: 0 !important;
+      max-height: none !important;
+      object-fit: contain !important;
+      object-position: center center !important;
+      display: block !important;
+      background: #ffffff !important;
+      border: none !important;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+    }
+
+    .esp1-section .esp1-row:nth-of-type(2) .esp1-image-caption {
+      padding: 0.24rem 0.50rem !important;
+      color: rgba(255, 255, 255, 0.82) !important;
+      background: rgba(5, 5, 5, 0.88) !important;
+      border-top: none !important;
+      font-size: 0.69rem !important;
+      line-height: 1.05 !important;
+      text-align: center !important;
+    }
+
+    .esp1-section .esp1-row:nth-of-type(2) .esp1-text-box {
+      height: 205px !important;
+      min-height: 0 !important;
+      max-height: 205px !important;
+      padding: 0.48rem 0.78rem !important;
+      justify-content: center !important;
+      overflow: hidden !important;
+    }
+
+    .esp1-section .esp1-row:nth-of-type(2) .esp1-subheading {
+      margin-bottom: 0.25rem !important;
+      font-size: clamp(0.92rem, 1.05vw, 1.08rem) !important;
+      line-height: 1.05 !important;
+    }
+
+    .esp1-section .esp1-row:nth-of-type(2) .esp1-text-box p {
+      font-size: clamp(0.76rem, 0.82vw, 0.88rem) !important;
+      line-height: 1.18 !important;
+      margin: 0 !important;
+    }
+
+    @media (max-width: 1050px) {
+      .esp1-section .esp1-row:nth-of-type(2),
+      .esp1-section .esp1-row:nth-of-type(2) .esp1-image-pair,
+      .esp1-section .esp1-row:nth-of-type(2) .esp1-text-box,
+      .esp1-section .esp1-row:nth-of-type(2) .esp1-media-tile {
+        height: auto !important;
+        min-height: 220px !important;
+        max-height: none !important;
+      }
+
+      .esp1-section .esp1-row:nth-of-type(2),
+      .esp1-section .esp1-row:nth-of-type(2) .esp1-image-pair {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+
+    /* FINAL OVERRIDE: row 2 height restored to match the ESP1 Electrical Design row more closely.
+       This keeps the no-crop/white-fill behavior but raises the explicit cap from the overly short 205px. */
+    .esp1-section .esp1-row:nth-of-type(2) {
+      height: 285px !important;
+      min-height: 285px !important;
+      max-height: 285px !important;
+      gap: 0.75rem !important;
+    }
+
+    .esp1-section .esp1-row:nth-of-type(2) .esp1-image-pair {
+      height: 285px !important;
+      min-height: 285px !important;
+      max-height: 285px !important;
+    }
+
+    .esp1-section .esp1-row:nth-of-type(2) .esp1-media-tile {
+      height: 285px !important;
+      min-height: 0 !important;
+      max-height: 285px !important;
+    }
+
+    .esp1-section .esp1-row:nth-of-type(2) .esp1-text-box {
+      height: 285px !important;
+      min-height: 0 !important;
+      max-height: 285px !important;
+      padding: 0.75rem 0.95rem !important;
+      overflow: hidden !important;
+    }
+
+    .esp1-section .esp1-row:nth-of-type(2) .esp1-subheading {
+      margin-bottom: 0.35rem !important;
+      font-size: clamp(1.0rem, 1.2vw, 1.22rem) !important;
+      line-height: 1.15 !important;
+    }
+
+    .esp1-section .esp1-row:nth-of-type(2) .esp1-text-box p {
+      font-size: clamp(0.80rem, 0.88vw, 0.96rem) !important;
+      line-height: 1.30 !important;
+      margin: 0 !important;
+    }
+
+    .esp1-section .esp1-row:nth-of-type(2) .esp1-image-caption {
+      padding: 0.34rem 0.60rem !important;
+      font-size: 0.74rem !important;
+      line-height: 1.15 !important;
+    }
+
+    @media (max-width: 1050px) {
+      .esp1-section .esp1-row:nth-of-type(2),
+      .esp1-section .esp1-row:nth-of-type(2) .esp1-image-pair,
+      .esp1-section .esp1-row:nth-of-type(2) .esp1-text-box,
+      .esp1-section .esp1-row:nth-of-type(2) .esp1-media-tile {
+        height: auto !important;
+        min-height: 240px !important;
+        max-height: none !important;
+      }
+    }
+
+
+
+    /* FINAL OVERRIDE: make ESP1 row 2 match the Electrical Design row height.
+       The prior 285px cap was too short; this sets the full row, image pair,
+       image cards, and paragraph card to a clearly taller shared height while
+       keeping the contained images fully visible with white media fill only. */
+    .esp1-section .esp1-row:nth-of-type(2) {
+      height: clamp(560px, 46vw, 760px) !important;
+      min-height: clamp(560px, 46vw, 760px) !important;
+      max-height: clamp(560px, 46vw, 760px) !important;
+      gap: 1.0rem !important;
+      align-items: stretch !important;
+    }
+
+    .esp1-section .esp1-row:nth-of-type(2) .esp1-image-pair {
+      height: 100% !important;
+      min-height: 100% !important;
+      max-height: 100% !important;
+      grid-template-columns: minmax(0, 0.82fr) minmax(0, 1.18fr) !important;
+      gap: 0.75rem !important;
+      align-items: stretch !important;
+    }
+
+    .esp1-section .esp1-row:nth-of-type(2) .esp1-media-tile,
+    .esp1-section .esp1-row:nth-of-type(2) .esp1-text-box {
+      height: 100% !important;
+      min-height: 0 !important;
+      max-height: none !important;
+    }
+
+    .esp1-section .esp1-row:nth-of-type(2) .esp1-media-tile {
+      background: rgba(5, 5, 5, 0.78) !important;
+      border: 1px solid rgba(255, 255, 255, 0.16) !important;
+      border-radius: 16px !important;
+      overflow: hidden !important;
+      display: grid !important;
+      grid-template-rows: minmax(0, 1fr) auto !important;
+    }
+
+    .esp1-section .esp1-row:nth-of-type(2) .esp1-media-tile img,
+    .esp1-section .esp1-row:nth-of-type(2) .esp1-media-tile video {
+      width: 100% !important;
+      height: 100% !important;
+      min-height: 0 !important;
+      object-fit: contain !important;
+      object-position: center center !important;
+      display: block !important;
+      background: #ffffff !important;
+      border: none !important;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+    }
+
+    .esp1-section .esp1-row:nth-of-type(2) .esp1-image-caption {
+      padding: 0.42rem 0.65rem !important;
+      color: rgba(255, 255, 255, 0.82) !important;
+      background: rgba(5, 5, 5, 0.88) !important;
+      border-top: none !important;
+      font-size: 0.78rem !important;
+      line-height: 1.20 !important;
+      text-align: center !important;
+    }
+
+    .esp1-section .esp1-row:nth-of-type(2) .esp1-text-box {
+      padding: 1.0rem 1.15rem !important;
+      justify-content: center !important;
+      overflow: hidden !important;
+    }
+
+    .esp1-section .esp1-row:nth-of-type(2) .esp1-subheading {
+      margin-bottom: 0.45rem !important;
+      font-size: clamp(1.0rem, 1.2vw, 1.22rem) !important;
+      line-height: 1.15 !important;
+    }
+
+    .esp1-section .esp1-row:nth-of-type(2) .esp1-text-box p {
+      font-size: clamp(0.84rem, 0.95vw, 1.02rem) !important;
+      line-height: 1.38 !important;
+      margin: 0 !important;
+    }
+
+    @media (max-width: 1050px) {
+      .esp1-section .esp1-row:nth-of-type(2),
+      .esp1-section .esp1-row:nth-of-type(2) .esp1-image-pair {
+        height: auto !important;
+        min-height: 0 !important;
+        max-height: none !important;
+        grid-template-columns: 1fr !important;
+      }
+
+      .esp1-section .esp1-row:nth-of-type(2) .esp1-media-tile {
+        min-height: 280px !important;
+      }
+    }
+
+  
+
+    /* FINAL OVERRIDE: ESP1 third-row top grid contain + no-white-border white fill.
+       The top-left software image is made a little wider, while both top-row images
+       use contain on a white media viewport. The media cards themselves stay dark
+       with the normal grey outline so the white fill does not become a white border. */
+    .esp1-section .esp1-row:nth-of-type(3) .esp1-grid-2x2 {
+      grid-template-columns: minmax(0, 0.82fr) minmax(0, 1.18fr) !important;
+      gap: 0.75rem !important;
+      align-items: stretch !important;
+    }
+
+    .esp1-section .esp1-row:nth-of-type(3) .esp1-grid-2x2 .esp1-media-tile:nth-child(1),
+    .esp1-section .esp1-row:nth-of-type(3) .esp1-grid-2x2 .esp1-media-tile:nth-child(2) {
+      background: rgba(5, 5, 5, 0.78) !important;
+      border: 1px solid rgba(255, 255, 255, 0.16) !important;
+      border-radius: 16px !important;
+      overflow: hidden !important;
+      box-shadow: 0 24px 90px rgba(0, 0, 0, 0.48) !important;
+      display: grid !important;
+      grid-template-rows: minmax(0, 1fr) auto !important;
+    }
+
+    .esp1-section .esp1-row:nth-of-type(3) .esp1-grid-2x2 .esp1-media-tile:nth-child(1) img,
+    .esp1-section .esp1-row:nth-of-type(3) .esp1-grid-2x2 .esp1-media-tile:nth-child(1) video,
+    .esp1-section .esp1-row:nth-of-type(3) .esp1-grid-2x2 .esp1-media-tile:nth-child(2) img,
+    .esp1-section .esp1-row:nth-of-type(3) .esp1-grid-2x2 .esp1-media-tile:nth-child(2) video {
+      width: 100% !important;
+      height: 100% !important;
+      min-height: 0 !important;
+      object-fit: contain !important;
+      object-position: center center !important;
+      background: #ffffff !important;
+      display: block !important;
+      border: none !important;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+    }
+
+    .esp1-section .esp1-row:nth-of-type(3) .esp1-grid-2x2 .esp1-media-tile:nth-child(1) .esp1-image-caption,
+    .esp1-section .esp1-row:nth-of-type(3) .esp1-grid-2x2 .esp1-media-tile:nth-child(2) .esp1-image-caption {
+      background: rgba(5, 5, 5, 0.88) !important;
+      border-top: none !important;
+      position: relative !important;
+      z-index: 2 !important;
+    }
+
+    @media (max-width: 1050px) {
+      .esp1-section .esp1-row:nth-of-type(3) .esp1-grid-2x2 {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    /* FINAL OVERRIDE: widen ESP1 third-row paragraph section.
+       The Software Design paragraph gets more width while the image grid side shrinks.
+       The top-row grid image contain/white-fill behavior remains unchanged. */
+    .esp1-section .esp1-row:nth-of-type(3) {
+      grid-template-columns: minmax(520px, 1.10fr) minmax(0, 0.90fr) !important;
+      gap: 1.0rem !important;
+      align-items: stretch !important;
+    }
+
+    .esp1-section .esp1-row:nth-of-type(3) .esp1-text-box {
+      width: 100% !important;
+      padding: 1.0rem 1.15rem !important;
+    }
+
+    @media (max-width: 1050px) {
+      .esp1-section .esp1-row:nth-of-type(3) {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    /* FINAL OVERRIDE: make ESP1 third-row paragraph section slightly less wide.
+       Gives a little width back to the image grid while keeping the top-row
+       grid images on contain with the no-white-border white-fill method. */
+    .esp1-section .esp1-row:nth-of-type(3) {
+      grid-template-columns: minmax(490px, 1.02fr) minmax(0, 0.98fr) !important;
+      gap: 1.0rem !important;
+      align-items: stretch !important;
+    }
+
+    @media (max-width: 1050px) {
+      .esp1-section .esp1-row:nth-of-type(3) {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+
+    /* FINAL OVERRIDE: widen every ESP1 Testing paragraph section and shrink the video columns. */
+    .esp1-testing-section .esp1-testing-row.text-left {
+      grid-template-columns: minmax(560px, 1.28fr) minmax(0, 0.72fr) !important;
+    }
+
+    .esp1-testing-section .esp1-testing-row.text-right {
+      grid-template-columns: minmax(0, 0.72fr) minmax(560px, 1.28fr) !important;
+    }
+
+    @media (max-width: 1050px) {
+      .esp1-testing-section .esp1-testing-row.text-left,
+      .esp1-testing-section .esp1-testing-row.text-right {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    /* FINAL OVERRIDE v5: make every ESP1 Testing paragraph section even wider and shrink video columns further. */
+    .esp1-testing-section .esp1-testing-row.text-left {
+      grid-template-columns: minmax(680px, 1.55fr) minmax(0, 0.45fr) !important;
+      gap: 0.95rem !important;
+    }
+
+    .esp1-testing-section .esp1-testing-row.text-right {
+      grid-template-columns: minmax(0, 0.45fr) minmax(680px, 1.55fr) !important;
+      gap: 0.95rem !important;
+    }
+
+    @media (max-width: 1050px) {
+      .esp1-testing-section .esp1-testing-row.text-left,
+      .esp1-testing-section .esp1-testing-row.text-right {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    /* FINAL OVERRIDE v6: make ESP1 Testing paragraph sections slightly less wide than v5. */
+    .esp1-testing-section .esp1-testing-row.text-left {
+      grid-template-columns: minmax(620px, 1.40fr) minmax(0, 0.60fr) !important;
+      gap: 1.0rem !important;
+    }
+
+    .esp1-testing-section .esp1-testing-row.text-right {
+      grid-template-columns: minmax(0, 0.60fr) minmax(620px, 1.40fr) !important;
+      gap: 1.0rem !important;
+    }
+
+    @media (max-width: 1050px) {
+      .esp1-testing-section .esp1-testing-row.text-left,
+      .esp1-testing-section .esp1-testing-row.text-right {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    /* FINAL OVERRIDE v7: make all ESP1 Testing paragraph sections just a tad wider than v6. */
+    .esp1-testing-section .esp1-testing-row.text-left {
+      grid-template-columns: minmax(640px, 1.45fr) minmax(0, 0.55fr) !important;
+      gap: 1.0rem !important;
+    }
+
+    .esp1-testing-section .esp1-testing-row.text-right {
+      grid-template-columns: minmax(0, 0.55fr) minmax(640px, 1.45fr) !important;
+      gap: 1.0rem !important;
+    }
+
+    @media (max-width: 1050px) {
+      .esp1-testing-section .esp1-testing-row.text-left,
+      .esp1-testing-section .esp1-testing-row.text-right {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    /* FINAL OVERRIDE v8: make ESP1 Testing paragraph sections just a smidge less wide than v7. */
+    .esp1-testing-section .esp1-testing-row.text-left {
+      grid-template-columns: minmax(630px, 1.425fr) minmax(0, 0.575fr) !important;
+      gap: 1.0rem !important;
+    }
+
+    .esp1-testing-section .esp1-testing-row.text-right {
+      grid-template-columns: minmax(0, 0.575fr) minmax(630px, 1.425fr) !important;
+      gap: 1.0rem !important;
+    }
+
+    @media (max-width: 1050px) {
+      .esp1-testing-section .esp1-testing-row.text-left,
+      .esp1-testing-section .esp1-testing-row.text-right {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    /* FINAL OVERRIDE v9: make ESP1 Testing paragraph sections a smidgen more wide than v8. */
+    .esp1-testing-section .esp1-testing-row.text-left {
+      grid-template-columns: minmax(635px, 1.4375fr) minmax(0, 0.5625fr) !important;
+      gap: 1.0rem !important;
+    }
+
+    .esp1-testing-section .esp1-testing-row.text-right {
+      grid-template-columns: minmax(0, 0.5625fr) minmax(635px, 1.4375fr) !important;
+      gap: 1.0rem !important;
+    }
+
+    @media (max-width: 1050px) {
+      .esp1-testing-section .esp1-testing-row.text-left,
+      .esp1-testing-section .esp1-testing-row.text-right {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+  
+
+    /* FINAL OVERRIDE v11: make ESP1 Testing paragraph sections a tiny bit wider than v10. */
+    .esp1-testing-section .esp1-testing-row.text-left {
+      grid-template-columns: minmax(652px, 1.475fr) minmax(0, 0.525fr) !important;
+      gap: 1.0rem !important;
+    }
+
+    .esp1-testing-section .esp1-testing-row.text-right {
+      grid-template-columns: minmax(0, 0.525fr) minmax(652px, 1.475fr) !important;
+      gap: 1.0rem !important;
+    }
+
+    @media (max-width: 1050px) {
+      .esp1-testing-section .esp1-testing-row.text-left,
+      .esp1-testing-section .esp1-testing-row.text-right {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+
+    /* FINAL OVERRIDE: Gallery fixed to EXACTLY two rows:
+       Row 1 = three images horizontally.
+       Row 2 = two looping videos horizontally. */
+    .final-gallery-section .final-gallery-grid {
+      display: grid !important;
+      grid-template-columns: 1fr !important;
+      grid-template-rows: auto auto !important;
+      gap: 0.75rem !important;
+      min-width: 0 !important;
+    }
+
+    .final-gallery-section .final-gallery-image-row {
+      display: grid !important;
+      grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+      gap: 0.75rem !important;
+      min-width: 0 !important;
+      width: 100% !important;
+    }
+
+    .final-gallery-section .final-gallery-video-row {
+      display: grid !important;
+      grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+      gap: 0.75rem !important;
+      min-width: 0 !important;
+      width: 100% !important;
+    }
+
+    .final-gallery-section .final-gallery-image-row .final-gallery-tile,
+    .final-gallery-section .final-gallery-video-row .final-gallery-tile {
+      width: 100% !important;
+      min-width: 0 !important;
+      min-height: 230px !important;
+    }
+
+    .final-gallery-section .final-gallery-tile img,
+    .final-gallery-section .final-gallery-tile video {
+      width: 100% !important;
+      height: 100% !important;
+      min-height: 230px !important;
+      object-fit: cover !important;
+      object-position: center center !important;
+      display: block !important;
+    }
+
+    @media (max-width: 1050px) {
+      .final-gallery-section .final-gallery-grid,
+      .final-gallery-section .final-gallery-image-row,
+      .final-gallery-section .final-gallery-video-row {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    /* FINAL OVERRIDE: width tuning from the uploaded v2 baseline.
+       Top row: middle image wider.
+       Bottom row: right video wider. */
+    .final-gallery-section .final-gallery-image-row {
+      grid-template-columns: minmax(0, 0.82fr) minmax(0, 1.36fr) minmax(0, 0.82fr) !important;
+    }
+
+    .final-gallery-section .final-gallery-video-row {
+      grid-template-columns: minmax(0, 0.48fr) minmax(0, 1.52fr) !important;
+    }
+
+    @media (max-width: 1050px) {
+      .final-gallery-section .final-gallery-image-row,
+      .final-gallery-section .final-gallery-video-row {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+  
+
+    /* FINAL OVERRIDE: remove grey divider lines between paragraphs in text boxes. */
+    .project-text-box p + p,
+    .airfoil-text-box p + p,
+    .airfoil-bottom-text p + p,
+    .aero-text-box p + p,
+    .tilt-text-box p + p,
+    .manufacturing-text-box p + p,
+    .flight-text-box p + p,
+    .esp1-testing-text-box p + p,
+    .system-demo-text-box p + p,
+    .submission-video-text-box p + p {
+      border-top: none !important;
+      padding-top: 0 !important;
+      margin-top: 0.55rem !important;
+    }
+
+  
+    /* FINAL OVERRIDE: remove ALL divider lines between stacked paragraphs in every paragraph/text box. */
+    .project-text-box p + p,
+    .vehicle-overview-column p + p,
+    .airfoil-text-box p + p,
+    .airfoil-bottom-text p + p,
+    .aero-text-box p + p,
+    .tilt-text-box p + p,
+    .manufacturing-text-box p + p,
+    .flight-text-box p + p,
+    .alarm-architecture-text-box p + p,
+    .esp1-text-box p + p,
+    .esp1-testing-text-box p + p,
+    .system-demo-text-box p + p,
+    .submission-video-text-box p + p {
+      border-top: none !important;
+      padding-top: 0 !important;
+      margin-top: 0.55rem !important;
+    }
+
+
+
+    /* FINAL OVERRIDE: Communication Architecture row becomes paragraph row + image row. */
+    .alarm-architecture-section .alarm-architecture-row:nth-of-type(1) {
+      grid-template-columns: 1fr !important;
+      gap: 1.1rem !important;
+      align-items: stretch !important;
+    }
+
+    .alarm-architecture-section .alarm-architecture-row:nth-of-type(1) .alarm-architecture-text-box {
+      width: 100% !important;
+      min-height: 0 !important;
+    }
+
+    .alarm-architecture-section .alarm-architecture-row:nth-of-type(1) .alarm-two-image-row {
+      grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+      width: 100% !important;
+    }
+
+    @media (max-width: 1050px) {
+      .alarm-architecture-section .alarm-architecture-row:nth-of-type(1),
+      .alarm-architecture-section .alarm-architecture-row:nth-of-type(1) .alarm-two-image-row {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    /* FINAL OVERRIDE: Physical Layout first row paragraph left, image right. */
+    .alarm-architecture-section .physical-layout-row {
+      grid-template-columns: minmax(580px, 1.45fr) minmax(0, 0.55fr) !important;
+    }
+
+    @media (max-width: 1050px) {
+      .alarm-architecture-section .physical-layout-row {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+
+    /* FINAL FINAL OVERRIDE: tune Physical Layout paragraph width less wide than previous version. */
+    .alarm-architecture-section .alarm-architecture-row.physical-layout-row {
+      grid-template-columns: minmax(560px, 1.30fr) minmax(0, 0.70fr) !important;
+      gap: 1.1rem !important;
+      align-items: stretch !important;
+    }
+
+    .alarm-architecture-section .alarm-architecture-row.physical-layout-row .alarm-architecture-text-box {
+      width: 100% !important;
+      max-width: none !important;
+    }
+
+    .alarm-architecture-section .alarm-architecture-row.physical-layout-row .alarm-single-image-row {
+      min-width: 0 !important;
+      width: 100% !important;
+    }
+
+    @media (max-width: 1050px) {
+      .alarm-architecture-section .alarm-architecture-row.physical-layout-row {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+
+    /* FINAL OVERRIDE: first-line indentation for every paragraph inside paragraph/text sections. */
+    .project-text-box p,
+    .vehicle-overview-column p,
+    .detail-card p,
+    .airfoil-text-box p,
+    .airfoil-bottom-text p,
+    .aero-text-box p,
+    .tilt-text-box p,
+    .manufacturing-text-box p,
+    .flight-text-box p,
+    .alarm-architecture-text-box p,
+    .esp1-text-box p,
+    .esp1-testing-text-box p,
+    .system-demo-text-box p,
+    .submission-video-text-box p {
+      text-indent: 1.6em !important;
+      text-align: left !important;
+    }
+
+    /* Keep headings/subheadings unindented while only the paragraph body text indents. */
+    .project-text-box h2,
+    .airfoil-text-box h2,
+    .aero-text-box h2,
+    .tilt-text-box h2,
+    .manufacturing-text-box h2,
+    .flight-text-box h2,
+    .alarm-architecture-text-box h2,
+    .esp1-text-box h2,
+    .esp1-testing-text-box h2,
+    .system-demo-text-box h2,
+    .submission-video-text-box h2,
+    .aero-subheading,
+    .flight-subheading,
+    .alarm-architecture-subheading,
+    .esp1-subheading,
+    .esp1-testing-subheading {
+      text-indent: 0 !important;
+    }
+
+
+    /* FINAL OVERRIDE: YouTube-hosted project submission video keeps the same local-file media-tile look. */
+    .youtube-submission-video {
+      overflow: hidden !important;
+      border-radius: 20px !important;
+      border: 1px solid rgba(255, 255, 255, 0.16) !important;
+      background: rgba(5, 5, 5, 0.78) !important;
+      box-shadow: 0 24px 90px rgba(0, 0, 0, 0.48) !important;
+    }
+
+    .youtube-submission-video iframe {
+      width: 100% !important;
+      height: 100% !important;
+      min-height: 520px !important;
+      display: block !important;
+      border: 0 !important;
+      background: rgba(30, 30, 30, 0.82) !important;
+    }
+
+    @media (max-width: 1050px) {
+      .youtube-submission-video iframe {
+        min-height: 340px !important;
+      }
+    }
+
+  
+
+    /* FINAL OVERRIDE: real YouTube submission video URL and smaller media tile. */
+    .submission-video-media-tile.youtube-submission-video {
+      min-height: 420px !important;
+      max-height: 420px !important;
+      height: 420px !important;
+      width: 100% !important;
+      overflow: hidden !important;
+      border-radius: 20px !important;
+      border: 1px solid rgba(255, 255, 255, 0.16) !important;
+      background: rgba(5, 5, 5, 0.78) !important;
+      box-shadow: 0 24px 90px rgba(0, 0, 0, 0.48) !important;
+    }
+
+    .submission-video-media-tile.youtube-submission-video iframe {
+      width: 100% !important;
+      height: 100% !important;
+      min-height: 0 !important;
+      display: block !important;
+      border: 0 !important;
+      background: rgba(30, 30, 30, 0.82) !important;
+    }
+
+    @media (max-width: 1050px) {
+      .submission-video-media-tile.youtube-submission-video {
+        min-height: 300px !important;
+        max-height: 300px !important;
+        height: 300px !important;
+      }
+    }
+
+
+    /* FINAL OVERRIDE: YouTube embed fix + slightly larger submission tile.
+       Uses youtube.com/embed with strict referrer policy to avoid Error 153 in normal hosted pages. */
+    .submission-video-media-tile.youtube-submission-video {
+      min-height: 460px !important;
+      max-height: 460px !important;
+      height: 460px !important;
+      width: 100% !important;
+      overflow: hidden !important;
+      border-radius: 20px !important;
+      border: 1px solid rgba(255, 255, 255, 0.16) !important;
+      background: rgba(5, 5, 5, 0.78) !important;
+      box-shadow: 0 24px 90px rgba(0, 0, 0, 0.48) !important;
+    }
+
+    .submission-video-media-tile.youtube-submission-video iframe {
+      width: 100% !important;
+      height: 100% !important;
+      min-height: 0 !important;
+      display: block !important;
+      border: 0 !important;
+      background: rgba(30, 30, 30, 0.82) !important;
+    }
+
+    @media (max-width: 1050px) {
+      .submission-video-media-tile.youtube-submission-video {
+        min-height: 320px !important;
+        max-height: 320px !important;
+        height: 320px !important;
+      }
+    }
+
+
+
+    /* FINAL OVERRIDE: Project Submission YouTube tile uses a correct 16:9 aspect ratio
+       and plays inside the page by replacing the thumbnail with an inline YouTube iframe. */
+    .submission-video-media-tile.youtube-inline-tile {
+      position: relative !important;
+      display: block !important;
+      width: 100% !important;
+      aspect-ratio: 16 / 9 !important;
+      min-height: 0 !important;
+      height: auto !important;
+      overflow: hidden !important;
+      text-decoration: none !important;
+      cursor: pointer !important;
+      background: rgba(5, 5, 5, 0.78) !important;
+    }
+
+    .submission-video-media-tile.youtube-inline-tile img,
+    .submission-video-media-tile.youtube-inline-tile iframe {
+      position: absolute !important;
+      inset: 0 !important;
+      width: 100% !important;
+      height: 100% !important;
+      min-height: 0 !important;
+      object-fit: cover !important;
+      object-position: center center !important;
+      display: block !important;
+      border: none !important;
+      background: rgba(30, 30, 30, 0.82) !important;
+    }
+
+    .submission-video-media-tile.youtube-inline-tile img {
+      filter: brightness(0.78) saturate(0.95) !important;
+    }
+
+    .submission-video-media-tile.youtube-inline-tile .youtube-play-overlay {
+      position: absolute !important;
+      inset: 0 !important;
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: center !important;
+      justify-content: center !important;
+      gap: 0.9rem !important;
+      color: white !important;
+      background: linear-gradient(to bottom, rgba(0,0,0,0.12), rgba(0,0,0,0.30)) !important;
+      text-align: center !important;
+      pointer-events: none !important;
+    }
+
+    .submission-video-media-tile.youtube-inline-tile .youtube-play-button {
+      width: 82px !important;
+      height: 82px !important;
+      border-radius: 999px !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      padding-left: 0.22rem !important;
+      background: rgba(255, 255, 255, 0.92) !important;
+      color: rgba(5, 5, 5, 0.96) !important;
+      font-size: 2.1rem !important;
+      line-height: 1 !important;
+      box-shadow: 0 18px 50px rgba(0, 0, 0, 0.48) !important;
+      transition: transform 180ms ease, background 180ms ease !important;
+    }
+
+    .submission-video-media-tile.youtube-inline-tile .youtube-play-text {
+      display: inline-block !important;
+      padding: 0.48rem 0.78rem !important;
+      border-radius: 999px !important;
+      background: rgba(5, 5, 5, 0.68) !important;
+      border: 1px solid rgba(255, 255, 255, 0.16) !important;
+      color: rgba(255, 255, 255, 0.90) !important;
+      font-size: clamp(0.88rem, 1vw, 1.05rem) !important;
+      font-weight: 700 !important;
+      letter-spacing: -0.01em !important;
+    }
+
+    .submission-video-media-tile.youtube-inline-tile:hover .youtube-play-button,
+    .submission-video-media-tile.youtube-inline-tile:focus-visible .youtube-play-button {
+      transform: scale(1.06) !important;
+      background: white !important;
+    }
+
+    @media (max-width: 1050px) {
+      .submission-video-media-tile.youtube-inline-tile {
+        aspect-ratio: 16 / 9 !important;
+      }
+    }
+
+
+    /* FINAL OVERRIDE: keep the Project Submission YouTube player at the real 16:9 video ratio.
+       The tile loads the YouTube player inline, matching the Google Sites style. */
+    .submission-video-media-tile.youtube-inline-tile {
+      width: 100% !important;
+      aspect-ratio: 16 / 9 !important;
+      min-height: 0 !important;
+      height: auto !important;
+      max-height: none !important;
+      background: rgba(5, 5, 5, 0.78) !important;
+      border: 1px solid rgba(255, 255, 255, 0.16) !important;
+      border-radius: 20px !important;
+      overflow: hidden !important;
+    }
+
+    .submission-video-media-tile.youtube-inline-tile iframe,
+    .submission-video-media-tile.youtube-inline-tile img {
+      position: absolute !important;
+      inset: 0 !important;
+      width: 100% !important;
+      height: 100% !important;
+      min-height: 0 !important;
+      object-fit: cover !important;
+      border: 0 !important;
+      display: block !important;
+    }
+
+    .youtube-local-note {
+      position: absolute !important;
+      left: 50% !important;
+      bottom: 1rem !important;
+      transform: translateX(-50%) !important;
+      z-index: 4 !important;
+      width: min(720px, calc(100% - 2rem)) !important;
+      padding: 0.55rem 0.8rem !important;
+      border-radius: 999px !important;
+      background: rgba(5, 5, 5, 0.72) !important;
+      border: 1px solid rgba(255, 255, 255, 0.16) !important;
+      color: rgba(255, 255, 255, 0.86) !important;
+      font-size: 0.82rem !important;
+      line-height: 1.22 !important;
+      text-align: center !important;
+      pointer-events: none !important;
+    }
+
+  
+
+    /* FINAL OVERRIDE: Project Submission Video card fit-to-screen sizing.
+       Only the video card is narrowed; the rest of the site keeps its existing widths.
+       The tile keeps a true 16:9 aspect ratio and is centered. */
+    .submission-video-section .submission-video-media-tile,
+    .submission-video-section .submission-video-media-tile.youtube-link-tile,
+    .submission-video-section .youtube-inline-tile {
+      width: min(100%, 1120px) !important;
+      max-width: 1120px !important;
+      aspect-ratio: 16 / 9 !important;
+      height: auto !important;
+      min-height: 0 !important;
+      margin-left: auto !important;
+      margin-right: auto !important;
+    }
+
+    .submission-video-section .submission-video-media-tile iframe,
+    .submission-video-section .submission-video-media-tile video,
+    .submission-video-section .submission-video-media-tile img,
+    .submission-video-section .submission-video-media-tile.youtube-link-tile img,
+    .submission-video-section .youtube-inline-tile iframe,
+    .submission-video-section .youtube-inline-tile img {
+      width: 100% !important;
+      height: 100% !important;
+      min-height: 0 !important;
+      aspect-ratio: 16 / 9 !important;
+      object-fit: cover !important;
+      object-position: center center !important;
+      display: block !important;
+    }
+
+    @media (max-height: 850px) and (min-width: 900px) {
+      .submission-video-section .submission-video-media-tile,
+      .submission-video-section .submission-video-media-tile.youtube-link-tile,
+      .submission-video-section .youtube-inline-tile {
+        width: min(100%, 980px) !important;
+        max-width: 980px !important;
+      }
+    }
+
+    @media (max-width: 1050px) {
+      .submission-video-section .submission-video-media-tile,
+      .submission-video-section .submission-video-media-tile.youtube-link-tile,
+      .submission-video-section .youtube-inline-tile {
+        width: 100% !important;
+        max-width: 100% !important;
+      }
+    }
+
+  </style>
+</head>
+
+<body>
+  <div class="gif-background" aria-hidden="true">
+    <video id="heroVideo" muted playsinline loop autoplay preload="auto">
+      <source src="assets/ME100/ME100FullTest.mp4" type="video/mp4" />
+    </video>
+  </div>
+
+  <header class="topbar">
+    <a class="brand" href="index.html" aria-label="Jaden Dew homepage">
+      <span>Jaden Dew</span>
+    </a>
+
+    <nav aria-label="Main navigation">
+      <a class="nav-link" href="index.html">Home</a>
+
+      <div class="nav-item">
+        <a class="nav-link" href="portfolio.html">Portfolio</a>
+        <div class="nav-dropdown" aria-label="Portfolio project links">
+          <a class="dropdown-link" href="BEAR.html">BEAR: Berkeley Aerial Emergency Response</a>
+          <a class="dropdown-link" href="E3_MVA.html">Liquid Rocket Test Stand Main Valves</a>
+          <a class="dropdown-link" href="E178_ME103.html">Flying Wing Simulation and Control</a>
+          <a class="dropdown-link" href="ME100.html">The Devious Alarm</a>
+          <a class="dropdown-link" href="vast.html">Vast Space: Saiph Thruster Testing</a>
+          <a class="dropdown-link" href="poppet.html">Custom Poppet Valve</a>
+          <a class="dropdown-link" href="NASA.html">NASA: Dragonfly Rotor Blade Optimization</a>
+        </div>
+      </div>
+
+      <a class="nav-link" href="assets/jaden_resume_alt_3-22-2026.pdf" target="_blank" rel="noopener">Resume</a>
+      <a class="nav-link" href="https://www.linkedin.com/in/jaden-dew-178a37249/" target="_blank" rel="noopener">LinkedIn</a>
+    </nav>
+  </header>
+
+  <main id="top">
+    <section class="hero" aria-label="ME100 project hero">
+      <div class="hero-card">
+        <div class="hero-kicker">Class Project</div>
+        <h1>The Devious Alarm</h1>
+        <div class="hero-subtitle">A more "motivational" alarm system that is impossible to ignore and only turns off when you leave your room.</div>
+      </div>
+    </section>
+
+    <section class="section" aria-label="ME100 project overview">
+      <div class="section-inner">
+        <section class="project-panel">
+          <div class="project-text-box">
+            <div>
+              <div class="section-kicker">Project Overview</div>
+              <h2>Overview</h2>
+            </div>
+
+            <div class="vehicle-overview-grid">
+              <div class="vehicle-overview-column">
+                <p>
+                  This project is the final project of my ME 100: Electronics for the Internet of Things class I took during my undergraduate degree. This
+                  project tasks teams of students with making an IOT device that utilizes multiple ESP32 microcontrollers, actuators, and sensors to solve a problem
+                  of their choosing. As such my team and I decided to create an alarm clock to solve the problem of us being constantly late for our 8 am ME 100 lab.
+                </p>
+                <p>
+                  To achieve this goal we set out to develop an alarm that was impossible to ignore and impossible to shut off until you were actually out of bed and getting ready for your day.
+                  This was accomplished by creating an alarm that integrated with your exing phone alarm and additional motivating factors that encourage immediately leaving the bed and punishes sleeping in.
+                  These factors were a wooden arm that smacks you, a blinking LED light, and a water sprayer. This alarm is activated by detecting when your phone alarm goes off, pauses when you leave your bed, and only
+                  shuts off when you open your door and leave your room.
+                </p>
+                <p>
+                  These functionalities were split across 3 ESP32's that communicated with each other over ESP Now. Since there were three ESP32 components and three members of my
+                  project group it was decided that each member would work on one of the ESP32 systems. As such I will only discuss the overall system architecture and the ESP32 group I Worked on, ESP1.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div class="vehicle-overview-image">
+            <img src="assets/ME100/FaceSpray.png" alt="ME100 overview image" />
+          </div>
+        </section>
+
+
+        <section class="alarm-architecture-section" aria-label="Alarm System Architecture">
+          <div class="alarm-architecture-row text-left">
+            <div class="alarm-architecture-text-box">
+              <h2>Alarm System Architecture</h2>
+              <div class="alarm-subheading">Communication Architecture</div>
+              <p>
+                As can be seen from the diagram each ESP32 controls its own set of actuators and sensors whose control needs to be coordinated across all three ESP32s. This was
+                achieved by designating one ESP32, ESP3, as the hub or brain ESP32. THis ESP32 was in charge of keeping track of what alarm state the system was at as well as telling
+                the other two ESP32s when to actuate their various components. This communication was done using the ESP32 inbuilt ESP Now communication protocol. This diagram also illustrates the components
+                present in the system along with what they are sensing for the sensors and what they are actuating for the actuators. It also illustrates for the sensors what a positive value does to the system if observed.
+              </p>
+              <p>
+                The alarm was designed to function as a cascaded system, with the alarm getting progressively more annoying as time progresses. Once the alarm senses the sounds of a phone alarm going off via the microphone, it activates alarm state one which is just the balsa wood smacker.
+                If the alarm is ignored for too long then the second stage activates which consists of both the balsa wood smacker and the strobing LED strip. Finally if the alarm is further ignored the third and final stage is activated
+                which consists of the smacker, the LED, and a cold water sprayer pointed at the user's face. At any point during this alarm progression one of two interrupts can occur. If the target takes their head off of their pillow as detected by a force
+                sensitive resistor the alarm will pause, ceasing all activities. However, once the user puts their head back onto the pillow the alarm will resume at the same alarm level as when the pause occurred. This is to prevent perpetual snoozing which results in tardiness.
+                The other interrupt, and only way to disable the alarm, is to open the door of the room and leave which is sensed by the IMU attached to ESP3. This shuts down the alarm permanently until reset by the user for the next night.
+              </p>
+            </div>
+
+            <div class="alarm-two-image-row">
+              <div class="alarm-media-tile">
+                <img src="assets/ME100/SystemCommunicationProtocol.png" alt="Alarm system communication architecture diagram" />
+                <div class="alarm-image-caption">System communication architecture.</div>
+              </div>
+
+              <div class="alarm-media-tile">
+                <img src="assets/ME100/LayeredAlarmStates.png" alt="Alarm system electronics station 1" />
+                <div class="alarm-image-caption">Cascaded alarm state flow chart.</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="alarm-architecture-row text-left physical-layout-row">
+            <div class="alarm-architecture-text-box">
+              <div class="alarm-subheading">Physical Layout</div>
+              <p>
+                Since each ESP32 was specialized to handle different tasks for the alarm they each needed to be located in a location where they could best achieve their task. ESP1 was mounted in a stand near the bed such that the smacker and
+                water sprayer was at the user's level when laying on the bed. ESP2 was mounted on the wall above the bed to place the LED close to the user's face and allow easy wire rounding to the pillow for the force sensitive resistor. ESP3 was mounted at the door so that the IMU could sense the door's movements and the microphone could sense the users
+                phone alarm from anywhere in the room.
+              </p>
+              <p>
+                In addition to each ESP32 being located in a particular spot in the user's room, they each also had a special mount to support the activity they needed to perform.
+                The ESP1 mount needed to be easily adjusted to account for different bed heights as well as have a mounting platform for the stepper and solenoid valve to be mounted to. As such
+                I designed a telescoping standing mount that the ESP1 system could be integrated width. The ESP2 mount needed only to be mounted to the wall and have a place to wrap the LED strip to. AS such I designed the mount to have a removable rod to wrap the
+                LED strip to as well as various mounting cubbies for the various batteries needed by the system. THe ESP3 system had two different mount needed for the in room use case only a simple wall mount was needed, however this project required a live demonstration in from of the
+                professor therefore I developed a door simulator that would allow this wall mounting stand to be connected to a hinge and allowed to swing like a door. All of the mounting infrastructure was 3D printed out of PLA on my Bambu A1 printer for ease of manufacturing and rapid design iteration.
+              </p>
+            </div>
+
+            <div class="alarm-single-image-row">
+              <div class="alarm-media-tile">
+                <img src="assets/ME100/RoomLayout.jpg" alt="Alarm system physical layout image" />
+                <div class="alarm-image-caption">ESP mounting locations in room.</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="alarm-architecture-row">
+            <div class="alarm-three-image-row">
+              <div class="alarm-media-tile">
+                <img src="assets/ME100/ESP1Stand.png" alt="Alarm system final layout image 1" />
+                <div class="alarm-image-caption">ESP1 mounting system.</div>
+              </div>
+
+              <div class="alarm-media-tile">
+                <img src="assets/ME100/ESP2Stand.png" alt="Alarm system final layout image 2" />
+                <div class="alarm-image-caption">ESP2 mounting system.</div>
+              </div>
+
+              <div class="alarm-media-tile">
+                <img src="assets/ME100/ESP3Stand.png" alt="Alarm system final layout image 3" />
+                <div class="alarm-image-caption">ESP3 mounting system.</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+
+
+        <section class="esp1-section" aria-label="ESP1">
+          <h2>ESP1</h2>
+
+          <div class="esp1-row text-left">
+            <div class="esp1-text-box">
+              <h2>ESP1</h2>
+              <div class="esp1-subheading">Electrical Design</div>
+              <p>
+                Since both the solenoid valve and stepper motor require 12 volt power sources they both could not be directly controlled by the ESP32 and instead needed
+                to be controlled by intermediate systems. The stepper motor was controlled via a A4988 stepper motor driver  with a PWM wave being sent to the drier which was then translated into
+                stepper motor commands via the driver. This signal determined both the speed and number of steps the motor was commanded to rotate with the direction being controlled via a binary signal to the DIR pin.
+                The solenoid was controlled via an NMOS transistor which when toggled would allow or b;lock current flow to the valve actuating it. In addition to these actuators a limit switch was also integrated to allow the system to determine
+                when the balsa wood smacker has made a full swipe. This limit switch served as a rest state for the smacker with every down stroke starting from the switch and every upstroke ending at the limit switch.
+              </p>
+            </div>
+
+            <div class="esp1-image-pair">
+              <div class="esp1-media-tile">
+                <img src="assets/ME100/ESP1CircuitDiagram.png" alt="ESP1 electrical design image 1" />
+                <div class="esp1-image-caption">ESP1 circuit diagram.</div>
+              </div>
+
+              <div class="esp1-media-tile">
+                <img src="assets/ME100/ESP1PhysicalCircuit.png" alt="ESP1 electrical design image 2" />
+                <div class="esp1-image-caption">ESP1 physical wiring.</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="esp1-row text-right">
+            <div class="esp1-image-pair">
+              <div class="esp1-media-tile">
+                <img src="assets/ME100/ESP1Stand.png" alt="ESP1 mechanical design image 1" />
+                <div class="esp1-image-caption">ESP1 mechanical design and mounting layout.</div>
+              </div>
+
+              <div class="esp1-media-tile">
+                <img src="assets/ME100/ComponentList.png" alt="ESP1 mechanical design image 2" />
+                <div class="esp1-image-caption">ESP1 actuator and enclosure integration.</div>
+              </div>
+            </div>
+
+            <div class="esp1-text-box">
+              <div class="esp1-subheading">Mechanical Design</div>
+              <p>
+                As mentioned previously the mount for the ESP1 hardware consisted of a telescoping stand with a platform in which all of the hardware was mounted.
+                The telescoping stand was designed as a set of concentric rectangles with a series of holes that can be lined up with a pin to lock each rectangle in place. In this way various heights could be achieved by changing which holes each rectangle
+                was pinned through. The mounting surface itself was printed as a single part with mounting holes for both the solenoid valve and stepper motor, boxes for the LiPO and 3.3 volt batteries, limit switch mount, and slider to attach the ESP1
+                breadboard too.
+              </p>
+              <p>
+                In addition to the mounting structure both the stepper motor smacker and solenoid sprayer need to be designed. The stepper motor smacker utilized a simple stick of balsa wood as its weapon due to its light weight nature with a 3D printed adapter connecting it to the stepper motor. Initial designs of
+                the smacker attempted to utilize a pool noodle and a pool noodle p;us reciprocating pinion systems; however both systems proved to be too heavy for the stepper motor I had. THe solenoid valve utilized a pressurized tank and a set of hose fittings to form the sprayer. The tank used was initially designed as a
+                manual plant waterer with a hand pump being used to pressurize a volume that would be released by a sprayer via a trigger. To convert this into the alarm's sprayer tank the mister and trigger were removed with the sprayer connected to the solenoid via a hose fitting and clamp. The other side of the solenoid
+                also utilized a hose fitting as its nozzle with a piece of tin foil wrapped around it with a hole poked through to act as an orifice ensuring the water would be sprayed at sufficient velocity.
+              </p>
+            </div>
+          </div>
+
+          <div class="esp1-row text-left">
+            <div class="esp1-text-box">
+              <div class="esp1-subheading">Software Design</div>
+              <p>
+                The software for the ESP1 portion of the alarm is housed entirely in one main loop which takes the commands it receives from ESP3 and then actuates a series of actuators depending on what alarm state that
+                ESP3 reports to it. Within these loops contain the actuation commands for both the solenoid and the stepper motor. The solenoid command is fairly simple with a high signal, a pause and then a low signal being sent to the NMOS to open the solenoid for a period of time and then close it.
+                The stepper motor code is much more complex. The command starts with a set degree the motor is commanded to actuate which is converted to PWM signal via the PWM generator helper function. In addition to just determining how manu steps it would take to achieve the required angle the function also accepts a requested RPM which
+                then determines the period of the PWM wave. As a part of this RPM the function also utilizes acceleration ramping with the PWM wave starting with a larger period and then exponentially decaying to reach the target period and therefore RPM. THis is done to avoid slamming the motor with a high RPM starting from zero which can cause the motor to lose torque and lock up.
+                The stepper motor also has a home position function which is used for the smacker upswing. This function actuates the motor in the upswing direction until it reaches the limit switch after which the motor shuts off and is ready to be used for another downswing.  
+              </p>
+              <p>
+                In addition to the actuator commands there are additional functions that help the main loop receive commands from ESP3. These functions serve as interrupts which occur between each actuation step. These functions essentially check what the latest message from ESP3 was between actuation sets so that the
+                controller does not need to go through an entire alarm loop before it shuts off in the case of a shut down or pause command. These functions also handle the additional empty pings that are sent by ESP3 which can clog up and prevent ESP1 from correctly interpreting commands. Essentially the interrupt function 
+                instead of just taking the most recent commands looks for the most recent non-empty command to use when deciding what to do next.
+              </p>
+            </div>
+
+            <div class="esp1-grid-2x2">
+              <div class="esp1-media-tile">
+                <img src="assets/ME100/ComLoop.png" alt="ESP1 software design image 1" />
+                <div class="esp1-image-caption">ESP communication, ping handling, and interupt code.</div>
+              </div>
+
+              <div class="esp1-media-tile">
+                <img src="assets/ME100/MotorLoop.png" alt="ESP1 software design image 2" />
+                <div class="esp1-image-caption">Stepper motor control code.</div>
+              </div>
+
+              <div class="esp1-media-tile">
+                <img src="assets/ME100/MainLoop.png" alt="ESP1 software design image 3" />
+                <div class="esp1-image-caption">Main ESP1 loop code.</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+
+        <section class="esp1-testing-section" aria-label="ESP1 Testing">
+          <h2>ESP1 Testing</h2>
+
+          <div class="esp1-testing-row text-left">
+            <div class="esp1-testing-text-box">
+              <h2>ESP1 Testing</h2>
+              <div class="esp1-testing-subheading">Motor Testing</div>
+              <p>
+                Before this project I had never worked with stepper motors before, as such much early testing went into learning how to control the stepper motor. This first test involved determining how to command the motor
+                to perform a full 360 degree turn at a specified RPM. To do so I only connected the ESP32 and stepper motor driver to the breadboard and wrote stand alone code in micro-python that generated a PWM wave from a given degree and RPM request.
+                The result of this unit test was successful with the motor successfully completing the task with no issues.
+              </p>
+            </div>
+
+            <div class="esp1-testing-media-tile">
+              <video src="assets/ME100/IsolatedMotorTest.mp4" autoplay muted loop playsinline></video>
+            </div>
+          </div>
+
+          <div class="esp1-testing-row text-right">
+            <div class="esp1-testing-media-tile">
+              <video src="assets/ME100/NoodleMountTest.mp4" autoplay muted loop playsinline></video>
+            </div>
+
+            <div class="esp1-testing-text-box">
+              <div class="esp1-testing-subheading">Motor + Wacker Mount Testing</div>
+              <p>
+                The next step was to test motor control in an upstroke downstroke motion with additional weight attached. This test was conducted when a pool noodle was still being attempted to be used as the wacker attachment with the
+                pool noodle motor mount being used as the weighted test instrument. To perform this test the first code was modified to turn only 90 degrees with the DIR pin connected to allow for directional control. Now before each RPM generation and execution command was made
+                and additional DIR command was sent, pulling that pin either high or low to determine what direction the motor was turning. As can be seen in the horizontal configuration the motor was able to achieve the desired goal. However when the motor
+                was rotated such that the up and down strokes were in the vertical direction the motor struggled to achieve the desired motion at the desired RPM and could only achieve the motion at lower RPMs. Additionally, once the pool noodle was added the motor did not have enough power to actuate the
+                pool noodle in any direction. As such it was determined that a different approach would need to be taken to make the pool noodle work.
+            </div>
+          </div>
+
+          <div class="esp1-testing-row text-left">
+            <div class="esp1-testing-text-box">
+              <div class="esp1-testing-subheading">Pinion Mount Testing</div>
+              <p>
+                The next phase of iteration and testing was integrating the mount and reciprocating pinion system with the electronic hardware. To overcome the issue with motor torque a reciprocating pinion system was developed in which a rack would be driven up and down rotating the pool noodle about a pivot point located on the ESP1 mount.
+                The idea was that this would reduce the leaver arm the motor had to work over thus allowing it to move the pool noodle. The main drawback of this was that in order to get the range of motion that was needed for the smacker to be effective a fairly large rack and gear were needed. This resulted in these components being fairly weighty in their own right.
+                Initial tests were promising with the gear being able to spin at the desired speed and across the desired range. However once the rack was added the motor ceased to be able to control the mechanism indicating that this design was not going to work.
+              </p>
+            </div>
+
+            <div class="esp1-testing-media-tile">
+              <video src="assets/ME100/FailedPrototype.mp4" autoplay muted loop playsinline></video>
+            </div>
+          </div>
+
+          <div class="esp1-testing-row text-right">
+            <div class="esp1-testing-media-tile">
+              <video src="assets/ME100/FullESP1Test.mp4" autoplay muted loop playsinline></video>
+            </div>
+
+            <div class="esp1-testing-text-box">
+              <div class="esp1-testing-subheading">Final Wacker Iteration Testing</div>
+              <p>
+                Once the reciprocating rack and pinion was determined to not work I then pivoted to simply using a balsa wood stick as the smacker instead of the pool noodle. The balsa wood was significantly lighter than the noodle and as such worked very
+                as the smacker given the underpowered motors we were using. This iteration also integrated the limit switch with solved issues with motor drift that had been observed in previous testing. In this configuration the smacker was able to perform multiple up and downswings at both the RPM and angle that was desired.
+                This version did have some issues with acceleration ramping however. At this point I had yet to integrate the automatic exponential acceleration raming instead electing to utilize a hand tuned approach. In this approach I would send a series of one or two step commands on increasingly higher RPM until a final command at the desired RPM was sent.
+                This ramping would be tuned manually via trial and error and would frequently result in locking or weird jumping behavior that can be observed in this video. That is why for the final iteration that was integrated into the full alarm system this method was abandoned and the
+                automatic exponential ramping was adopted.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        
+        <section class="system-demo-section" aria-label="System Integration ad Demonstration">
+          <h2>System Integration ad Demonstration</h2>
+
+          <div class="system-demo-row">
+            <div class="system-demo-text-box">
+              <h2>System Integration and Demonstration</h2>
+              <p>
+                This video is the final integrated demonstration of the alarm system. The video starts with my phone alarm going off which triggers the start of the alarm system. Once the phone goes off and a few
+                seconds have passed the first stage of the alarm begins and the smacker starts actuating. This goes on for a time and I don't wake up which triggers the second stage of the alarm in which both the smacker and the LED strobe light
+                are being actuated.  After this occurs I get up from my pillow which pauses the alarm system and turn off my phone alarm. I however do not get out of bed and when I put my head back onto the pillow the force sensitive resistor
+                senses I have gone back to sleep and the alarm resumes at level two with both the smacker and LED going off. Finally, after a little while longer of not getting up, the alarm state three engages and the water sprayer shoots water in my face.
+                Once this occurs I get out of bed triggering the pause functionality once again however this time I fully get out of bed and leave the room. This triggers the IMU sensors on the door which fully shuts down the
+                alarm system, ending the alarm sequence.
+              </p>
+            </div>
+
+            <div class="system-demo-media-tile">
+              <video src="assets/ME100/ME100FullTest.mp4" autoplay muted loop playsinline></video>
+            </div>
+          </div>
+        </section>
+
+
+        <section class="submission-video-section" aria-label="Project Submission Video">
+          <h2>Project Submission Video</h2>
+
+          <div class="submission-video-text-box">
+            <h2>Project Submission Video</h2>
+            <p>
+              In addition to the presentation and live demonstration, the class required that we submit a video demonstration and explanation of our system for our final project grade. This video has been provided below which goes over the same design process I have discussed here as well as the design of ESP2 and ESP3.
+              The video also includes the above recorded demonstration but with the sound enabled.
+            </p>
+          </div>
+
+          <div class="submission-video-media-tile youtube-submission-video youtube-inline-tile"
+               data-youtube-id="cXryTn3na9w"
+               role="button"
+               tabindex="0"
+               aria-label="Play ME100 Project Submission Video">
+            <img src="https://img.youtube.com/vi/cXryTn3na9w/maxresdefault.jpg" alt="ME100 Project Submission Video thumbnail" />
+            <span class="youtube-play-overlay" aria-hidden="true">
+              <span class="youtube-play-button">▶</span>
+              <span class="youtube-play-text">Play Project Submission Video</span>
+            </span>
+          </div>
+        </section>
+
+<section class="final-gallery-section" aria-label="Gallery">
+          <h2>Gallery</h2>
+
+          <div class="final-gallery-grid">
+            <div class="final-gallery-image-row">
+              <div class="final-gallery-tile">
+                <img src="assets/ME100/MotorPlusBreadboard.jpg" alt="ME100 gallery image 1" />
+              </div>
+
+              <div class="final-gallery-tile">
+                <img src="assets/ME100/BreadbordPlusMount.jpg" alt="ME100 gallery image 2" />
+              </div>
+
+              <div class="final-gallery-tile">
+                <img src="assets/ME100/SolenoidSetup.jpg" alt="ME100 gallery image 3" />
+              </div>
+            </div>
+
+            <div class="final-gallery-video-row">
+              <div class="final-gallery-tile">
+                <video src="assets/ME100/Pump.mp4" autoplay muted loop playsinline></video>
+              </div>
+
+              <div class="final-gallery-tile">
+                <video src="assets/ME100/FunSmacks.mp4" autoplay muted loop playsinline></video>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>© 2026 Jaden Dew.</p>
+  </footer>
+
+  <script>
+    const heroVideo = document.getElementById("heroVideo");
+
+    function updateBackgroundFade() {
+      const y = window.scrollY || window.pageYOffset;
+      const fadeStart = window.innerHeight * 0.55;
+      const fadeEnd = window.innerHeight * 1.10;
+
+      let opacity = 1.0;
+      if (y > fadeStart) {
+        const p = Math.min(1, (y - fadeStart) / Math.max(1, fadeEnd - fadeStart));
+        opacity = 1.0 - 0.55 * p;
+      }
+
+      if (heroVideo) heroVideo.style.opacity = String(opacity);
+    }
+
+    if (heroVideo) {
+      heroVideo.play().catch(() => {});
+    }
+
+    window.addEventListener("load", updateBackgroundFade);
+    window.addEventListener("scroll", updateBackgroundFade, { passive: true });
+    window.addEventListener("resize", updateBackgroundFade);
+  
+
+    document.querySelectorAll(".youtube-inline-tile").forEach((tile) => {
+      const playInline = () => {
+        const videoId = tile.dataset.youtubeId;
+        if (!videoId || tile.querySelector("iframe")) return;
+
+        const iframe = document.createElement("iframe");
+        const params = new URLSearchParams({
+          autoplay: "1",
+          rel: "0",
+          modestbranding: "1",
+          playsinline: "1",
+          enablejsapi: "1"
+        });
+
+        /* YouTube Error 153 is usually caused by the page preview not giving YouTube
+           a normal HTTPS page origin/referrer. Adding origin/widget_referrer fixes it
+           once this page is served from a real website, while preserving the same
+           in-tile Google-Sites-style playback. */
+        if (window.location.origin && window.location.origin !== "null") {
+          params.set("origin", window.location.origin);
+        }
+        if (window.location.href && window.location.protocol !== "file:") {
+          params.set("widget_referrer", window.location.href);
+        }
+
+        iframe.src = `https://www.youtube.com/embed/${videoId}?${params.toString()}`;
+        iframe.title = "ME100 Project Submission Video";
+        iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share";
+        iframe.allowFullscreen = true;
+        iframe.referrerPolicy = "strict-origin-when-cross-origin";
+
+        tile.innerHTML = "";
+        tile.appendChild(iframe);
+        tile.removeAttribute("role");
+        tile.removeAttribute("tabindex");
+      };
+
+      tile.addEventListener("click", playInline);
+      tile.addEventListener("keydown", (event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          playInline();
+        }
+      });
+    });
+</script>
+</body>
+</html>

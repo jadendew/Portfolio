@@ -1,0 +1,2808 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BEAR | Jaden Dew</title>
+
+  <style>
+    :root {
+      --bg: #050505;
+      --panel: rgba(10, 10, 10, 0.76);
+      --panel-solid: rgba(18, 18, 18, 0.94);
+      --border: rgba(255, 255, 255, 0.16);
+      --text: #d4d4d4;
+      --muted: #9cdcfe;
+      --subtle: #b8b8b8;
+      --accent: #007acc;
+      --accent-hover: #179fff;
+      --shadow: rgba(0, 0, 0, 0.48);
+      --topbar-h: 56px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html {
+      scroll-behavior: smooth;
+      background: #000;
+    }
+
+    body {
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: transparent;
+      color: var(--text);
+      line-height: 1.6;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    .gif-background {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      overflow: hidden;
+      background: #000;
+      pointer-events: none;
+    }
+
+    .gif-background video {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center center;
+      display: block;
+      opacity: 1;
+      filter: saturate(0.98) contrast(1.04);
+      transition: opacity 180ms ease;
+    }
+
+    .gif-background::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      background:
+        linear-gradient(to bottom, rgba(0, 0, 0, 0.20), rgba(0, 0, 0, 0.18) 38%, rgba(0, 0, 0, 0.62));
+      pointer-events: none;
+    }
+
+    .topbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      min-height: var(--topbar-h);
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      gap: 1rem;
+      padding: 0.45rem 6vw;
+      background: rgba(5, 5, 5, 0.95);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.34);
+    }
+
+    .brand {
+      justify-self: start;
+      display: inline-flex;
+      align-items: center;
+      color: white;
+      font-size: 0.88rem;
+      font-weight: 650;
+      letter-spacing: 0.01em;
+      opacity: 0.92;
+    }
+
+    nav {
+      justify-self: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.1rem;
+    }
+
+    .nav-link {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.46rem 0.82rem;
+      border-radius: 8px;
+      color: white;
+      font-size: 0.84rem;
+      opacity: 0.9;
+      transition: background 180ms ease, opacity 180ms ease;
+    }
+
+    .nav-link:hover,
+    .nav-link:focus-visible {
+      background: rgba(255, 255, 255, 0.09);
+      opacity: 1;
+      outline: none;
+    }
+
+    .nav-item {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .nav-dropdown {
+      position: absolute;
+      top: calc(100% + 0.45rem);
+      left: 50%;
+      transform: translateX(-50%) translateY(-6px);
+      min-width: 235px;
+      padding: 0.45rem;
+      display: grid;
+      gap: 0.12rem;
+      background: rgba(5, 5, 5, 0.96);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 12px;
+      box-shadow: 0 18px 60px rgba(0, 0, 0, 0.55);
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transition: opacity 180ms ease, transform 180ms ease, visibility 180ms ease;
+    }
+
+    .nav-item:hover .nav-dropdown,
+    .nav-item:focus-within .nav-dropdown {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .dropdown-link {
+      display: block;
+      padding: 0.52rem 0.68rem;
+      border-radius: 8px;
+      color: rgba(255, 255, 255, 0.88);
+      font-size: 0.80rem;
+      line-height: 1.2;
+      white-space: nowrap;
+      transition: background 180ms ease, color 180ms ease;
+    }
+
+    .dropdown-link:hover,
+    .dropdown-link:focus-visible {
+      background: rgba(255, 255, 255, 0.09);
+      color: white;
+      outline: none;
+    }
+
+    main {
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: end;
+      padding: calc(var(--topbar-h) + 2rem) 6vw 3.5rem;
+      background: transparent;
+    }
+
+    .hero-card {
+      width: min(920px, 88vw);
+      padding: 1.0rem 1.15rem;
+      color: rgba(255, 255, 255, 0.94);
+      background: rgba(5, 5, 5, 0.50);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 16px;
+      backdrop-filter: blur(14px);
+      box-shadow: 0 18px 60px rgba(0, 0, 0, 0.46);
+    }
+
+    .hero-kicker,
+    .section-kicker {
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      font-size: 0.70rem;
+      font-weight: 760;
+      margin-bottom: 0.26rem;
+    }
+
+    .hero-card h1 {
+      color: white;
+      font-size: clamp(1.65rem, 3.2vw, 3.0rem);
+      font-weight: 760;
+      letter-spacing: -0.055em;
+      line-height: 1.0;
+      margin-bottom: 0.38rem;
+    }
+
+    .hero-subtitle {
+      color: rgba(255, 255, 255, 0.82);
+      font-size: clamp(0.86rem, 1.05vw, 1.08rem);
+      font-weight: 560;
+      letter-spacing: 0.01em;
+      line-height: 1.32;
+    }
+
+    .section {
+      min-height: 100vh;
+      padding: calc(var(--topbar-h) + 0.75rem) 2rem 0.9rem;
+      display: grid;
+      align-items: stretch;
+      background: rgba(0, 0, 0, 0.72);
+      backdrop-filter: blur(10px);
+    }
+
+    .section-inner {
+      width: min(1820px, 100%);
+      margin: 0 auto;
+    }
+
+    .project-panel {
+      min-height: calc(100vh - var(--topbar-h) - 1.65rem);
+      padding: clamp(1.2rem, 2.4vw, 2rem);
+      background: rgba(18, 18, 18, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 26px;
+      box-shadow: 0 28px 95px rgba(0, 0, 0, 0.5);
+      display: grid;
+      grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
+      gap: 1.1rem;
+      align-items: stretch;
+    }
+
+    .project-media-card {
+      min-width: 0;
+      min-height: 0;
+      overflow: hidden;
+      background: rgba(5, 5, 5, 0.78);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 22px;
+      box-shadow: 0 24px 90px var(--shadow);
+      display: grid;
+      grid-template-rows: minmax(0, 1fr) auto;
+    }
+
+    .project-media-card img,
+    .project-media-card video {
+      width: 100%;
+      height: 100%;
+      min-height: 0;
+      object-fit: cover;
+      object-position: center center;
+      display: block;
+      background: rgba(30, 30, 30, 0.82);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .media-caption {
+      padding: 0.42rem 0.76rem;
+      color: rgba(255, 255, 255, 0.82);
+      background: rgba(5, 5, 5, 0.88);
+      font-size: 0.78rem;
+      line-height: 1.2;
+    }
+
+    .project-text-box {
+      min-height: 0;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 0.62rem;
+      padding: 1.0rem 1.15rem;
+      background: rgba(18, 18, 18, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 20px;
+      box-shadow: 0 22px 70px rgba(0, 0, 0, 0.42);
+    }
+
+    .project-text-box h2 {
+      color: white;
+      font-size: clamp(1.55rem, 2.4vw, 2.65rem);
+      line-height: 1.0;
+      letter-spacing: -0.055em;
+      margin-bottom: 0.2rem;
+    }
+
+    .project-text-box p {
+      color: rgba(255, 255, 255, 0.74);
+      font-size: clamp(0.84rem, 0.95vw, 1.02rem);
+      line-height: 1.38;
+      margin: 0;
+    }
+
+    .project-text-box p + p {
+      margin-top: 0.32rem;
+      padding-top: 0.45rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.10);
+    }
+
+    .details-grid {
+      margin-top: 0.55rem;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.65rem;
+    }
+
+    .detail-card {
+      padding: 0.72rem 0.82rem;
+      background: rgba(5, 5, 5, 0.34);
+      border: 1px solid rgba(255, 255, 255, 0.10);
+      border-radius: 14px;
+    }
+
+    .detail-card h3 {
+      color: var(--muted);
+      font-size: clamp(0.88rem, 1vw, 1.02rem);
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.25rem;
+    }
+
+    .detail-card p {
+      font-size: 0.82rem;
+      line-height: 1.28;
+    }
+
+    .gallery-section {
+      margin-top: 1rem;
+      padding-top: 0.75rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.10);
+    }
+
+    .gallery-section h2 {
+      color: white;
+      text-align: center;
+      font-size: clamp(1.45rem, 2.1vw, 2.2rem);
+      line-height: 1;
+      letter-spacing: -0.045em;
+      margin-bottom: 0.75rem;
+    }
+
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 0.75rem;
+    }
+
+    .gallery-tile {
+      overflow: hidden;
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(5, 5, 5, 0.50);
+      min-height: 180px;
+    }
+
+    .gallery-tile img {
+      width: 100%;
+      height: 100%;
+      min-height: 180px;
+      object-fit: cover;
+      object-position: center center;
+      display: block;
+    }
+
+
+    .vehicle-overview-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.8rem;
+      margin-top: 0.35rem;
+    }
+
+    .vehicle-overview-column {
+      padding: 0.85rem 0.95rem;
+      background: rgba(5, 5, 5, 0.34);
+      border: 1px solid rgba(255, 255, 255, 0.10);
+      border-radius: 14px;
+    }
+
+    .vehicle-overview-column p {
+      border-top: none !important;
+      padding-top: 0 !important;
+      margin-top: 0 !important;
+    }
+
+    .vehicle-overview-image {
+      margin-top: 0.85rem;
+      overflow: hidden;
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(5, 5, 5, 0.50);
+      min-height: 260px;
+    }
+
+    .vehicle-overview-image img {
+      width: 100%;
+      height: 100%;
+      min-height: 260px;
+      object-fit: cover;
+      object-position: center center;
+      display: block;
+    }
+
+
+    /* Airfoil Optimization and Wing Design segment */
+    .airfoil-section {
+      margin-top: 1.1rem;
+      padding: clamp(1.2rem, 2.4vw, 2rem);
+      background: rgba(18, 18, 18, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 26px;
+      box-shadow: 0 28px 95px rgba(0, 0, 0, 0.5);
+    }
+
+    .airfoil-section h2 {
+      color: white;
+      font-size: clamp(1.55rem, 2.4vw, 2.65rem);
+      line-height: 1.0;
+      letter-spacing: -0.055em;
+      margin-bottom: 0.9rem;
+      text-align: center;
+    }
+
+    .airfoil-top-layout {
+      display: grid;
+      grid-template-columns: minmax(280px, 0.70fr) minmax(0, 1.30fr);
+      gap: 1.1rem;
+      align-items: stretch;
+    }
+
+    .airfoil-text-box {
+      min-height: 0;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 1.0rem 1.15rem;
+      background: rgba(18, 18, 18, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 20px;
+      box-shadow: 0 22px 70px rgba(0, 0, 0, 0.42);
+    }
+
+    .airfoil-text-box p,
+    .airfoil-bottom-text p {
+      color: rgba(255, 255, 255, 0.74);
+      font-size: clamp(0.84rem, 0.95vw, 1.02rem);
+      line-height: 1.38;
+      margin: 0;
+    }
+
+    .airfoil-media-rows {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 0.85rem;
+      min-width: 0;
+    }
+
+    .airfoil-media-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 0.75rem;
+      align-items: stretch;
+    }
+
+    .airfoil-media-tile {
+      overflow: hidden;
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(5, 5, 5, 0.50);
+      min-height: 210px;
+    }
+
+    .airfoil-media-tile img,
+    .airfoil-media-tile video {
+      width: 100%;
+      height: 100%;
+      min-height: 210px;
+      object-fit: cover;
+      object-position: center center;
+      display: block;
+      background: rgba(30, 30, 30, 0.82);
+    }
+
+    .airfoil-row-caption {
+      grid-column: 1 / -1;
+      color: rgba(255, 255, 255, 0.74);
+      font-size: 0.84rem;
+      line-height: 1.28;
+      text-align: center;
+      padding: 0.45rem 0.65rem;
+      background: rgba(5, 5, 5, 0.38);
+      border: 1px solid rgba(255, 255, 255, 0.10);
+      border-radius: 12px;
+    }
+
+    .airfoil-bottom-layout {
+      margin-top: 1.1rem;
+      padding-top: 1.1rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.10);
+      display: grid;
+      grid-template-columns: minmax(280px, 0.80fr) minmax(0, 1.20fr);
+      gap: 1.1rem;
+      align-items: stretch;
+    }
+
+    .airfoil-bottom-text {
+      min-height: 0;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 1.0rem 1.15rem;
+      background: rgba(18, 18, 18, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 20px;
+      box-shadow: 0 22px 70px rgba(0, 0, 0, 0.42);
+    }
+
+    .airfoil-bottom-image {
+      overflow: hidden;
+      border-radius: 22px;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      background: rgba(5, 5, 5, 0.50);
+      min-height: 320px;
+      box-shadow: 0 24px 90px var(--shadow);
+    }
+
+    .airfoil-bottom-image img {
+      width: 100%;
+      height: 100%;
+      min-height: 320px;
+      object-fit: cover;
+      object-position: center center;
+      display: block;
+    }
+
+    @media (max-width: 1050px) {
+      .airfoil-top-layout,
+      .airfoil-media-row,
+      .airfoil-bottom-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+
+    /* Aerodynamic Analysis segment */
+    .aero-section {
+      margin-top: 1.1rem;
+      padding: clamp(1.2rem, 2.4vw, 2rem);
+      background: rgba(18, 18, 18, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 26px;
+      box-shadow: 0 28px 95px rgba(0, 0, 0, 0.5);
+    }
+
+    .aero-section h2 {
+      color: white;
+      font-size: clamp(1.55rem, 2.4vw, 2.65rem);
+      line-height: 1.0;
+      letter-spacing: -0.055em;
+      margin-bottom: 1rem;
+      text-align: center;
+    }
+
+    .aero-row {
+      display: grid;
+      gap: 1.1rem;
+      align-items: stretch;
+      margin-top: 1.1rem;
+      padding-top: 1.1rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.10);
+    }
+
+    .aero-row:first-of-type {
+      margin-top: 0;
+      padding-top: 0;
+      border-top: none;
+    }
+
+    .aero-row.text-left {
+      grid-template-columns: minmax(320px, 0.85fr) minmax(0, 1.15fr);
+    }
+
+    .aero-row.text-right {
+      grid-template-columns: minmax(0, 1.15fr) minmax(320px, 0.85fr);
+    }
+
+    .aero-text-box {
+      min-height: 0;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 1.0rem 1.15rem;
+      background: rgba(18, 18, 18, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 20px;
+      box-shadow: 0 22px 70px rgba(0, 0, 0, 0.42);
+    }
+
+    .aero-text-box p {
+      color: rgba(255, 255, 255, 0.74);
+      font-size: clamp(0.84rem, 0.95vw, 1.02rem);
+      line-height: 1.38;
+      margin: 0;
+    }
+
+    .aero-stack {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 0.75rem;
+      min-width: 0;
+    }
+
+    .aero-side-by-side {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.75rem;
+      min-width: 0;
+    }
+
+    .aero-four-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 0.75rem;
+      margin-top: 1.1rem;
+      padding-top: 1.1rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.10);
+    }
+
+    .aero-media-tile {
+      overflow: hidden;
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(5, 5, 5, 0.50);
+      min-height: 210px;
+    }
+
+    .aero-stack .aero-media-tile {
+      min-height: 185px;
+    }
+
+    .aero-four-grid .aero-media-tile {
+      min-height: 190px;
+    }
+
+    .aero-media-tile img,
+    .aero-media-tile video {
+      width: 100%;
+      height: 100%;
+      min-height: inherit;
+      object-fit: cover;
+      object-position: center center;
+      display: block;
+      background: rgba(30, 30, 30, 0.82);
+    }
+
+    @media (max-width: 1050px) {
+      .aero-row.text-left,
+      .aero-row.text-right,
+      .aero-side-by-side,
+      .aero-four-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+
+    /* Tiltrotor Mechanism Design segment */
+    .tilt-section {
+      margin-top: 1.1rem;
+      padding: clamp(1.2rem, 2.4vw, 2rem);
+      background: rgba(18, 18, 18, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 26px;
+      box-shadow: 0 28px 95px rgba(0, 0, 0, 0.5);
+    }
+
+    .tilt-row {
+      display: grid;
+      gap: 1.1rem;
+      align-items: stretch;
+    }
+
+    .tilt-row + .tilt-row {
+      margin-top: 1.1rem;
+      padding-top: 1.1rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.10);
+    }
+
+    .tilt-row-1 {
+      grid-template-columns: minmax(0, 1.15fr) minmax(320px, 0.85fr);
+    }
+
+    .tilt-text-box {
+      min-height: 0;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 1.0rem 1.15rem;
+      background: rgba(18, 18, 18, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 20px;
+      box-shadow: 0 22px 70px rgba(0, 0, 0, 0.42);
+    }
+
+    .tilt-text-box h2 {
+      color: white;
+      font-size: clamp(1.55rem, 2.4vw, 2.65rem);
+      line-height: 1.0;
+      letter-spacing: -0.055em;
+      margin-bottom: 0.75rem;
+      text-align: left;
+    }
+
+    .tilt-text-box p {
+      color: rgba(255, 255, 255, 0.74);
+      font-size: clamp(0.84rem, 0.95vw, 1.02rem);
+      line-height: 1.38;
+      margin: 0;
+    }
+
+    .tilt-image-pair {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.75rem;
+      min-width: 0;
+    }
+
+    .tilt-media-tile {
+      overflow: hidden;
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(5, 5, 5, 0.50);
+      min-height: 250px;
+      display: grid;
+      grid-template-rows: minmax(0, 1fr) auto;
+    }
+
+    .tilt-media-tile img,
+    .tilt-media-tile video {
+      width: 100%;
+      height: 100%;
+      min-height: 210px;
+      object-fit: cover;
+      object-position: center center;
+      display: block;
+      background: rgba(30, 30, 30, 0.82);
+    }
+
+    .tilt-image-caption {
+      padding: 0.42rem 0.65rem;
+      color: rgba(255, 255, 255, 0.78);
+      background: rgba(5, 5, 5, 0.82);
+      border-top: 1px solid rgba(255, 255, 255, 0.10);
+      font-size: 0.78rem;
+      line-height: 1.22;
+      text-align: center;
+    }
+
+    @media (max-width: 1050px) {
+      .tilt-row-1,
+      .tilt-image-pair {
+        grid-template-columns: 1fr;
+      }
+    }
+
+
+    /* Manufacturing segment */
+    .manufacturing-section {
+      margin-top: 1.1rem;
+      padding: clamp(1.2rem, 2.4vw, 2rem);
+      background: rgba(18, 18, 18, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 26px;
+      box-shadow: 0 28px 95px rgba(0, 0, 0, 0.5);
+    }
+
+    .manufacturing-row {
+      display: grid;
+      gap: 1.1rem;
+      align-items: stretch;
+    }
+
+    .manufacturing-row + .manufacturing-row {
+      margin-top: 1.1rem;
+      padding-top: 1.1rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.10);
+    }
+
+    .manufacturing-row-1 {
+      grid-template-columns: minmax(340px, 0.82fr) minmax(0, 1.18fr);
+    }
+
+    .manufacturing-text-box {
+      min-height: 0;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 1.0rem 1.15rem;
+      background: rgba(18, 18, 18, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 20px;
+      box-shadow: 0 22px 70px rgba(0, 0, 0, 0.42);
+    }
+
+    .manufacturing-text-box h2 {
+      color: white;
+      font-size: clamp(1.55rem, 2.4vw, 2.65rem);
+      line-height: 1.0;
+      letter-spacing: -0.055em;
+      margin-bottom: 0.75rem;
+      text-align: left;
+    }
+
+    .manufacturing-text-box p {
+      color: rgba(255, 255, 255, 0.74);
+      font-size: clamp(0.84rem, 0.95vw, 1.02rem);
+      line-height: 1.38;
+      margin: 0;
+    }
+
+    .manufacturing-image-pair {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.75rem;
+      min-width: 0;
+    }
+
+    .manufacturing-five-grid {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 0.75rem;
+      min-width: 0;
+    }
+
+    .manufacturing-media-tile {
+      overflow: hidden;
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(5, 5, 5, 0.50);
+      min-height: 235px;
+      display: grid;
+      grid-template-rows: minmax(0, 1fr) auto;
+    }
+
+    .manufacturing-five-grid .manufacturing-media-tile {
+      min-height: 190px;
+    }
+
+    .manufacturing-media-tile img,
+    .manufacturing-media-tile video {
+      width: 100%;
+      height: 100%;
+      min-height: inherit;
+      object-fit: cover;
+      object-position: center center;
+      display: block;
+      background: rgba(30, 30, 30, 0.82);
+    }
+
+    .manufacturing-image-caption {
+      padding: 0.42rem 0.65rem;
+      color: rgba(255, 255, 255, 0.78);
+      background: rgba(5, 5, 5, 0.82);
+      border-top: 1px solid rgba(255, 255, 255, 0.10);
+      font-size: 0.78rem;
+      line-height: 1.22;
+      text-align: center;
+    }
+
+    @media (max-width: 1050px) {
+      .manufacturing-row-1,
+      .manufacturing-image-pair,
+      .manufacturing-five-grid {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    /* Flight Test and Final Demonstration segment */
+    .flight-section {
+      margin-top: 1.1rem;
+      padding: clamp(1.2rem, 2.4vw, 2rem);
+      background: rgba(18, 18, 18, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 26px;
+      box-shadow: 0 28px 95px rgba(0, 0, 0, 0.5);
+    }
+
+    .flight-row {
+      display: grid;
+      gap: 1.1rem;
+      align-items: stretch;
+    }
+
+    .flight-row + .flight-row {
+      margin-top: 1.1rem;
+      padding-top: 1.1rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.10);
+    }
+
+    .flight-row.text-left {
+      grid-template-columns: minmax(340px, 0.85fr) minmax(0, 1.15fr);
+    }
+
+    .flight-row.text-right {
+      grid-template-columns: minmax(0, 1.15fr) minmax(340px, 0.85fr);
+    }
+
+    .flight-text-box {
+      min-height: 0;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 1.0rem 1.15rem;
+      background: rgba(18, 18, 18, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 20px;
+      box-shadow: 0 22px 70px rgba(0, 0, 0, 0.42);
+    }
+
+    .flight-text-box h2 {
+      color: white;
+      font-size: clamp(1.55rem, 2.4vw, 2.65rem);
+      line-height: 1.0;
+      letter-spacing: -0.055em;
+      margin-bottom: 0.75rem;
+      text-align: left;
+    }
+
+    .flight-subheading {
+      color: var(--muted);
+      font-size: clamp(1.0rem, 1.2vw, 1.22rem);
+      line-height: 1.15;
+      letter-spacing: -0.025em;
+      font-weight: 760;
+      margin-bottom: 0.45rem;
+    }
+
+    .flight-text-box p {
+      color: rgba(255, 255, 255, 0.74);
+      font-size: clamp(0.84rem, 0.95vw, 1.02rem);
+      line-height: 1.38;
+      margin: 0;
+    }
+
+    .flight-media-tile {
+      overflow: hidden;
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(5, 5, 5, 0.50);
+      min-height: 310px;
+      display: grid;
+      grid-template-rows: minmax(0, 1fr) auto;
+    }
+
+    .flight-media-tile video,
+    .flight-media-tile img {
+      width: 100%;
+      height: 100%;
+      min-height: 270px;
+      object-fit: cover;
+      object-position: center center;
+      display: block;
+      background: rgba(30, 30, 30, 0.82);
+    }
+
+    .flight-image-caption {
+      padding: 0.42rem 0.65rem;
+      color: rgba(255, 255, 255, 0.78);
+      background: rgba(5, 5, 5, 0.82);
+      border-top: 1px solid rgba(255, 255, 255, 0.10);
+      font-size: 0.78rem;
+      line-height: 1.22;
+      text-align: center;
+    }
+
+    @media (max-width: 1050px) {
+      .flight-row.text-left,
+      .flight-row.text-right {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    /* Gallery final section */
+    .final-gallery-section {
+      margin-top: 1.1rem;
+      padding: clamp(1.2rem, 2.4vw, 2rem);
+      background: rgba(18, 18, 18, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 26px;
+      box-shadow: 0 28px 95px rgba(0, 0, 0, 0.5);
+    }
+
+    .final-gallery-section h2 {
+      color: white;
+      text-align: center;
+      font-size: clamp(1.55rem, 2.4vw, 2.65rem);
+      line-height: 1.0;
+      letter-spacing: -0.055em;
+      margin-bottom: 1.1rem;
+    }
+
+    .final-gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 0.75rem;
+      min-width: 0;
+    }
+
+    .final-gallery-tile {
+      overflow: hidden;
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(5, 5, 5, 0.50);
+      min-height: 230px;
+    }
+
+    .final-gallery-tile img,
+    .final-gallery-tile video {
+      width: 100%;
+      height: 100%;
+      min-height: 230px;
+      object-fit: cover;
+      object-position: center center;
+      display: block;
+      background: rgba(30, 30, 30, 0.82);
+    }
+
+    @media (max-width: 1050px) {
+      .final-gallery-grid {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+    footer {
+      position: relative;
+      z-index: 2;
+      border-top: 1px solid rgba(255, 255, 255, 0.13);
+      padding: 2rem 6vw;
+      color: var(--subtle);
+      background: rgba(5, 5, 5, 0.92);
+      backdrop-filter: blur(18px);
+      font-size: 0.9rem;
+    }
+
+    @media (max-width: 1050px) {
+      .topbar {
+        grid-template-columns: 1fr;
+        justify-items: center;
+        gap: 0.3rem;
+        padding: 0.55rem 4vw;
+      }
+
+      .brand {
+        justify-self: center;
+      }
+
+      nav {
+        width: 100%;
+        overflow-x: auto;
+        justify-content: center;
+        padding-bottom: 0.1rem;
+      }
+
+      :root {
+        --topbar-h: 88px;
+      }
+
+      .project-panel,
+      .gallery-grid,
+      .vehicle-overview-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .project-panel {
+        min-height: auto;
+      }
+
+      .project-media-card {
+        min-height: 420px;
+      }
+
+      .details-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .section {
+        padding-left: 1rem;
+        padding-right: 1rem;
+      }
+
+      .hero {
+        padding-left: 1rem;
+        padding-right: 1rem;
+      }
+
+      .project-media-card {
+        min-height: 300px;
+      }
+    }
+
+    /* FINAL OVERRIDE: Vehicle Overview section with text on the left and image on the right. */
+    .project-panel {
+      grid-template-columns: minmax(260px, 0.55fr) minmax(0, 1.45fr) !important;
+      align-items: stretch !important;
+    }
+
+    .project-text-box {
+      width: 100% !important;
+      height: 100% !important;
+      justify-content: center !important;
+    }
+
+    .project-text-box .section-kicker {
+      display: none !important;
+    }
+
+    .project-text-box h2 {
+      text-align: left !important;
+    }
+
+    .project-text-box p {
+      text-align: left !important;
+    }
+
+    .vehicle-overview-grid {
+      display: block !important;
+      margin-top: 0 !important;
+    }
+
+    .vehicle-overview-column {
+      padding: 0 !important;
+      background: transparent !important;
+      border: none !important;
+      border-radius: 0 !important;
+    }
+
+    .vehicle-overview-column + .vehicle-overview-column {
+      display: none !important;
+    }
+
+    .vehicle-overview-column p {
+      border-top: none !important;
+      padding-top: 0 !important;
+      margin-top: 0 !important;
+    }
+
+    .vehicle-overview-image {
+      margin-top: 0 !important;
+      overflow: hidden !important;
+      border-radius: 22px !important;
+      border: 1px solid rgba(255, 255, 255, 0.16) !important;
+      background: rgba(5, 5, 5, 0.50) !important;
+      min-height: 0 !important;
+      height: 100% !important;
+      box-shadow: 0 24px 90px var(--shadow);
+    }
+
+    .vehicle-overview-image img {
+      width: 100% !important;
+      height: 100% !important;
+      min-height: 0 !important;
+      object-fit: contain !important;
+      object-position: center center !important;
+      display: block !important;
+    }
+
+    @media (max-width: 1050px) {
+      .project-panel {
+        grid-template-columns: 1fr !important;
+      }
+
+      .vehicle-overview-image {
+        min-height: 340px !important;
+      }
+    }
+
+
+    /* FINAL OVERRIDE: make the BEAR overview image fully visible and give it more width. */
+    .vehicle-overview-image {
+      background: #ffffff !important;
+    }
+
+    .vehicle-overview-image img {
+      object-fit: contain !important;
+      object-position: center center !important;
+      background: #ffffff !important;
+    }
+
+
+    /* FINAL OVERRIDE: Airfoil section layout adjustments. */
+    .airfoil-section > h2 {
+      display: none !important;
+    }
+
+    .airfoil-text-box h2 {
+      color: white;
+      font-size: clamp(1.55rem, 2.4vw, 2.65rem);
+      line-height: 1.0;
+      letter-spacing: -0.055em;
+      margin-bottom: 0.75rem;
+      text-align: left;
+    }
+
+    .airfoil-top-layout {
+      grid-template-columns: minmax(420px, 1.15fr) minmax(0, 0.85fr) !important;
+    }
+
+    .airfoil-bottom-layout {
+      grid-template-columns: minmax(0, 0.95fr) minmax(420px, 1.05fr) !important;
+    }
+
+    .airfoil-bottom-text {
+      justify-content: center !important;
+    }
+
+    .airfoil-media-tile {
+      min-height: 180px !important;
+    }
+
+    .airfoil-media-tile img,
+    .airfoil-media-tile video {
+      min-height: 180px !important;
+    }
+
+    @media (max-width: 1050px) {
+      .airfoil-top-layout,
+      .airfoil-bottom-layout {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    /* FINAL OVERRIDE: Aerodynamic Analysis heading lives inside the first paragraph box. */
+    .aero-section > h2 {
+      display: none !important;
+    }
+
+    .aero-text-box h2 {
+      color: white;
+      font-size: clamp(1.55rem, 2.4vw, 2.65rem);
+      line-height: 1.0;
+      letter-spacing: -0.055em;
+      margin-bottom: 0.75rem;
+      text-align: left;
+    }
+
+
+    /* FINAL OVERRIDE: Aerodynamic Analysis image layout and captions. */
+    .aero-section .aero-stack {
+      grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    }
+
+    .aero-section .aero-media-tile {
+      display: grid !important;
+      grid-template-rows: minmax(0, 1fr) auto !important;
+      min-height: 230px !important;
+    }
+
+    .aero-section .aero-media-tile img,
+    .aero-section .aero-media-tile video {
+      width: 100% !important;
+      height: 100% !important;
+      min-height: 190px !important;
+      object-fit: cover !important;
+      object-position: center center !important;
+      display: block !important;
+    }
+
+    .aero-image-caption {
+      padding: 0.42rem 0.65rem;
+      color: rgba(255, 255, 255, 0.78);
+      background: rgba(5, 5, 5, 0.82);
+      border-top: 1px solid rgba(255, 255, 255, 0.10);
+      font-size: 0.78rem;
+      line-height: 1.22;
+      text-align: center;
+    }
+
+    @media (max-width: 1050px) {
+      .aero-section .aero-stack {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    /* FINAL OVERRIDE: third Aerodynamic Analysis row images stacked vertically. */
+    .aero-section .aero-row:nth-of-type(3) .aero-side-by-side {
+      grid-template-columns: 1fr !important;
+    }
+
+
+    /* FINAL OVERRIDE: Aerodynamic Analysis row-specific width tuning. */
+
+    /* Row 2:
+       Make the left image group slightly narrower and the right paragraph box slightly narrower,
+       giving more usable room to the second image/residual plot inside the left group. */
+    .aero-section .aero-row:nth-of-type(2) {
+      grid-template-columns: minmax(0, 1.28fr) minmax(260px, 0.72fr) !important;
+    }
+
+    .aero-section .aero-row:nth-of-type(2) .aero-stack {
+      grid-template-columns: minmax(0, 0.88fr) minmax(0, 1.12fr) !important;
+    }
+
+    /* Row 3:
+       Make the paragraph box wider and the image column narrower. */
+    .aero-section .aero-row:nth-of-type(3) {
+      grid-template-columns: minmax(420px, 1.10fr) minmax(0, 0.90fr) !important;
+    }
+
+    .aero-section .aero-row:nth-of-type(3) .aero-side-by-side {
+      grid-template-columns: 1fr !important;
+    }
+
+    @media (max-width: 1050px) {
+      .aero-section .aero-row:nth-of-type(2),
+      .aero-section .aero-row:nth-of-type(3),
+      .aero-section .aero-row:nth-of-type(2) .aero-stack {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    /* FINAL OVERRIDE: widen third-row paragraph section more, shrinking the image column further. */
+    .aero-section .aero-row:nth-of-type(3) {
+      grid-template-columns: minmax(520px, 1.30fr) minmax(0, 0.70fr) !important;
+    }
+
+    @media (max-width: 1050px) {
+      .aero-section .aero-row:nth-of-type(3) {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    /* FINAL OVERRIDE: return third-row Aerodynamic Analysis images to horizontal layout. */
+    .aero-section .aero-row:nth-of-type(3) .aero-side-by-side {
+      grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    }
+
+    @media (max-width: 1050px) {
+      .aero-section .aero-row:nth-of-type(3) .aero-side-by-side {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    /* FINAL OVERRIDE: restore third-row paragraph/image widths to original horizontal-image layout. */
+    .aero-section .aero-row:nth-of-type(3) {
+      grid-template-columns: minmax(320px, 0.85fr) minmax(0, 1.15fr) !important;
+    }
+
+    .aero-section .aero-row:nth-of-type(3) .aero-side-by-side {
+      grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    }
+
+    @media (max-width: 1050px) {
+      .aero-section .aero-row:nth-of-type(3),
+      .aero-section .aero-row:nth-of-type(3) .aero-side-by-side {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    /* FINAL OVERRIDE: Aerodynamic Analysis paragraph subtitles. */
+    .aero-subheading {
+      color: var(--muted);
+      font-size: clamp(1.0rem, 1.2vw, 1.22rem);
+      line-height: 1.15;
+      letter-spacing: -0.025em;
+      font-weight: 760;
+      margin-bottom: 0.45rem;
+    }
+
+
+    /* FINAL OVERRIDE: Tiltrotor section width tuning and video crop controls. */
+
+    /* Give the top-row image area more width by narrowing the paragraph section slightly. */
+    .tilt-section .tilt-row-1 {
+      grid-template-columns: minmax(300px, 0.78fr) minmax(0, 1.22fr) !important;
+    }
+
+    /* In the top row image pair, make the left image wider than the right image. */
+    .tilt-section .tilt-row-1 .tilt-image-pair {
+      grid-template-columns: minmax(0, 1.28fr) minmax(0, 0.72fr) !important;
+    }
+
+    /* In the bottom row, make the left image wider than the video tile. */
+    .tilt-section .tilt-row:not(.tilt-row-1) .tilt-image-pair {
+      grid-template-columns: minmax(0, 1.20fr) minmax(0, 0.80fr) !important;
+    }
+
+    /* Position/scale controls for the tiltrotor MP4 tile.
+       Edit these inline variables on the video tile:
+       --tilt-video-x: 50%;     left/right crop focus
+       --tilt-video-y: 50%;     up/down crop focus
+       --tilt-video-zoom: 1;    larger = more zoomed/cropped
+    */
+    .tilt-video-crop video {
+      object-fit: cover !important;
+      object-position: var(--tilt-video-x, 50%) var(--tilt-video-y, 50%) !important;
+      transform: scale(var(--tilt-video-zoom, 1)) !important;
+      transform-origin: var(--tilt-video-x, 50%) var(--tilt-video-y, 50%) !important;
+    }
+
+    @media (max-width: 1050px) {
+      .tilt-section .tilt-row-1,
+      .tilt-section .tilt-row-1 .tilt-image-pair,
+      .tilt-section .tilt-row:not(.tilt-row-1) .tilt-image-pair {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    /* FINAL OVERRIDE: corrected Tiltrotor image widths and center-only video crop. */
+
+    /* Top row: keep the paragraph on the left, but give the image area more room. */
+    .tilt-section .tilt-row-1 {
+      grid-template-columns: minmax(280px, 0.72fr) minmax(0, 1.28fr) !important;
+    }
+
+    /* Top row image pair: make the RIGHT image wider than the left image. */
+    .tilt-section .tilt-row-1 .tilt-image-pair {
+      grid-template-columns: minmax(0, 0.72fr) minmax(0, 1.28fr) !important;
+    }
+
+    /* Bottom row: make the left bottom image wider and the video tile narrower. */
+    .tilt-section .tilt-row:not(.tilt-row-1) .tilt-image-pair {
+      grid-template-columns: minmax(0, 1.45fr) minmax(0, 0.55fr) !important;
+    }
+
+    /* Spatial crop for the MP4: focus on the center and chop off top/bottom.
+       Increase --tilt-video-crop-y to crop more from the top and bottom.
+       Use --tilt-video-y to shift the cropped center up/down if needed.
+    */
+    .tilt-video-crop {
+      overflow: hidden !important;
+    }
+
+    .tilt-video-crop video {
+      object-fit: cover !important;
+      object-position: 50% var(--tilt-video-y, 50%) !important;
+      transform: scaleY(var(--tilt-video-crop-y, 1.35)) !important;
+      transform-origin: 50% var(--tilt-video-y, 50%) !important;
+    }
+
+    @media (max-width: 1050px) {
+      .tilt-section .tilt-row-1,
+      .tilt-section .tilt-row-1 .tilt-image-pair,
+      .tilt-section .tilt-row:not(.tilt-row-1) .tilt-image-pair {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    /* FINAL OVERRIDE: corrected Tiltrotor top-right image width and real top/bottom video crop. */
+
+    /* Top row: paragraph a bit narrower so the two image tiles get more total width. */
+    .tilt-section .tilt-row-1 {
+      grid-template-columns: minmax(260px, 0.62fr) minmax(0, 1.38fr) !important;
+    }
+
+    /* Top row image pair: make the RIGHT image tile much wider than the left tile. */
+    .tilt-section .tilt-row-1 .tilt-image-pair {
+      grid-template-columns: minmax(0, 0.48fr) minmax(0, 1.52fr) !important;
+    }
+
+    /* Top-right image: show more of the CAD by containing it instead of cropping it. */
+    .tilt-section .tilt-row-1 .tilt-image-pair .tilt-media-tile:nth-child(2) {
+      background: #ffffff !important;
+    }
+
+    .tilt-section .tilt-row-1 .tilt-image-pair .tilt-media-tile:nth-child(2) img {
+      object-fit: contain !important;
+      object-position: center center !important;
+      background: #ffffff !important;
+    }
+
+    /* Bottom row: make the left image wider and the video tile narrower. */
+    .tilt-section .tilt-row:not(.tilt-row-1) .tilt-image-pair {
+      grid-template-columns: minmax(0, 1.45fr) minmax(0, 0.55fr) !important;
+    }
+
+    /* Actual spatial crop for the MP4:
+       the video is made taller than its tile and clipped by overflow hidden,
+       so the top and bottom are chopped off while the center remains visible.
+       Increase --tilt-video-height for more top/bottom crop.
+       Adjust --tilt-video-y if the center needs to move up/down.
+    */
+    .tilt-video-crop {
+      overflow: hidden !important;
+      position: relative !important;
+    }
+
+    .tilt-video-crop video {
+      position: absolute !important;
+      left: 50% !important;
+      top: var(--tilt-video-y, 50%) !important;
+      width: 100% !important;
+      height: var(--tilt-video-height, 180%) !important;
+      min-height: 0 !important;
+      object-fit: cover !important;
+      object-position: center center !important;
+      transform: translate(-50%, -50%) !important;
+      transform-origin: center center !important;
+    }
+
+    @media (max-width: 1050px) {
+      .tilt-section .tilt-row-1,
+      .tilt-section .tilt-row-1 .tilt-image-pair,
+      .tilt-section .tilt-row:not(.tilt-row-1) .tilt-image-pair {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    /* FINAL OVERRIDE: clean top-right tiltrotor image border and zoom it out slightly. */
+
+    /* Remove the bright/white-looking tile outline from the top-right image tile. */
+    .tilt-section .tilt-row-1 .tilt-image-pair .tilt-media-tile:nth-child(2) {
+      border-color: rgba(255, 255, 255, 0.06) !important;
+      background: #ffffff !important;
+    }
+
+    /* Zoom the top-right image out so the mechanism fits better inside the tile. */
+    .tilt-section .tilt-row-1 .tilt-image-pair .tilt-media-tile:nth-child(2) img {
+      object-fit: contain !important;
+      object-position: center center !important;
+      background: #ffffff !important;
+      transform: scale(0.88) !important;
+      transform-origin: center center !important;
+    }
+
+
+    /* FINAL OVERRIDE: top-right tiltrotor image uses the same centered/absolute sizing approach
+       as the portfolio poppet tile, so it actually zooms out and does not leave a bright
+       white edge touching the caption. */
+    .tilt-section .tilt-row-1 .tilt-image-pair .tilt-media-tile:nth-child(2) {
+      position: relative !important;
+      overflow: hidden !important;
+      background: rgba(5, 5, 5, 0.50) !important;
+      border-color: rgba(255, 255, 255, 0.12) !important;
+      display: grid !important;
+      grid-template-rows: minmax(0, 1fr) auto !important;
+    }
+
+    .tilt-section .tilt-row-1 .tilt-image-pair .tilt-media-tile:nth-child(2) img {
+      position: absolute !important;
+      top: calc(50% - 12px) !important;
+      left: 50% !important;
+      width: 88% !important;
+      height: 82% !important;
+      min-height: 0 !important;
+      object-fit: contain !important;
+      object-position: center center !important;
+      background: #ffffff !important;
+      transform: translate(-50%, -50%) !important;
+      transform-origin: center center !important;
+      border-radius: 0 !important;
+    }
+
+    .tilt-section .tilt-row-1 .tilt-image-pair .tilt-media-tile:nth-child(2) .tilt-image-caption {
+      position: relative !important;
+      z-index: 2 !important;
+      border-top: 1px solid rgba(255, 255, 255, 0.10) !important;
+    }
+
+    /* Bottom row: make the bottom-left image slightly less wide than before. */
+    .tilt-section .tilt-row:not(.tilt-row-1) .tilt-image-pair {
+      grid-template-columns: minmax(0, 1.35fr) minmax(0, 0.65fr) !important;
+    }
+
+    @media (max-width: 1050px) {
+      .tilt-section .tilt-row:not(.tilt-row-1) .tilt-image-pair {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    /* FINAL OVERRIDE: revert ONLY the top-right tiltrotor image behavior.
+       Keep the widened top-right tile, but remove the later zoom/absolute-position tricks.
+       Bottom-row sizing and video crop settings are left unchanged. */
+    .tilt-section .tilt-row-1 {
+      grid-template-columns: minmax(260px, 0.62fr) minmax(0, 1.38fr) !important;
+    }
+
+    .tilt-section .tilt-row-1 .tilt-image-pair {
+      grid-template-columns: minmax(0, 0.48fr) minmax(0, 1.52fr) !important;
+    }
+
+    .tilt-section .tilt-row-1 .tilt-image-pair .tilt-media-tile:nth-child(2) {
+      position: static !important;
+      overflow: hidden !important;
+      display: grid !important;
+      grid-template-rows: minmax(0, 1fr) auto !important;
+      background: #ffffff !important;
+      border: 1px solid rgba(255, 255, 255, 0.12) !important;
+    }
+
+    .tilt-section .tilt-row-1 .tilt-image-pair .tilt-media-tile:nth-child(2) img {
+      position: static !important;
+      top: auto !important;
+      left: auto !important;
+      width: 100% !important;
+      height: 100% !important;
+      min-height: 210px !important;
+      object-fit: contain !important;
+      object-position: center center !important;
+      background: #ffffff !important;
+      transform: none !important;
+      transform-origin: center center !important;
+      border-radius: 0 !important;
+    }
+
+    .tilt-section .tilt-row-1 .tilt-image-pair .tilt-media-tile:nth-child(2) .tilt-image-caption {
+      position: static !important;
+      z-index: auto !important;
+    }
+
+    @media (max-width: 1050px) {
+      .tilt-section .tilt-row-1,
+      .tilt-section .tilt-row-1 .tilt-image-pair {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    /* FINAL OVERRIDE: Tiltrotor top row uses one image only; video caption is visible. */
+    .tilt-section .tilt-row-1 .tilt-image-pair {
+      grid-template-columns: 1fr !important;
+    }
+
+    .tilt-section .tilt-row-1 .tilt-image-pair .tilt-media-tile {
+      min-height: 300px !important;
+    }
+
+    /* Ensure the bottom-right MP4 tile keeps a normal caption underneath it. */
+    .tilt-section .tilt-video-crop {
+      display: grid !important;
+      grid-template-rows: minmax(0, 1fr) auto !important;
+    }
+
+    .tilt-section .tilt-video-crop .tilt-image-caption {
+      position: relative !important;
+      z-index: 3 !important;
+      display: block !important;
+    }
+
+    @media (max-width: 1050px) {
+      .tilt-section .tilt-row-1 .tilt-image-pair {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    /* FINAL OVERRIDE: Tiltrotor layout + cropped video with normal caption. */
+
+    /* Top row: widen paragraph section and shrink the single image section. */
+    .tilt-section .tilt-row-1 {
+      grid-template-columns: minmax(380px, 0.95fr) minmax(0, 1.05fr) !important;
+    }
+
+    .tilt-section .tilt-row-1 .tilt-image-pair {
+      grid-template-columns: 1fr !important;
+    }
+
+    /* Bottom row: keep the calculation image wide and the video tile narrower. */
+    .tilt-section .tilt-row:not(.tilt-row-1) .tilt-image-pair {
+      grid-template-columns: minmax(0, 1.65fr) minmax(0, 0.35fr) !important;
+    }
+
+    /* Video tile acts like every other media tile: media on top, caption underneath. */
+    .tilt-section .tilt-video-crop {
+      display: grid !important;
+      grid-template-rows: minmax(0, 1fr) auto !important;
+      overflow: hidden !important;
+      position: static !important;
+      background: rgba(5, 5, 5, 0.50) !important;
+      border: 1px solid rgba(255, 255, 255, 0.12) !important;
+      border-radius: 16px !important;
+    }
+
+    /* This frame is the cropped viewport. It clips the top and bottom of the MP4. */
+    .tilt-section .tilt-video-frame {
+      position: relative !important;
+      overflow: hidden !important;
+      width: 100% !important;
+      height: 100% !important;
+      min-height: 210px !important;
+      background: rgba(30, 30, 30, 0.82) !important;
+    }
+
+    /* Real spatial crop: video is taller than the visible frame and clipped by the frame. */
+    .tilt-section .tilt-video-frame video {
+      position: absolute !important;
+      left: 50% !important;
+      top: var(--tilt-video-y, 50%) !important;
+      width: 100% !important;
+      height: var(--tilt-video-height, 180%) !important;
+      min-height: 0 !important;
+      object-fit: cover !important;
+      object-position: center center !important;
+      transform: translate(-50%, -50%) !important;
+      transform-origin: center center !important;
+      display: block !important;
+      background: rgba(30, 30, 30, 0.82) !important;
+    }
+
+    /* Caption remains below the cropped video, same behavior as image captions. */
+    .tilt-section .tilt-video-crop .tilt-image-caption {
+      position: static !important;
+      z-index: auto !important;
+      display: block !important;
+      padding: 0.42rem 0.65rem !important;
+      color: rgba(255, 255, 255, 0.78) !important;
+      background: rgba(5, 5, 5, 0.82) !important;
+      border-top: 1px solid rgba(255, 255, 255, 0.10) !important;
+      font-size: 0.78rem !important;
+      line-height: 1.22 !important;
+      text-align: center !important;
+    }
+
+    @media (max-width: 1050px) {
+      .tilt-section .tilt-row-1,
+      .tilt-section .tilt-row-1 .tilt-image-pair,
+      .tilt-section .tilt-row:not(.tilt-row-1) .tilt-image-pair {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    /* FINAL FINAL OVERRIDE: make top paragraph wider and bottom-left image less wide. */
+
+    /* Top row: paragraph/title box gets more width, image area gets less width. */
+    .tilt-section .tilt-row-1 {
+      grid-template-columns: minmax(520px, 1.35fr) minmax(0, 0.65fr) !important;
+    }
+
+    /* Top row now only has one image, so keep that image tile as one column. */
+    .tilt-section .tilt-row-1 .tilt-image-pair {
+      grid-template-columns: 1fr !important;
+    }
+
+    /* Bottom row: reduce the bottom-left image width and give more width back to the video tile. */
+    .tilt-section .tilt-row:not(.tilt-row-1) .tilt-image-pair {
+      grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr) !important;
+    }
+
+    @media (max-width: 1050px) {
+      .tilt-section .tilt-row-1,
+      .tilt-section .tilt-row-1 .tilt-image-pair,
+      .tilt-section .tilt-row:not(.tilt-row-1) .tilt-image-pair {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    /* FINAL FINAL OVERRIDE: make the bottom-right video/image tile narrower, closer to the red-box width. */
+    .tilt-section .tilt-row:not(.tilt-row-1) .tilt-image-pair {
+      grid-template-columns: minmax(0, 1.55fr) minmax(0, 0.45fr) !important;
+    }
+
+    @media (max-width: 1050px) {
+      .tilt-section .tilt-row:not(.tilt-row-1) .tilt-image-pair {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    /* FINAL OVERRIDE: make all Flight Test paragraph boxes wider and video columns narrower. */
+
+    /* Rows 1 and 3: paragraph on left gets more width, video on right gets less width. */
+    .flight-section .flight-row.text-left {
+      grid-template-columns: minmax(520px, 1.25fr) minmax(0, 0.75fr) !important;
+    }
+
+    /* Row 2: video on left gets less width, paragraph on right gets more width. */
+    .flight-section .flight-row.text-right {
+      grid-template-columns: minmax(0, 0.75fr) minmax(520px, 1.25fr) !important;
+    }
+
+    @media (max-width: 1050px) {
+      .flight-section .flight-row.text-left,
+      .flight-section .flight-row.text-right {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    /* FINAL OVERRIDE: updated Tiltrotor section is one row with image + video on the right. */
+    .tilt-section .tilt-row-1 {
+      grid-template-columns: minmax(520px, 1.25fr) minmax(0, 0.95fr) !important;
+    }
+
+    .tilt-section .tilt-row-1 .tilt-image-pair {
+      grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+      align-items: stretch !important;
+    }
+
+    .tilt-section .tilt-row-1 .tilt-media-tile {
+      min-height: 300px !important;
+    }
+
+    /* Keep the moved TiltTest video spatially cropped while still keeping its caption below. */
+    .tilt-section .tilt-video-crop {
+      display: grid !important;
+      grid-template-rows: minmax(0, 1fr) auto !important;
+      overflow: hidden !important;
+      position: static !important;
+      background: rgba(5, 5, 5, 0.50) !important;
+      border: 1px solid rgba(255, 255, 255, 0.12) !important;
+      border-radius: 16px !important;
+    }
+
+    .tilt-section .tilt-video-frame {
+      position: relative !important;
+      overflow: hidden !important;
+      width: 100% !important;
+      height: 100% !important;
+      min-height: 210px !important;
+      background: rgba(30, 30, 30, 0.82) !important;
+    }
+
+    .tilt-section .tilt-video-frame video {
+      position: absolute !important;
+      left: 50% !important;
+      top: var(--tilt-video-y, 50%) !important;
+      width: 100% !important;
+      height: var(--tilt-video-height, 180%) !important;
+      min-height: 0 !important;
+      object-fit: cover !important;
+      object-position: center center !important;
+      transform: translate(-50%, -50%) !important;
+      transform-origin: center center !important;
+      display: block !important;
+    }
+
+    /* FINAL OVERRIDE: updated Manufacturing section is one row with paragraph, 2x2 grid, and fifth image. */
+    .manufacturing-section .manufacturing-row-1 {
+      grid-template-columns: minmax(300px, 0.52fr) minmax(0, 1.48fr) !important;
+    }
+
+    .manufacturing-media-combo {
+      display: grid !important;
+      grid-template-columns: minmax(0, 1.25fr) minmax(0, 0.75fr) !important;
+      gap: 0.75rem !important;
+      min-width: 0 !important;
+      align-items: stretch !important;
+    }
+
+    .manufacturing-two-by-two-grid {
+      display: grid !important;
+      grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+      grid-template-rows: repeat(2, minmax(0, 1fr)) !important;
+      gap: 0.75rem !important;
+      min-width: 0 !important;
+    }
+
+    .manufacturing-media-combo .manufacturing-media-tile {
+      min-height: 165px !important;
+    }
+
+    .manufacturing-media-combo .manufacturing-media-tile img,
+    .manufacturing-media-combo .manufacturing-media-tile video {
+      min-height: 125px !important;
+      object-fit: cover !important;
+      object-position: center center !important;
+    }
+
+    .manufacturing-wide-tile {
+      height: 100% !important;
+      min-height: 340px !important;
+    }
+
+    @media (max-width: 1050px) {
+      .tilt-section .tilt-row-1,
+      .tilt-section .tilt-row-1 .tilt-image-pair,
+      .manufacturing-section .manufacturing-row-1,
+      .manufacturing-media-combo,
+      .manufacturing-two-by-two-grid {
+        grid-template-columns: 1fr !important;
+      }
+
+      .manufacturing-two-by-two-grid {
+        grid-template-rows: auto !important;
+      }
+    }
+
+
+    /* FINAL OVERRIDE: Airfoil/Wing Design paragraph subheadings. */
+    .airfoil-subheading {
+      color: var(--muted);
+      font-size: clamp(1.0rem, 1.2vw, 1.22rem);
+      line-height: 1.15;
+      letter-spacing: -0.025em;
+      font-weight: 760;
+      margin-bottom: 0.45rem;
+    }
+
+
+    /* FINAL OVERRIDE: Gallery is now a 3x3 grid. */
+    .final-gallery-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    }
+
+
+    /* FINAL OVERRIDE: paragraph indentation for all main text boxes. */
+    .project-text-box p,
+    .airfoil-text-box p,
+    .airfoil-bottom-text p,
+    .aero-text-box p,
+    .tilt-text-box p,
+    .manufacturing-text-box p,
+    .flight-text-box p {
+      text-indent: 1.75em !important;
+    }
+
+    /* Keep paragraph breaks readable when multiple paragraphs are stacked. */
+    .project-text-box p + p,
+    .airfoil-text-box p + p,
+    .airfoil-bottom-text p + p,
+    .aero-text-box p + p,
+    .tilt-text-box p + p,
+    .manufacturing-text-box p + p,
+    .flight-text-box p + p {
+      margin-top: 0.55rem !important;
+    }
+
+    /* FINAL OVERRIDE: make the CONOPS text side wider so its text box height better matches the image. */
+    .project-panel {
+      grid-template-columns: minmax(520px, 1.10fr) minmax(0, 0.90fr) !important;
+      align-items: stretch !important;
+    }
+
+    .project-text-box,
+    .vehicle-overview-image {
+      height: 100% !important;
+    }
+
+    @media (max-width: 1050px) {
+      .project-panel {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    /* FINAL OVERRIDE: CONOPS/Vehicle Overview width and top alignment.
+       This makes the text column wider and starts the heading at the top of the box
+       instead of vertically centering the whole text block. */
+    .project-panel {
+      grid-template-columns: minmax(620px, 1.28fr) minmax(0, 0.72fr) !important;
+      align-items: stretch !important;
+    }
+
+    .project-panel .project-text-box {
+      justify-content: flex-start !important;
+      padding-top: 1.35rem !important;
+    }
+
+    .project-panel .project-text-box h2 {
+      margin-top: 0 !important;
+      margin-bottom: 0.85rem !important;
+    }
+
+    @media (max-width: 1050px) {
+      .project-panel {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    /* FINAL OVERRIDE: CONOPS width-only correction.
+       Restore the original vertically-centered text behavior, then make the text column narrower
+       so the wrapped paragraph block becomes taller and the heading naturally sits near the top. */
+    .project-panel {
+      grid-template-columns: minmax(420px, 0.68fr) minmax(0, 1.32fr) !important;
+      align-items: stretch !important;
+    }
+
+    .project-panel .project-text-box {
+      justify-content: center !important;
+      padding-top: 1.0rem !important;
+      padding-bottom: 1.0rem !important;
+    }
+
+    .project-panel .project-text-box h2 {
+      margin-top: 0 !important;
+      margin-bottom: 0.85rem !important;
+    }
+
+    @media (max-width: 1050px) {
+      .project-panel {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    /* FINAL OVERRIDE: make the CONOPS paragraph section slightly wider. */
+    .project-panel {
+      grid-template-columns: minmax(460px, 0.76fr) minmax(0, 1.24fr) !important;
+      align-items: stretch !important;
+    }
+
+    .project-panel .project-text-box {
+      justify-content: center !important;
+    }
+
+    @media (max-width: 1050px) {
+      .project-panel {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    /* FINAL OVERRIDE: Simulation Results section layout only. */
+    .aero-section .aero-results-row {
+      grid-template-columns: minmax(420px, 0.92fr) minmax(0, 1.08fr) !important;
+      align-items: stretch !important;
+    }
+
+    .aero-section .aero-results-images {
+      display: grid !important;
+      grid-template-columns: 1fr !important;
+      gap: 0.75rem !important;
+      min-width: 0 !important;
+    }
+
+    .aero-section .aero-results-images .aero-media-tile {
+      min-height: 255px !important;
+    }
+
+    .aero-section .aero-results-images .aero-media-tile img {
+      min-height: 215px !important;
+      object-fit: cover !important;
+      object-position: center center !important;
+    }
+
+    .aero-section .aero-results-graphs {
+      display: grid !important;
+      grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+      gap: 0.75rem !important;
+      margin-top: 1.1rem !important;
+      padding-top: 1.1rem !important;
+      border-top: 1px solid rgba(255, 255, 255, 0.10) !important;
+    }
+
+    .aero-section .aero-results-graphs .aero-media-tile {
+      min-height: 280px !important;
+    }
+
+    .aero-section .aero-results-graphs .aero-media-tile img {
+      min-height: 235px !important;
+      object-fit: cover !important;
+      object-position: center center !important;
+    }
+
+    /* Simple HTML math formatting. No stacked fractions. */
+    .math {
+      font-family: "Times New Roman", Times, serif;
+      font-style: italic;
+      white-space: nowrap;
+      display: inline;
+      line-height: inherit;
+      vertical-align: baseline;
+    }
+
+    .math sub,
+    .math sup {
+      font-size: 0.72em;
+      line-height: 0;
+    }
+
+    @media (max-width: 1050px) {
+      .aero-section .aero-results-row,
+      .aero-section .aero-results-images,
+      .aero-section .aero-results-graphs {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    /* FINAL OVERRIDE: keep Tiltrotor and following sections as separate normal bounding boxes. */
+    .tilt-section,
+    .manufacturing-section,
+    .flight-section,
+    .final-gallery-section {
+      margin-top: 1.1rem !important;
+      background: rgba(18, 18, 18, 0.92) !important;
+      border: 1px solid rgba(255, 255, 255, 0.16) !important;
+      border-radius: 26px !important;
+      box-shadow: 0 28px 95px rgba(0, 0, 0, 0.5) !important;
+    }
+
+
+    /* FINAL OVERRIDE: remove outline/border from only the tiltrotor video tile. */
+    .tilt-section .tilt-media-tile.tilt-video-crop {
+      border: none !important;
+      outline: none !important;
+      box-shadow: none !important;
+      background: rgba(5, 5, 5, 0.50) !important;
+    }
+
+    .tilt-section .tilt-media-tile.tilt-video-crop .tilt-video-frame {
+      border: none !important;
+      outline: none !important;
+      box-shadow: none !important;
+      overflow: hidden !important;
+    }
+
+    .tilt-section .tilt-media-tile.tilt-video-crop video {
+      border: none !important;
+      outline: none !important;
+      box-shadow: none !important;
+    }
+
+    .tilt-section .tilt-media-tile.tilt-video-crop .tilt-image-caption {
+      border-top: none !important;
+      outline: none !important;
+      box-shadow: none !important;
+    }
+
+
+    /* FINAL OVERRIDE: force-hide the visible white perimeter on the tiltrotor video tile.
+       This does NOT change the page/section backgrounds or the video crop logic. */
+    .tilt-section .tilt-media-tile.tilt-video-crop {
+      position: relative !important;
+      isolation: isolate !important;
+      border: 0 !important;
+      outline: 0 !important;
+      box-shadow: none !important;
+      background: #050505 !important;
+      overflow: hidden !important;
+      border-radius: 16px !important;
+    }
+
+    /* Dark inset mask that covers any white edge coming from the video frame or inherited border. */
+    .tilt-section .tilt-media-tile.tilt-video-crop::after {
+      content: "" !important;
+      position: absolute !important;
+      inset: 0 !important;
+      z-index: 5 !important;
+      pointer-events: none !important;
+      border-radius: 16px !important;
+      box-shadow: inset 0 0 0 3px #050505 !important;
+    }
+
+    .tilt-section .tilt-video-frame {
+      position: relative !important;
+      overflow: hidden !important;
+      border: 0 !important;
+      outline: 0 !important;
+      box-shadow: none !important;
+      background: #050505 !important;
+    }
+
+    /* Overscan the video slightly so any light edge inside the MP4 itself is pushed outside the tile. */
+    .tilt-section .tilt-video-frame video {
+      width: 106% !important;
+      left: 50% !important;
+      transform: translate(-50%, -50%) !important;
+      border: 0 !important;
+      outline: 0 !important;
+      box-shadow: none !important;
+      background: #050505 !important;
+    }
+
+    .tilt-section .tilt-media-tile.tilt-video-crop .tilt-image-caption {
+      position: relative !important;
+      z-index: 2 !important;
+      border: 0 !important;
+      outline: 0 !important;
+      box-shadow: none !important;
+      background: rgba(5, 5, 5, 0.92) !important;
+    }
+
+
+    /* FINAL OVERRIDE: use a dedicated video tile class so the normal image-tile border
+       is not applied to the tiltrotor video at all. */
+    .tilt-section .tilt-video-tile {
+      overflow: hidden !important;
+      border: 0 !important;
+      outline: 0 !important;
+      box-shadow: none !important;
+      background: rgba(5, 5, 5, 0.50) !important;
+      border-radius: 16px !important;
+      min-height: 250px !important;
+      display: grid !important;
+      grid-template-rows: minmax(0, 1fr) auto !important;
+      padding: 0 !important;
+      position: relative !important;
+    }
+
+    .tilt-section .tilt-video-tile::before,
+    .tilt-section .tilt-video-tile::after {
+      content: none !important;
+      display: none !important;
+    }
+
+    .tilt-section .tilt-video-tile .tilt-video-frame {
+      position: relative !important;
+      overflow: hidden !important;
+      width: 100% !important;
+      height: 100% !important;
+      min-height: 210px !important;
+      border: 0 !important;
+      outline: 0 !important;
+      box-shadow: none !important;
+      background: #050505 !important;
+      border-radius: 16px 16px 0 0 !important;
+      padding: 0 !important;
+      margin: 0 !important;
+    }
+
+    .tilt-section .tilt-video-tile video {
+      position: absolute !important;
+      left: 50% !important;
+      top: var(--tilt-video-y, 50%) !important;
+      width: 106% !important;
+      height: var(--tilt-video-height, 180%) !important;
+      min-height: 0 !important;
+      object-fit: cover !important;
+      object-position: center center !important;
+      transform: translate(-50%, -50%) !important;
+      transform-origin: center center !important;
+      display: block !important;
+      border: 0 !important;
+      outline: 0 !important;
+      box-shadow: none !important;
+      background: #050505 !important;
+    }
+
+    .tilt-section .tilt-video-tile .tilt-image-caption {
+      padding: 0.42rem 0.65rem !important;
+      color: rgba(255, 255, 255, 0.78) !important;
+      background: rgba(5, 5, 5, 0.82) !important;
+      border: 0 !important;
+      border-top: 0 !important;
+      outline: 0 !important;
+      box-shadow: none !important;
+      font-size: 0.78rem !important;
+      line-height: 1.22 !important;
+      text-align: center !important;
+      border-radius: 0 0 16px 16px !important;
+    }
+
+    /* Keep the remaining still image tile unchanged. */
+    .tilt-section .tilt-media-tile {
+      border: 1px solid rgba(255, 255, 255, 0.12) !important;
+    }
+
+  </style>
+</head>
+
+<body>
+  <div class="gif-background" aria-hidden="true">
+    <video id="heroVideo" muted playsinline loop autoplay preload="auto">
+      <source src="assets/Videos/BEAR_FulleSunsetTest.mp4" type="video/mp4" />
+    </video>
+  </div>
+
+  <header class="topbar">
+    <a class="brand" href="index.html" aria-label="Jaden Dew homepage">
+      <span>Jaden Dew</span>
+    </a>
+
+    <nav aria-label="Main navigation">
+      <a class="nav-link" href="index.html">Home</a>
+
+      <div class="nav-item">
+        <a class="nav-link" href="portfolio.html">Portfolio</a>
+        <div class="nav-dropdown" aria-label="Portfolio project links">
+          <a class="dropdown-link" href="BEAR.html">BEAR: Berkeley Aerial Emergency Response</a>
+          <a class="dropdown-link" href="E3_MVA.html">Liquid Rocket Test Stand Main Valves</a>
+          <a class="dropdown-link" href="E178_ME103.html">Flying Wing Simulation and Control</a>
+          <a class="dropdown-link" href="ME100.html">The Devious Alarm</a>
+          <a class="dropdown-link" href="vast.html">Vast Space: Saiph Thruster Testing</a>
+          <a class="dropdown-link" href="poppet.html">Custom Poppet Valve</a>
+          <a class="dropdown-link" href="NASA.html">NASA: Dragonfly Rotor Blade Optimization</a>
+        </div>
+      </div>
+
+      <a class="nav-link" href="assets/jaden_resume_alt_3-22-2026.pdf" target="_blank" rel="noopener">Resume</a>
+      <a class="nav-link" href="https://www.linkedin.com/in/jaden-dew-178a37249/" target="_blank" rel="noopener">LinkedIn</a>
+    </nav>
+  </header>
+
+  <main id="top">
+    <section class="hero" aria-label="BEAR project hero">
+      <div class="hero-card">
+        <div class="hero-kicker">Class Project</div>
+        <h1>BEAR: Berkeley Emergency Aerial Response</h1>
+        <div class="hero-subtitle">Autonomous tilt-rotor VTOL drone for search-and-rescue.</div>
+      </div>
+    </section>
+
+    <section class="section" aria-label="BEAR project overview">
+      <div class="section-inner">
+        <section class="project-panel">
+<div class="project-text-box">
+            <div>
+              <div class="section-kicker">Project Overview</div>
+              <h2>CONOPS and Vehicle Overview</h2>
+            </div>
+
+            <div class="vehicle-overview-grid">
+              <div class="vehicle-overview-column">
+                <p>
+                  This drone was designed to satisfy my senior design capstone during my undergraduate degree at UC Berkeley.
+                  The theme of the capstone class was search and rescue, with teams being tasked with making an imaging cubesat and
+                  drone to aid in locating hikers who have gotten lost on trails. The specific objective for the drone teams  was
+                  to design a drone capable of flying autonomously between waypoints representing a trail and then use its thermal
+                  camera to identify the lost hiker, report their location to search and rescue teams, and drop an aid payload. These
+                  capabilities were to be tested on a "Demonstration Day" where a smaller trail and hiker surrogate would be made to asses
+                  the drone's capabilities to perform these tasks.
+                </p>
+                <p>
+                  To accomplish this goal my team and I elected to pursue a VTOL drone design, specifically a front motor tilt rotor configuration,
+                  to allow for increased efficiently and longer flight times during length search and rescue operation while still maintaining the versatility
+                  of a quadcopter configuration. We were aware that the test area designated for demo day would be too small to be able to demonstrate
+                  the drone's fixed wing capabilities and as such would entirely run in quadcopter mode, however we felt that it was important
+                  to design for the overall theme of the project rather than the specific scenario of demo day. 
+                </p>
+                 <p>
+                  This drone contained a few key innovations that separated it from other tilt-rotor designs. For one, we pursued a twin fuselage design
+                  which eliminated the need to construct extra mounting structure for the tilt mechanisms. To accommodate this decision a novel powertrain was also constructed
+                  with two sets of batteries being located in each fuselage with each battery pair powering its own half of the drone as well as the left battery pair powering the
+                  avionics bay. Secondly, we decided to design the wings using custom airfoils optimized using the DAFoam software to achieve more efficient fixed wing flight.
+                  Finally, our design contained dual payload release mechanisms allowing for two separate aid packages to be dropped in the case of multiple hikers being lost.   
+                </p>
+                 <p>
+                  This project's completion was a group effort and every member of my project group contributed to its success. Below I have detailed
+                  the components of the project I worked on personally along with the final outcomes of the project.    
+                </p>
+              </div>
+            </div>
+          </div>
+
+            <div class="vehicle-overview-image">
+              <img src="assets/BEAR/BearOverview.PNG" alt="BEAR vehicle overview image" />
+            </div>
+        </section>
+
+        <section class="airfoil-section" aria-label="Airfoil optimization and wing design">
+          <div class="airfoil-top-layout">
+            <div class="airfoil-text-box">
+              <h2>Airfoil Optimization and Wing Design</h2>
+              <h3 class="airfoil-subheading">Airfoil Optimization</h3>
+              <p>
+                To achieve an aerodynamically efficient wing design I decided to leverage the aerodynamic design optimization skills I learned from my internship at
+                NASA Ames Research Center to create a set of airfoils to use in the design of the wing. To do so I utilized the design optimization software DAFoam to create drag efficient versions
+                of the Clark Y and NACA 4415 airfoil geometries. This software works by pinching and stretching the airfoil's shape between a set of 3 free form deformation (FFD) point pairs
+                that are placed along the chord line. For each iteration of shape change the software solves for the relevant aerodynamic coefficients  and uses that to march towards a solution
+                that minimizes the chosen objective function.
+
+              </p>            
+              <p>
+                For these airfoils I chose to conduct a multipoint optimization across 4 angles of attack with weights assigned to each point based on a normal distribution centered at an angle
+                of attack of 0 degrees. This means that these airfoils were optimized across a variety of operating conditions with preference given to conditions that were near trim resulting in
+                airfoils that are efficient over an increased range. Each airfoil was optimized to reduce <span class="math">C<sub>D</sub></span> while holding <span class="math">C<sub>L</sub></span> constant. Geometric constraints were also placed on the optimization
+                with a minimum thickness constraint at each FFD pair of 85% the original thickness and volume constraint of total volume remaining constant being applied. The base computational fluid dynamics (CFD) solver
+                was configured to use an incompressible pressure based formulation with the K-Omega SST viscosity model being chosen to model the boundary layer. The airfoils were both optimized at a fixed speed of 20 m/s with the initial mesh having a <span class="math">y<sup>+</sup></span> of 25.
+              </p>
+
+              <p>
+                Once the drag efficient geometries were created they were then analysed and compared  to their initial baseline geometries using Xfoil. This analysis was conducted over a full -20 to 20 angle of attack sweep
+                at a fixed velocity of 20 m/s. This analysis revealed that for angles of attack near 0 degrees the optimized airfoils achieved greater <span class="math">L/D</span> than the optimized version.
+                This indicates that near the trim condition these airfoils would fly more efficiently than their unoptimized counterparts thus resulting in increased range during steady level flight. 
+              </p>
+
+            </div>
+
+            <div class="airfoil-media-rows">
+              <div class="airfoil-media-row">
+                <div class="airfoil-media-tile">
+                  <img src="assets/Videos/ClarkyPressAn.gif" alt="Airfoil optimization GIF row 1" />
+                </div>
+                <div class="airfoil-media-tile">
+                  <img src="assets/BEAR/ClarkyOptXfoilGraph.png" alt="Airfoil optimization image row 1" />
+                </div>
+                <div class="airfoil-row-caption">
+                  Clark Y Airfoil Optimization Results.
+                </div>
+              </div>
+
+              <div class="airfoil-media-row">
+                <div class="airfoil-media-tile">
+                  <img src="assets/Videos/NACA4415PressAn.gif" alt="Airfoil optimization GIF row 2" />
+                </div>
+                <div class="airfoil-media-tile">
+                  <img src="assets/BEAR/NACA4415OptXfoilGraph.png" alt="Airfoil optimization image row 2" />
+                </div>
+                <div class="airfoil-row-caption">
+                  NACA 4415 Airfoil Optimization Results.
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="airfoil-bottom-layout">
+            <div class="airfoil-bottom-image">
+              <img src="assets/BEAR/BearWingLabeled.PNG" alt="BEAR wing design follow-on image" />
+            </div>
+
+            <div class="airfoil-bottom-text">
+              <h3 class="airfoil-subheading">Wing Design</h3>
+              <p>
+                Once these airfoils were created they needed to be integrated into a 3D wing design. To achieve this it was decided to utilize a tapered wing design in order to
+                achieve a wing lift distribution that more closely approximates the ideal elliptical distribution and as such achieve more efficient fixed wing flight. In our case this was achieved
+                by splitting the wing into two segments. The first segment, using the optimized Clark Y airfoil, was of constant chord and was done in order to maintain a thick airfoil at the wing root to ensure
+                the wing was structurally stable. The second tapered section was made up of a loft between the optimized Clark Y airfoil at the root and the optimized NACA 4415 airfoil at the tip. This particular
+                layout was chosen due to NACA 4415 being a thicker airfoil than Clark Y ensuring that the wing tip would be thick enough to house structural spars even at a smaller chord length. With this wing design
+                in mind the total wing span of the drone was decided to be 1.6 m in order to achieve enough lift to maintain steady flight at a 0 degree angle of attack.
+              </p>
+              <p>
+                With the wing designed this wing as then manufactured out of foam utilizing a CNC foamcutter, outfitted with internal structural carbon fiber tubing spars, and overlapped with laminate plastic and fiber tape
+                to increase its strength
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section class="aero-section" aria-label="Aerodynamic analysis">
+          <div class="aero-row text-left">
+            <div class="aero-text-box">
+              <h2>Aerodynamic Analysis</h2>
+              <h3 class="aero-subheading">OML and Mesh</h3>
+              <p>
+                To confirm that the drone would be able to operate successfully in a fixed wing configuration I conducted a series of ANSYS Fluent simulations
+                for the expected angle of attack envelope the drone would be operating in.  To do so I first created a simplified drone OML CAD split down the
+                center along its symmetry plane. I was then able to create a fluid volume from this CAD for use in the ANSYS simulation. To do so I elected to
+                utilize a half cylinder with a half-dome inlet for the fluid geometry. To ensure adequate distance from the sides of the fluid volume a radius
+                20 chord lengths or 10 meters was selected for the cylinder and half-dome with the ends of these being 10 meters away from the drone.  
+              </p>
+              <p>
+                With the fluid volume created I then generated the mesh using ANSYS Fluent meshing. The mesh contained a total of 1.1 million cells with and average
+                orthogonality of 0.15. I configured the mesh with a uniform boundary layer consisting of 17 total layers and an initial height of 0.2 mm achieving
+                a <span class="math">y<sup>+</sup></span> of 20. This was the best I could achieve considering the hardware limits of my personal laptop.
+              </p>
+            </div>
+
+            <div class="aero-stack">
+              <div class="aero-media-tile">
+                <img src="assets/BEAR/BearCFDCad.png" alt="Aerodynamic analysis image row 1 top" />
+              <div class="aero-image-caption">Simplified Drone OML CAD.</div>
+              </div>
+              <div class="aero-media-tile">
+                <img src="assets/BEAR/BearAnsysSurfaceMesh.png" alt="Aerodynamic analysis image row 1 bottom" />
+              <div class="aero-image-caption">ANSYS surface mesh used for analysis.</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="aero-row text-right">
+            <div class="aero-stack">
+              <div class="aero-media-tile">
+                <img src="assets/BEAR/BearAnsysSetup2.png" alt="Aerodynamic analysis image row 2 top" />
+              <div class="aero-image-caption">ANSYS Fluent solver setup.</div>
+              </div>
+              <div class="aero-media-tile">
+                <img src="assets/BEAR/BearAnsysResiduals1.png" alt="Aerodynamic analysis image row 2 bottom" />
+              <div class="aero-image-caption">Solver residual convergence history for 0 degree angle of attack case.</div>
+              </div>
+            </div>
+
+            <div class="aero-text-box">
+              <h3 class="aero-subheading">Solver Setup</h3>
+              <p>
+                Considering the projected trim cruise velocity for the drone in fixed wing flight was 20 m/s I elected to utilize Fluent's incompressible
+                pressure based solver. The fluid domain was configured with a velocity inlet with component based velocity vector definition on both the dome and
+                cylinder side faces. Additionally, a pressure outlet was utilized at the back end of the cylinder. Finally, symmetry plane was defined at the cross
+                section that the original simplified OML cut was made. For the viscosity solver the K-Omega SST formulation was used and in order to ensure convergence a
+                1st order upwind solution was utilized.
+              </p>
+              <p>
+                With these solver settings the simulation was able to reach convergence within 150 iterations with sufficiently small residuals for all angles of attack cases.
+              </p>
+            </div>
+          </div>
+
+          <div class="aero-row aero-results-row text-left">
+            <div class="aero-text-box">
+              <h3 class="aero-subheading">Simulation Results</h3>
+              <p>
+              Results were collected for each angle of attack in the sweep. Example streamlines and contours for the 0 degree angle of attack case are exhibited to the right.
+              From these plots we can verify that the simulation solution is broadly capturing correct characteristics of the flow. This can be seen with how the tops of the
+              wings experience zones of low surface pressure on the top and high on the bottom as well as increased surface pressure on the leading edge. In addition the streamlines
+              reveal a laminar oncoming flow and turbulent wake which is also to be expected from a fixed wing aircraft.  
+              </p>
+              <p>
+                For each angle of attack the <span class="math">C<sub>L</sub></span>, <span class="math">C<sub>D</sub></span>, and <span class="math">L/D</span> was determined and is displayed in the graphs below. These coefficients were calculated utilising a fixed
+                sea level density of 1.225 <span class="math">kg/m<sup>3</sup></span> and a fixed velocity of 20 m/s. Additionally wing area was calculated using a mean aerodynamic chord of 0.2 m and a wing span of 1.6 m.
+                Important takeaways from this analysis are two fold. For one from the ANSYS simulation it was determined that for the 0 degree angle of attack case 41.2 N of lift was generated which matched well
+                with initial estimates generated from XFLR5. Additionally, it can be seen from the graphs that the maximum <span class="math">L/D</span> ratio is achieved at an angle of attack of 0 degrees. This means
+                that the drone is achieving its most efficient flight at the trim condition verifying the validity of the wing design and optimization.
+              </p>
+            </div>
+
+            <div class="aero-side-by-side aero-results-images">
+              <div class="aero-media-tile">
+                <img src="assets/BEAR/BearAnsysStreamlines.png" alt="Aerodynamic analysis streamline image" />
+                <div class="aero-image-caption">Streamline visualization for 0 degree angle of attack case.</div>
+              </div>
+
+              <div class="aero-media-tile">
+                <img src="assets/BEAR/BearAnsysPressureContour.png" alt="Aerodynamic analysis pressure contour image" />
+                <div class="aero-image-caption">Pressure contour visualization for 0 degree angle of attack case.</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="aero-four-grid aero-results-graphs">
+            <div class="aero-media-tile">
+              <img src="assets/BEAR/coeff_CL_vs_aoa.png" alt="Aerodynamic analysis final image 1" />
+              <div class="aero-image-caption"><span class="math">C<sub>L</sub></span> vs Angle of Attack</div>
+            </div>
+
+            <div class="aero-media-tile">
+              <img src="assets/BEAR/coeff_CD_vs_aoa.png" alt="Aerodynamic analysis final image 2" />
+              <div class="aero-image-caption"><span class="math">C<sub>D</sub></span> vs Angle of Attack</div>
+            </div>
+
+            <div class="aero-media-tile">
+              <img src="assets/BEAR/coeff_CL_vs_CD.png" alt="Aerodynamic analysis final image 3" />
+              <div class="aero-image-caption"><span class="math">C<sub>L</sub></span> vs <span class="math">C<sub>D</sub></span></div>
+            </div>
+
+            <div class="aero-media-tile">
+              <img src="assets/BEAR/coeff_CL_over_CD_vs_aoa.png" alt="Aerodynamic analysis final image 4" />
+              <div class="aero-image-caption"><span class="math">L/D</span> vs Angle of Attack</div>
+            </div>
+          </div>
+        </section>
+
+        <section class="tilt-section" aria-label="Tiltrotor mechanism design">
+          <div class="tilt-row tilt-row-1">
+            <div class="tilt-text-box">
+              <h2>Tiltrotor Mechanism Design</h2>
+              <p>
+                To successfully accomplish transition between fixed wing and quadcopter flight a tilt mechanism needed to be designed that could hold the motor in place and quickly move the motor
+                and propeller during high RPM operation. To do so I chose to utilize a 20 kg robotic locking servo motor to hold and move the front two motors between these two configurations. Additionally,
+                two adapting brackets were designed to, in conjunction with aluminum standoffs, attach the robotic servos to the fuselage plates. The ability of these servos to move and hold the motors in
+                was assessed using both simple hand calculations and unit tests of the servos themselves. Utiling simple hand calculations assuming worst case loading and RPM conditions it was determined that
+                the servos would be able to hold the motors in place with a factor of safety of 10 and would be able to transition the motor between configurations in 0.3 seconds with a 1.5 factor of safety. These
+                calculations were confirmed in testing with the servos being able to achieve transition in 1 second at 70% throttle which was decided to be our maximum reasonable operating conditions for transition.
+              </p>
+            </div>
+
+            <div class="tilt-image-pair">
+              <div class="tilt-media-tile">
+                <img src="assets/BEAR/TiltConfigs.png" alt="Tiltrotor mechanism configuration image" />
+                <div class="tilt-image-caption">Tiltrotor mechanism design and configurations.</div>
+              </div>
+
+              <div class="tilt-video-tile tilt-video-crop" style="--tilt-video-y: 50%; --tilt-video-height: 180%;">
+                <div class="tilt-video-frame">
+                  <video muted playsinline loop autoplay preload="auto" aria-label="Tiltrotor mechanism design looping video">
+                    <source src="assets/Videos/TiltTest.mp4" type="video/mp4" />
+                  </video>
+                </div>
+                <div class="tilt-image-caption">Tiltrotor mechanism test video.</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="manufacturing-section" aria-label="Manufacturing">
+          <div class="manufacturing-row manufacturing-row-1">
+            <div class="manufacturing-text-box">
+              <h2>Manufacturing</h2>
+              <p>
+                I served as the main manufacturing engineer for this project as I was the sole member of the group with the equipment training necessary to handle cutting sheet metal and carbon fiber.
+                Due to this I handled all cutting and bending of the components utilizing these materials.
+              <p>
+                The main fuselage, ESC mounting, and aft motor mounting components were all cut out of 3 mm carbon fiber laid up sheets. These sheets were cut utilizing an OMAX Waterjet cutter.
+                I facilitated the cutting throughout the entirety of the manufacturing process including creating the nested DXF file, creating te tool path in Omax Layout, and performing the
+                actual cutting operation on the waterjet itself. The manufacturing process went smoothly bar some issues with delamination. Due to how tightly spaced the nested parts needed
+                to be in order to cut them all out of one sheet as well as the complicated cut geometry of the plates there were large amounts of piercing points concentrated over a very small diameter.
+                This resulted in delamination over most of the CF parts cut from the plates. I attempted to use waterjet settings to limit these issues however they were not enough to completely
+                avoid delamination and due to having no facility in which predrilling piece points was allowed to be done we simply had to accept the delamination and bake that into our structural analysis. 
+              </p>
+              <p>
+                The battery mount U channels and tilt servo brackets were both cut out of 1/16 in 5052 Aluminum sheet metal on a Fablight metal laser cutter. Similar to the jet I handled manufacturing process from start to finish
+                for all of the aluminum cuts. In addition the battery mount U channels needed to be bent into shape which I did on a manual break. This resulted in the successful fabrication of all the necessary aluminum parts, each having a set of spares.
+              </p>
+            </div>
+
+            <div class="manufacturing-media-combo">
+              <div class="manufacturing-two-by-two-grid">
+                <div class="manufacturing-media-tile">
+                  <img src="assets/BEAR/Waterjet.jpg" alt="Manufacturing image 1" />
+                  <div class="manufacturing-image-caption">OMAX waterjet cutter used in CF manufacturing.</div>
+                </div>
+
+                <div class="manufacturing-media-tile">
+                  <img src="assets/BEAR/CFPlate.jpg" alt="Manufacturing image 2" />
+                  <div class="manufacturing-image-caption"> CF plate used for fuslage components halfway through cutting.</div>
+                </div>
+
+                <div class="manufacturing-media-tile">
+                  <img src="assets/BEAR/Fablight.jpg" alt="Manufacturing image 3" />
+                  <div class="manufacturing-image-caption">Fablight laser cutter used during aluminum manufacturing.</div>
+                </div>
+
+                <div class="manufacturing-media-tile">
+                  <img src="assets/BEAR/Aluminum.jpg" alt="Manufacturing image 4" />
+                  <div class="manufacturing-image-caption">Unbent alimunum components.</div>
+                </div>
+              </div>
+
+              <div class="manufacturing-media-tile manufacturing-wide-tile">
+                <img src="assets/BEAR/Bending.jpg" alt="Manufacturing image 5" />
+                <div class="manufacturing-image-caption">Manual break used for aluminum part bending.</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="flight-section" aria-label="Flight Test and Final Demonstration">
+          <div class="flight-row text-left">
+            <div class="flight-text-box">
+              <h2>Flight Test and Final Demonstration</h2>
+              <h3 class="flight-subheading">Integrated Flight Test</h3>
+              <p>
+                This video shows the final integrated flight test that was conducted before demonstration day. This test simulated a shortened version of the demonstration day mission with the
+                drone autonomously taking off, traveling between a series of 3 way points including lingering at each waypoint for 3 seconds, and then finally performing an autonomous return to landing.
+              </p>
+              <p>
+                This test came at the end of a multi-day flight test campaign. During this test campaign we verified the operation of multiple quadcopter configuration features starting from manual flight,
+                automatic hover, automatic position holding, autonomous take off, autonomous return to landing, geofence beaching procedure and then finally the integrated test.
+                These combination of tests along with the complete success of the demo-day procedure simulation gave us confidence that the drone would be able to successfully complete the demo day mission.
+              </p>
+            </div>
+
+            <div class="flight-media-tile">
+              <video muted playsinline loop autoplay preload="auto" aria-label="Integrated flight test looping video">
+                <source src="assets/Videos/BEAR_SunsetFlightTest2.mp4" type="video/mp4" />
+              </video>
+            </div>
+          </div>
+
+          <div class="flight-row text-right">
+            <div class="flight-media-tile">
+              <video muted playsinline loop autoplay preload="auto" aria-label="Demonstration day flight looping video">
+                <source src="assets/Videos/BEAR_DemoDay.mp4" type="video/mp4" />
+              </video>
+            </div>
+
+            <div class="flight-text-box">
+              <h3 class="flight-subheading">Demonstration Day Flight</h3>
+              <p>
+                This video showcases the result of our main demonstration day flight. This day the winds were significantly higher than on any of our previous testing days (10-12 mph) and as such the drone was
+                struggling to fight against the wind. This did not cause issues with drone stability but did however cause issues with flight time. In the capstone class the batteries were had to use for the drones were
+                provided to use by the class with the use of these particular batteries being mandatory. These batteries were very small in capacity with each battery being a 3s with only 2200 mAh of capacity. Additionally due
+                to our drone being a VTOL it was fairly heavy (3.7 kg) meaning that to even be able to fly we needed to utilize 4 of these 3s batters combining them in series to make two 6s sets to even be able to make it off of the ground.
+                In addition, the flight area mandated by the demo day mission was much larger than originally expected which further compounded the flight time issue. THis resulted in the drone hitting our automatic low battery land in place
+                failsafe during operation due to both overall battery depletion and dips in working voltage under load from wind gusts resulting in the drone automatically landing before it could complete the course.
+              </p>
+              <p>
+                Due to these issues with capacity we were unable to fully complete the course however since the location of the hiker surrogate was fairly early on in the course we were able to determine its location
+                and upon retrieval of the drone, extract that location from its on-board computer. Unfortunately we were not able to drop the medical payload due a malfunction that was experienced day of which caused the
+                payload to be automatically dropped upon takeoff. This as attributed to the thermal camera picking up a spike in head from the landing pad concrete upon takeoff resulting in a false positive hiker identification
+                and the early deployment of the payload.
+              </p>
+            </div>
+          </div>
+
+          <div class="flight-row text-left">
+            <div class="flight-text-box">
+              <h3 class="flight-subheading">Crash and Failure Analysis</h3>
+              <p>
+                This video depicts the drone's final flight post demonstration day where we attempted to address the issues we observed on demo day by increasing the drone's throttle cap and
+                converting some automatic failsafes to give warning instead of triggering automatic landings. Once we did this however the drone stopped behaving as expected and instead uncontrollably
+                began to climb in altitude as it maxed-out the throttle of the motors in an attempt to fight the wind. Once we realized the drone was climbing too rapidly the decision was made to
+                trigger the drone's automatic return to landing feature however despite commanding it to do so the drone continued to climb in altitude. Once this measure failed the call was made for our
+                pilot to assume manual control of the drone and manually land it. This initially began to work with the drone slowly lowering in altitude however at the critical moment one of the
+                propellers shattered resulting in the drone nose diving into the ground.
+              </p>
+              <p>
+                Upon analysing the video of the crash we were unable to fully determine why the drone was increasing in altitude so rapidly. The best theory we came up with was just that the autopilot was
+                poorly configured for such high thrusts and as such was unable to figure out how to make the small throttle adjustments needed to maintain proper control. We did determine a more concrete explanation as
+                to why the front propellor exploded. The prominent theory for why this happened is due to resonance inducing vibrations onto the propellor which lead to it colding with the top of the wing shattering the propellor.
+                This theory is supported by a few things. Firstly it is supported by the large gash in the wing on the side of the propellor that exploded indicating that there was a collision between the propellor and the wing at some point.
+                Secondly, from the modal analysis that a member of our group had done previously we knew that one of the vehicle resonance frequencies was at a throttle of 78% of the motors. When we increase the throttle cap we did so hastily due to us
+                being desperate to get a working flight in for demo day resulting in us forgetting about this resonance frequency and setting the cap to 80% throttle. This would mean that for a large period of time, the drone would have been operating at or near its resonance
+                frequency.
+              </p>
+              <p>
+                Despite the crash and thus our inability to test fixed wing flight, this project was still a great success as we were able to demonstrate full operational capability in the quadcopter configuration. In addition we were to only team
+                able to survive up and through demonstration day and as such were the only team that actually flew that day.
+              </p>
+            </div>
+
+            <div class="flight-media-tile">
+              <video muted playsinline loop autoplay preload="auto" aria-label="Crash and failure analysis looping video">
+                <source src="assets/Videos/BEAR_Crash.mp4" type="video/mp4" />
+              </video>
+            </div>
+          </div>
+        </section>
+
+        <section class="final-gallery-section" aria-label="Gallery">
+          <h2>Gallery</h2>
+
+          <div class="final-gallery-grid">
+            <div class="final-gallery-tile">
+              <img src="assets/BEAR/BearLandedGloryShot.png" alt="BEAR gallery image 1" />
+            </div>
+
+            <div class="final-gallery-tile">
+              <img src="assets/BEAR/GroupPhoto.png" alt="BEAR gallery image 2" />
+            </div>
+
+            <div class="final-gallery-tile">
+              <img src="assets/BEAR/BearDisassembled.png" alt="BEAR gallery image 3" />
+            </div>
+
+            <div class="final-gallery-tile">
+              <img src="assets/BEARSunsetFlight.jpg" alt="BEAR gallery image 4" />
+            </div>
+
+            <div class="final-gallery-tile">
+              <img src="assets/BEAR/FullGroupPhoto.png" alt="BEAR gallery image 5" />
+            </div>
+
+            <div class="final-gallery-tile">
+              <img src="assets/BEAR/TiltTest.png" alt="BEAR gallery image 6" />
+            </div>
+
+            <div class="final-gallery-tile">
+              <img src="assets/BEAR/RyanSuffers.png" alt="BEAR gallery image 7" />
+            </div>
+
+            <div class="final-gallery-tile">
+              <img src="assets/BEAR/BigYawn.png" alt="BEAR gallery image 8" />
+            </div>
+
+            <div class="final-gallery-tile">
+              <img src="assets/BEAR/MeCarryingBear.png" alt="BEAR gallery image 9" />
+            </div>
+          </div>
+        </section>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>© 2026 Jaden Dew.</p>
+  </footer>
+
+  <script>
+    const heroVideo = document.getElementById("heroVideo");
+
+    function updateBackgroundFade() {
+      const y = window.scrollY || window.pageYOffset;
+      const fadeStart = window.innerHeight * 0.55;
+      const fadeEnd = window.innerHeight * 1.10;
+
+      let opacity = 1.0;
+      if (y > fadeStart) {
+        const p = Math.min(1, (y - fadeStart) / Math.max(1, fadeEnd - fadeStart));
+        opacity = 1.0 - 0.55 * p;
+      }
+
+      if (heroVideo) heroVideo.style.opacity = String(opacity);
+    }
+
+    if (heroVideo) {
+      heroVideo.play().catch(() => {});
+    }
+
+    window.addEventListener("load", updateBackgroundFade);
+    window.addEventListener("scroll", updateBackgroundFade, { passive: true });
+    window.addEventListener("resize", updateBackgroundFade);
+  </script>
+</body>
+</html>

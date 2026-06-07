@@ -1,0 +1,3055 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>E3 MVA | Jaden Dew</title>
+
+  <style>
+    :root {
+      --bg: #050505;
+      --panel: rgba(10, 10, 10, 0.76);
+      --panel-solid: rgba(18, 18, 18, 0.94);
+      --border: rgba(255, 255, 255, 0.16);
+      --text: #d4d4d4;
+      --muted: #9cdcfe;
+      --subtle: #b8b8b8;
+      --accent: #007acc;
+      --accent-hover: #179fff;
+      --shadow: rgba(0, 0, 0, 0.48);
+      --topbar-h: 56px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html {
+      scroll-behavior: smooth;
+      background: #000;
+    }
+
+    body {
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: transparent;
+      color: var(--text);
+      line-height: 1.6;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    .gif-background {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      overflow: hidden;
+      background: #000;
+      pointer-events: none;
+    }
+
+    .gif-background video {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center center;
+      display: block;
+      opacity: 1;
+      filter: saturate(0.98) contrast(1.04);
+      transition: opacity 180ms ease;
+    }
+
+    .gif-background::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      background:
+        linear-gradient(to bottom, rgba(0, 0, 0, 0.20), rgba(0, 0, 0, 0.18) 38%, rgba(0, 0, 0, 0.62));
+      pointer-events: none;
+    }
+
+    .topbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      min-height: var(--topbar-h);
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      gap: 1rem;
+      padding: 0.45rem 6vw;
+      background: rgba(5, 5, 5, 0.95);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.34);
+    }
+
+    .brand {
+      justify-self: start;
+      display: inline-flex;
+      align-items: center;
+      color: white;
+      font-size: 0.88rem;
+      font-weight: 650;
+      letter-spacing: 0.01em;
+      opacity: 0.92;
+    }
+
+    nav {
+      justify-self: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.1rem;
+    }
+
+    .nav-link {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.46rem 0.82rem;
+      border-radius: 8px;
+      color: white;
+      font-size: 0.84rem;
+      opacity: 0.9;
+      transition: background 180ms ease, opacity 180ms ease;
+    }
+
+    .nav-link:hover,
+    .nav-link:focus-visible {
+      background: rgba(255, 255, 255, 0.09);
+      opacity: 1;
+      outline: none;
+    }
+
+    .nav-item {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .nav-dropdown {
+      position: absolute;
+      top: calc(100% + 0.45rem);
+      left: 50%;
+      transform: translateX(-50%) translateY(-6px);
+      min-width: 235px;
+      padding: 0.45rem;
+      display: grid;
+      gap: 0.12rem;
+      background: rgba(5, 5, 5, 0.96);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 12px;
+      box-shadow: 0 18px 60px rgba(0, 0, 0, 0.55);
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transition: opacity 180ms ease, transform 180ms ease, visibility 180ms ease;
+    }
+
+    .nav-item:hover .nav-dropdown,
+    .nav-item:focus-within .nav-dropdown {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .dropdown-link {
+      display: block;
+      padding: 0.52rem 0.68rem;
+      border-radius: 8px;
+      color: rgba(255, 255, 255, 0.88);
+      font-size: 0.80rem;
+      line-height: 1.2;
+      white-space: nowrap;
+      transition: background 180ms ease, color 180ms ease;
+    }
+
+    .dropdown-link:hover,
+    .dropdown-link:focus-visible {
+      background: rgba(255, 255, 255, 0.09);
+      color: white;
+      outline: none;
+    }
+
+    main {
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: end;
+      padding: calc(var(--topbar-h) + 2rem) 6vw 3.5rem;
+      background: transparent;
+    }
+
+    .hero-card {
+      width: min(920px, 88vw);
+      padding: 1.0rem 1.15rem;
+      color: rgba(255, 255, 255, 0.94);
+      background: rgba(5, 5, 5, 0.50);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 16px;
+      backdrop-filter: blur(14px);
+      box-shadow: 0 18px 60px rgba(0, 0, 0, 0.46);
+    }
+
+    .hero-kicker,
+    .section-kicker {
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      font-size: 0.70rem;
+      font-weight: 760;
+      margin-bottom: 0.26rem;
+    }
+
+    .hero-card h1 {
+      color: white;
+      font-size: clamp(1.65rem, 3.2vw, 3.0rem);
+      font-weight: 760;
+      letter-spacing: -0.055em;
+      line-height: 1.0;
+      margin-bottom: 0.38rem;
+    }
+
+    .hero-subtitle {
+      color: rgba(255, 255, 255, 0.82);
+      font-size: clamp(0.86rem, 1.05vw, 1.08rem);
+      font-weight: 560;
+      letter-spacing: 0.01em;
+      line-height: 1.32;
+    }
+
+    .section {
+      min-height: 100vh;
+      padding: calc(var(--topbar-h) + 0.75rem) 2rem 0.9rem;
+      display: grid;
+      align-items: stretch;
+      background: rgba(0, 0, 0, 0.72);
+      backdrop-filter: blur(10px);
+    }
+
+    .section-inner {
+      width: min(1820px, 100%);
+      margin: 0 auto;
+    }
+
+    .project-panel {
+      min-height: calc(100vh - var(--topbar-h) - 1.65rem);
+      padding: clamp(1.2rem, 2.4vw, 2rem);
+      background: rgba(18, 18, 18, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 26px;
+      box-shadow: 0 28px 95px rgba(0, 0, 0, 0.5);
+      display: grid;
+      grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
+      gap: 1.1rem;
+      align-items: stretch;
+    }
+
+    .project-media-card {
+      min-width: 0;
+      min-height: 0;
+      overflow: hidden;
+      background: rgba(5, 5, 5, 0.78);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 22px;
+      box-shadow: 0 24px 90px var(--shadow);
+      display: grid;
+      grid-template-rows: minmax(0, 1fr) auto;
+    }
+
+    .project-media-card img,
+    .project-media-card video {
+      width: 100%;
+      height: 100%;
+      min-height: 0;
+      object-fit: cover;
+      object-position: center center;
+      display: block;
+      background: rgba(30, 30, 30, 0.82);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .media-caption {
+      padding: 0.42rem 0.76rem;
+      color: rgba(255, 255, 255, 0.82);
+      background: rgba(5, 5, 5, 0.88);
+      font-size: 0.78rem;
+      line-height: 1.2;
+    }
+
+    .project-text-box {
+      min-height: 0;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 0.62rem;
+      padding: 1.0rem 1.15rem;
+      background: rgba(18, 18, 18, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 20px;
+      box-shadow: 0 22px 70px rgba(0, 0, 0, 0.42);
+    }
+
+    .project-text-box h2 {
+      color: white;
+      font-size: clamp(1.55rem, 2.4vw, 2.65rem);
+      line-height: 1.0;
+      letter-spacing: -0.055em;
+      margin-bottom: 0.2rem;
+    }
+
+    .project-text-box p {
+      color: rgba(255, 255, 255, 0.74);
+      font-size: clamp(0.84rem, 0.95vw, 1.02rem);
+      line-height: 1.38;
+      margin: 0;
+    }
+
+    .project-text-box p + p {
+      margin-top: 0.32rem;
+      padding-top: 0.45rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.10);
+    }
+
+    .details-grid {
+      margin-top: 0.55rem;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.65rem;
+    }
+
+    .detail-card {
+      padding: 0.72rem 0.82rem;
+      background: rgba(5, 5, 5, 0.34);
+      border: 1px solid rgba(255, 255, 255, 0.10);
+      border-radius: 14px;
+    }
+
+    .detail-card h3 {
+      color: var(--muted);
+      font-size: clamp(0.88rem, 1vw, 1.02rem);
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.25rem;
+    }
+
+    .detail-card p {
+      font-size: 0.82rem;
+      line-height: 1.28;
+    }
+
+    .gallery-section {
+      margin-top: 1rem;
+      padding-top: 0.75rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.10);
+    }
+
+    .gallery-section h2 {
+      color: white;
+      text-align: center;
+      font-size: clamp(1.45rem, 2.1vw, 2.2rem);
+      line-height: 1;
+      letter-spacing: -0.045em;
+      margin-bottom: 0.75rem;
+    }
+
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 0.75rem;
+    }
+
+    .gallery-tile {
+      overflow: hidden;
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(5, 5, 5, 0.50);
+      min-height: 180px;
+    }
+
+    .gallery-tile img {
+      width: 100%;
+      height: 100%;
+      min-height: 180px;
+      object-fit: cover;
+      object-position: center center;
+      display: block;
+    }
+
+
+    .vehicle-overview-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.8rem;
+      margin-top: 0.35rem;
+    }
+
+    .vehicle-overview-column {
+      padding: 0.85rem 0.95rem;
+      background: rgba(5, 5, 5, 0.34);
+      border: 1px solid rgba(255, 255, 255, 0.10);
+      border-radius: 14px;
+    }
+
+    .vehicle-overview-column p {
+      border-top: none !important;
+      padding-top: 0 !important;
+      margin-top: 0 !important;
+    }
+
+    .vehicle-overview-image {
+      margin-top: 0.85rem;
+      overflow: hidden;
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(5, 5, 5, 0.50);
+      min-height: 260px;
+    }
+
+    .vehicle-overview-image img {
+      width: 100%;
+      height: 100%;
+      min-height: 260px;
+      object-fit: cover;
+      object-position: center center;
+      display: block;
+    }
+
+
+    /* Airfoil Optimization and Wing Design segment */
+    .airfoil-section {
+      margin-top: 1.1rem;
+      padding: clamp(1.2rem, 2.4vw, 2rem);
+      background: rgba(18, 18, 18, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 26px;
+      box-shadow: 0 28px 95px rgba(0, 0, 0, 0.5);
+    }
+
+    .airfoil-section h2 {
+      color: white;
+      font-size: clamp(1.55rem, 2.4vw, 2.65rem);
+      line-height: 1.0;
+      letter-spacing: -0.055em;
+      margin-bottom: 0.9rem;
+      text-align: center;
+    }
+
+    .airfoil-top-layout {
+      display: grid;
+      grid-template-columns: minmax(280px, 0.70fr) minmax(0, 1.30fr);
+      gap: 1.1rem;
+      align-items: stretch;
+    }
+
+    .airfoil-text-box {
+      min-height: 0;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 1.0rem 1.15rem;
+      background: rgba(18, 18, 18, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 20px;
+      box-shadow: 0 22px 70px rgba(0, 0, 0, 0.42);
+    }
+
+    .airfoil-text-box p,
+    .airfoil-bottom-text p {
+      color: rgba(255, 255, 255, 0.74);
+      font-size: clamp(0.84rem, 0.95vw, 1.02rem);
+      line-height: 1.38;
+      margin: 0;
+    }
+
+    .airfoil-media-rows {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 0.85rem;
+      min-width: 0;
+    }
+
+    .airfoil-media-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 0.75rem;
+      align-items: stretch;
+    }
+
+    .airfoil-media-tile {
+      overflow: hidden;
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(5, 5, 5, 0.50);
+      min-height: 210px;
+    }
+
+    .airfoil-media-tile img,
+    .airfoil-media-tile video {
+      width: 100%;
+      height: 100%;
+      min-height: 210px;
+      object-fit: cover;
+      object-position: center center;
+      display: block;
+      background: rgba(30, 30, 30, 0.82);
+    }
+
+    .airfoil-row-caption {
+      grid-column: 1 / -1;
+      color: rgba(255, 255, 255, 0.74);
+      font-size: 0.84rem;
+      line-height: 1.28;
+      text-align: center;
+      padding: 0.45rem 0.65rem;
+      background: rgba(5, 5, 5, 0.38);
+      border: 1px solid rgba(255, 255, 255, 0.10);
+      border-radius: 12px;
+    }
+
+    .airfoil-bottom-layout {
+      margin-top: 1.1rem;
+      padding-top: 1.1rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.10);
+      display: grid;
+      grid-template-columns: minmax(280px, 0.80fr) minmax(0, 1.20fr);
+      gap: 1.1rem;
+      align-items: stretch;
+    }
+
+    .airfoil-bottom-text {
+      min-height: 0;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 1.0rem 1.15rem;
+      background: rgba(18, 18, 18, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 20px;
+      box-shadow: 0 22px 70px rgba(0, 0, 0, 0.42);
+    }
+
+    .airfoil-bottom-image {
+      overflow: hidden;
+      border-radius: 22px;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      background: rgba(5, 5, 5, 0.50);
+      min-height: 320px;
+      box-shadow: 0 24px 90px var(--shadow);
+    }
+
+    .airfoil-bottom-image img {
+      width: 100%;
+      height: 100%;
+      min-height: 320px;
+      object-fit: cover;
+      object-position: center center;
+      display: block;
+    }
+
+    @media (max-width: 1050px) {
+      .airfoil-top-layout,
+      .airfoil-media-row,
+      .airfoil-bottom-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+
+    /* Aerodynamic Analysis segment */
+    .aero-section {
+      margin-top: 1.1rem;
+      padding: clamp(1.2rem, 2.4vw, 2rem);
+      background: rgba(18, 18, 18, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 26px;
+      box-shadow: 0 28px 95px rgba(0, 0, 0, 0.5);
+    }
+
+    .aero-section h2 {
+      color: white;
+      font-size: clamp(1.55rem, 2.4vw, 2.65rem);
+      line-height: 1.0;
+      letter-spacing: -0.055em;
+      margin-bottom: 1rem;
+      text-align: center;
+    }
+
+    .aero-row {
+      display: grid;
+      gap: 1.1rem;
+      align-items: stretch;
+      margin-top: 1.1rem;
+      padding-top: 1.1rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.10);
+    }
+
+    .aero-row:first-of-type {
+      margin-top: 0;
+      padding-top: 0;
+      border-top: none;
+    }
+
+    .aero-row.text-left {
+      grid-template-columns: minmax(320px, 0.85fr) minmax(0, 1.15fr);
+    }
+
+    .aero-row.text-right {
+      grid-template-columns: minmax(0, 1.15fr) minmax(320px, 0.85fr);
+    }
+
+    .aero-text-box {
+      min-height: 0;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 1.0rem 1.15rem;
+      background: rgba(18, 18, 18, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 20px;
+      box-shadow: 0 22px 70px rgba(0, 0, 0, 0.42);
+    }
+
+    .aero-text-box p {
+      color: rgba(255, 255, 255, 0.74);
+      font-size: clamp(0.84rem, 0.95vw, 1.02rem);
+      line-height: 1.38;
+      margin: 0;
+    }
+
+    .aero-stack {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 0.75rem;
+      min-width: 0;
+    }
+
+    .aero-side-by-side {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.75rem;
+      min-width: 0;
+    }
+
+    .aero-four-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 0.75rem;
+      margin-top: 1.1rem;
+      padding-top: 1.1rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.10);
+    }
+
+    .aero-media-tile {
+      overflow: hidden;
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(5, 5, 5, 0.50);
+      min-height: 210px;
+    }
+
+    .aero-stack .aero-media-tile {
+      min-height: 185px;
+    }
+
+    .aero-four-grid .aero-media-tile {
+      min-height: 190px;
+    }
+
+    .aero-media-tile img,
+    .aero-media-tile video {
+      width: 100%;
+      height: 100%;
+      min-height: inherit;
+      object-fit: cover;
+      object-position: center center;
+      display: block;
+      background: rgba(30, 30, 30, 0.82);
+    }
+
+    @media (max-width: 1050px) {
+      .aero-row.text-left,
+      .aero-row.text-right,
+      .aero-side-by-side,
+      .aero-four-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+
+    /* Tiltrotor Mechanism Design segment */
+    .tilt-section {
+      margin-top: 1.1rem;
+      padding: clamp(1.2rem, 2.4vw, 2rem);
+      background: rgba(18, 18, 18, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 26px;
+      box-shadow: 0 28px 95px rgba(0, 0, 0, 0.5);
+    }
+
+    .tilt-row {
+      display: grid;
+      gap: 1.1rem;
+      align-items: stretch;
+    }
+
+    .tilt-row + .tilt-row {
+      margin-top: 1.1rem;
+      padding-top: 1.1rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.10);
+    }
+
+    .tilt-row-1 {
+      grid-template-columns: minmax(0, 1.15fr) minmax(320px, 0.85fr);
+    }
+
+    .tilt-text-box {
+      min-height: 0;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 1.0rem 1.15rem;
+      background: rgba(18, 18, 18, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 20px;
+      box-shadow: 0 22px 70px rgba(0, 0, 0, 0.42);
+    }
+
+    .tilt-text-box h2 {
+      color: white;
+      font-size: clamp(1.55rem, 2.4vw, 2.65rem);
+      line-height: 1.0;
+      letter-spacing: -0.055em;
+      margin-bottom: 0.75rem;
+      text-align: left;
+    }
+
+    .tilt-text-box p {
+      color: rgba(255, 255, 255, 0.74);
+      font-size: clamp(0.84rem, 0.95vw, 1.02rem);
+      line-height: 1.38;
+      margin: 0;
+    }
+
+    .tilt-image-pair {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.75rem;
+      min-width: 0;
+    }
+
+    .tilt-media-tile {
+      overflow: hidden;
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(5, 5, 5, 0.50);
+      min-height: 250px;
+      display: grid;
+      grid-template-rows: minmax(0, 1fr) auto;
+    }
+
+    .tilt-media-tile img,
+    .tilt-media-tile video {
+      width: 100%;
+      height: 100%;
+      min-height: 210px;
+      object-fit: cover;
+      object-position: center center;
+      display: block;
+      background: rgba(30, 30, 30, 0.82);
+    }
+
+    .tilt-image-caption {
+      padding: 0.42rem 0.65rem;
+      color: rgba(255, 255, 255, 0.78);
+      background: rgba(5, 5, 5, 0.82);
+      border-top: 1px solid rgba(255, 255, 255, 0.10);
+      font-size: 0.78rem;
+      line-height: 1.22;
+      text-align: center;
+    }
+
+    @media (max-width: 1050px) {
+      .tilt-row-1,
+      .tilt-image-pair {
+        grid-template-columns: 1fr;
+      }
+    }
+
+
+    /* Manufacturing segment */
+    .manufacturing-section {
+      margin-top: 1.1rem;
+      padding: clamp(1.2rem, 2.4vw, 2rem);
+      background: rgba(18, 18, 18, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 26px;
+      box-shadow: 0 28px 95px rgba(0, 0, 0, 0.5);
+    }
+
+    .manufacturing-row {
+      display: grid;
+      gap: 1.1rem;
+      align-items: stretch;
+    }
+
+    .manufacturing-row + .manufacturing-row {
+      margin-top: 1.1rem;
+      padding-top: 1.1rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.10);
+    }
+
+    .manufacturing-row-1 {
+      grid-template-columns: minmax(340px, 0.82fr) minmax(0, 1.18fr);
+    }
+
+    .manufacturing-text-box {
+      min-height: 0;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 1.0rem 1.15rem;
+      background: rgba(18, 18, 18, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 20px;
+      box-shadow: 0 22px 70px rgba(0, 0, 0, 0.42);
+    }
+
+    .manufacturing-text-box h2 {
+      color: white;
+      font-size: clamp(1.55rem, 2.4vw, 2.65rem);
+      line-height: 1.0;
+      letter-spacing: -0.055em;
+      margin-bottom: 0.75rem;
+      text-align: left;
+    }
+
+    .manufacturing-text-box p {
+      color: rgba(255, 255, 255, 0.74);
+      font-size: clamp(0.84rem, 0.95vw, 1.02rem);
+      line-height: 1.38;
+      margin: 0;
+    }
+
+    .manufacturing-image-pair {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.75rem;
+      min-width: 0;
+    }
+
+    .manufacturing-five-grid {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 0.75rem;
+      min-width: 0;
+    }
+
+    .manufacturing-media-tile {
+      overflow: hidden;
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(5, 5, 5, 0.50);
+      min-height: 235px;
+      display: grid;
+      grid-template-rows: minmax(0, 1fr) auto;
+    }
+
+    .manufacturing-five-grid .manufacturing-media-tile {
+      min-height: 190px;
+    }
+
+    .manufacturing-media-tile img,
+    .manufacturing-media-tile video {
+      width: 100%;
+      height: 100%;
+      min-height: inherit;
+      object-fit: cover;
+      object-position: center center;
+      display: block;
+      background: rgba(30, 30, 30, 0.82);
+    }
+
+    .manufacturing-image-caption {
+      padding: 0.42rem 0.65rem;
+      color: rgba(255, 255, 255, 0.78);
+      background: rgba(5, 5, 5, 0.82);
+      border-top: 1px solid rgba(255, 255, 255, 0.10);
+      font-size: 0.78rem;
+      line-height: 1.22;
+      text-align: center;
+    }
+
+    @media (max-width: 1050px) {
+      .manufacturing-row-1,
+      .manufacturing-image-pair,
+      .manufacturing-five-grid {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    /* Flight Test and Final Demonstration segment */
+    .flight-section {
+      margin-top: 1.1rem;
+      padding: clamp(1.2rem, 2.4vw, 2rem);
+      background: rgba(18, 18, 18, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 26px;
+      box-shadow: 0 28px 95px rgba(0, 0, 0, 0.5);
+    }
+
+    .flight-row {
+      display: grid;
+      gap: 1.1rem;
+      align-items: stretch;
+    }
+
+    .flight-row + .flight-row {
+      margin-top: 1.1rem;
+      padding-top: 1.1rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.10);
+    }
+
+    .flight-row.text-left {
+      grid-template-columns: minmax(340px, 0.85fr) minmax(0, 1.15fr);
+    }
+
+    .flight-row.text-right {
+      grid-template-columns: minmax(0, 1.15fr) minmax(340px, 0.85fr);
+    }
+
+    .flight-text-box {
+      min-height: 0;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 1.0rem 1.15rem;
+      background: rgba(18, 18, 18, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 20px;
+      box-shadow: 0 22px 70px rgba(0, 0, 0, 0.42);
+    }
+
+    .flight-text-box h2 {
+      color: white;
+      font-size: clamp(1.55rem, 2.4vw, 2.65rem);
+      line-height: 1.0;
+      letter-spacing: -0.055em;
+      margin-bottom: 0.75rem;
+      text-align: left;
+    }
+
+    .flight-subheading {
+      color: var(--muted);
+      font-size: clamp(1.0rem, 1.2vw, 1.22rem);
+      line-height: 1.15;
+      letter-spacing: -0.025em;
+      font-weight: 760;
+      margin-bottom: 0.45rem;
+    }
+
+    .flight-text-box p {
+      color: rgba(255, 255, 255, 0.74);
+      font-size: clamp(0.84rem, 0.95vw, 1.02rem);
+      line-height: 1.38;
+      margin: 0;
+    }
+
+    .flight-media-tile {
+      overflow: hidden;
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(5, 5, 5, 0.50);
+      min-height: 310px;
+      display: grid;
+      grid-template-rows: minmax(0, 1fr) auto;
+    }
+
+    .flight-media-tile video,
+    .flight-media-tile img {
+      width: 100%;
+      height: 100%;
+      min-height: 270px;
+      object-fit: cover;
+      object-position: center center;
+      display: block;
+      background: rgba(30, 30, 30, 0.82);
+    }
+
+    .flight-image-caption {
+      padding: 0.42rem 0.65rem;
+      color: rgba(255, 255, 255, 0.78);
+      background: rgba(5, 5, 5, 0.82);
+      border-top: 1px solid rgba(255, 255, 255, 0.10);
+      font-size: 0.78rem;
+      line-height: 1.22;
+      text-align: center;
+    }
+
+    @media (max-width: 1050px) {
+      .flight-row.text-left,
+      .flight-row.text-right {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    /* Gallery final section */
+    .final-gallery-section {
+      margin-top: 1.1rem;
+      padding: clamp(1.2rem, 2.4vw, 2rem);
+      background: rgba(18, 18, 18, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 26px;
+      box-shadow: 0 28px 95px rgba(0, 0, 0, 0.5);
+    }
+
+    .final-gallery-section h2 {
+      color: white;
+      text-align: center;
+      font-size: clamp(1.55rem, 2.4vw, 2.65rem);
+      line-height: 1.0;
+      letter-spacing: -0.055em;
+      margin-bottom: 1.1rem;
+    }
+
+    .final-gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 0.75rem;
+      min-width: 0;
+    }
+
+    .final-gallery-tile {
+      overflow: hidden;
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(5, 5, 5, 0.50);
+      min-height: 230px;
+    }
+
+    .final-gallery-tile img,
+    .final-gallery-tile video {
+      width: 100%;
+      height: 100%;
+      min-height: 230px;
+      object-fit: cover;
+      object-position: center center;
+      display: block;
+      background: rgba(30, 30, 30, 0.82);
+    }
+
+    @media (max-width: 1050px) {
+      .final-gallery-grid {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+    footer {
+      position: relative;
+      z-index: 2;
+      border-top: 1px solid rgba(255, 255, 255, 0.13);
+      padding: 2rem 6vw;
+      color: var(--subtle);
+      background: rgba(5, 5, 5, 0.92);
+      backdrop-filter: blur(18px);
+      font-size: 0.9rem;
+    }
+
+    @media (max-width: 1050px) {
+      .topbar {
+        grid-template-columns: 1fr;
+        justify-items: center;
+        gap: 0.3rem;
+        padding: 0.55rem 4vw;
+      }
+
+      .brand {
+        justify-self: center;
+      }
+
+      nav {
+        width: 100%;
+        overflow-x: auto;
+        justify-content: center;
+        padding-bottom: 0.1rem;
+      }
+
+      :root {
+        --topbar-h: 88px;
+      }
+
+      .project-panel,
+      .gallery-grid,
+      .vehicle-overview-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .project-panel {
+        min-height: auto;
+      }
+
+      .project-media-card {
+        min-height: 420px;
+      }
+
+      .details-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .section {
+        padding-left: 1rem;
+        padding-right: 1rem;
+      }
+
+      .hero {
+        padding-left: 1rem;
+        padding-right: 1rem;
+      }
+
+      .project-media-card {
+        min-height: 300px;
+      }
+    }
+
+    /* FINAL OVERRIDE: Vehicle Overview section with text on the left and image on the right. */
+    .project-panel {
+      grid-template-columns: minmax(260px, 0.55fr) minmax(0, 1.45fr) !important;
+      align-items: stretch !important;
+    }
+
+    .project-text-box {
+      width: 100% !important;
+      height: 100% !important;
+      justify-content: center !important;
+    }
+
+    .project-text-box .section-kicker {
+      display: none !important;
+    }
+
+    .project-text-box h2 {
+      text-align: left !important;
+    }
+
+    .project-text-box p {
+      text-align: left !important;
+    }
+
+    .vehicle-overview-grid {
+      display: block !important;
+      margin-top: 0 !important;
+    }
+
+    .vehicle-overview-column {
+      padding: 0 !important;
+      background: transparent !important;
+      border: none !important;
+      border-radius: 0 !important;
+    }
+
+    .vehicle-overview-column + .vehicle-overview-column {
+      display: none !important;
+    }
+
+    .vehicle-overview-column p {
+      border-top: none !important;
+      padding-top: 0 !important;
+      margin-top: 0 !important;
+    }
+
+    .vehicle-overview-image {
+      margin-top: 0 !important;
+      overflow: hidden !important;
+      border-radius: 22px !important;
+      border: 1px solid rgba(255, 255, 255, 0.16) !important;
+      background: rgba(5, 5, 5, 0.50) !important;
+      min-height: 0 !important;
+      height: 100% !important;
+      box-shadow: 0 24px 90px var(--shadow);
+    }
+
+    .vehicle-overview-image img {
+      width: 100% !important;
+      height: 100% !important;
+      min-height: 0 !important;
+      object-fit: contain !important;
+      object-position: center center !important;
+      display: block !important;
+    }
+
+    @media (max-width: 1050px) {
+      .project-panel {
+        grid-template-columns: 1fr !important;
+      }
+
+      .vehicle-overview-image {
+        min-height: 340px !important;
+      }
+    }
+
+
+    /* FINAL OVERRIDE: make the BEAR overview image fully visible and give it more width. */
+    .vehicle-overview-image {
+      background: #ffffff !important;
+    }
+
+    .vehicle-overview-image img {
+      object-fit: contain !important;
+      object-position: center center !important;
+      background: #ffffff !important;
+    }
+
+
+    /* FINAL OVERRIDE: Airfoil section layout adjustments. */
+    .airfoil-section > h2 {
+      display: none !important;
+    }
+
+    .airfoil-text-box h2 {
+      color: white;
+      font-size: clamp(1.55rem, 2.4vw, 2.65rem);
+      line-height: 1.0;
+      letter-spacing: -0.055em;
+      margin-bottom: 0.75rem;
+      text-align: left;
+    }
+
+    .airfoil-top-layout {
+      grid-template-columns: minmax(420px, 1.15fr) minmax(0, 0.85fr) !important;
+    }
+
+    .airfoil-bottom-layout {
+      grid-template-columns: minmax(0, 0.95fr) minmax(420px, 1.05fr) !important;
+    }
+
+    .airfoil-bottom-text {
+      justify-content: center !important;
+    }
+
+    .airfoil-media-tile {
+      min-height: 180px !important;
+    }
+
+    .airfoil-media-tile img,
+    .airfoil-media-tile video {
+      min-height: 180px !important;
+    }
+
+    @media (max-width: 1050px) {
+      .airfoil-top-layout,
+      .airfoil-bottom-layout {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    /* FINAL OVERRIDE: Aerodynamic Analysis heading lives inside the first paragraph box. */
+    .aero-section > h2 {
+      display: none !important;
+    }
+
+    .aero-text-box h2 {
+      color: white;
+      font-size: clamp(1.55rem, 2.4vw, 2.65rem);
+      line-height: 1.0;
+      letter-spacing: -0.055em;
+      margin-bottom: 0.75rem;
+      text-align: left;
+    }
+
+
+    /* FINAL OVERRIDE: Aerodynamic Analysis image layout and captions. */
+    .aero-section .aero-stack {
+      grid-template-columns: minmax(0, 0.85fr) minmax(0, 1fr) !important;
+    }
+
+    .aero-section .aero-media-tile {
+      display: grid !important;
+      grid-template-rows: minmax(0, 1fr) auto !important;
+      min-height: 230px !important;
+    }
+
+    .aero-section .aero-media-tile img,
+    .aero-section .aero-media-tile video {
+      width: 100% !important;
+      height: 100% !important;
+      min-height: 190px !important;
+      object-fit: cover !important;
+      object-position: center center !important;
+      display: block !important;
+    }
+
+    .aero-image-caption {
+      padding: 0.42rem 0.65rem;
+      color: rgba(255, 255, 255, 0.78);
+      background: rgba(5, 5, 5, 0.82);
+      border-top: 1px solid rgba(255, 255, 255, 0.10);
+      font-size: 0.78rem;
+      line-height: 1.22;
+      text-align: center;
+    }
+
+    @media (max-width: 1050px) {
+      .aero-section .aero-stack {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    /* FINAL OVERRIDE: third Aerodynamic Analysis row images stacked vertically. */
+    .aero-section .aero-row:nth-of-type(3) .aero-side-by-side {
+      grid-template-columns: 1fr !important;
+    }
+
+
+    /* FINAL OVERRIDE: Aerodynamic Analysis row-specific width tuning. */
+
+    /* Row 2:
+       Make the left image group slightly narrower and the right paragraph box slightly narrower,
+       giving more usable room to the second image/residual plot inside the left group. */
+    .aero-section .aero-row:nth-of-type(2) {
+      grid-template-columns: minmax(0, 1.28fr) minmax(260px, 0.72fr) !important;
+    }
+
+    .aero-section .aero-row:nth-of-type(2) .aero-stack {
+      grid-template-columns: minmax(0, 0.88fr) minmax(0, 1.12fr) !important;
+    }
+
+    /* Row 3:
+       Make the paragraph box wider and the image column narrower. */
+    .aero-section .aero-row:nth-of-type(3) {
+      grid-template-columns: minmax(420px, 1.10fr) minmax(0, 0.90fr) !important;
+    }
+
+    .aero-section .aero-row:nth-of-type(3) .aero-side-by-side {
+      grid-template-columns: 1fr !important;
+    }
+
+    @media (max-width: 1050px) {
+      .aero-section .aero-row:nth-of-type(2),
+      .aero-section .aero-row:nth-of-type(3),
+      .aero-section .aero-row:nth-of-type(2) .aero-stack {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    /* FINAL OVERRIDE: widen third-row paragraph section more, shrinking the image column further. */
+    .aero-section .aero-row:nth-of-type(3) {
+      grid-template-columns: minmax(520px, 1.30fr) minmax(0, 0.70fr) !important;
+    }
+
+    @media (max-width: 1050px) {
+      .aero-section .aero-row:nth-of-type(3) {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    /* FINAL OVERRIDE: return third-row Aerodynamic Analysis images to horizontal layout. */
+    .aero-section .aero-row:nth-of-type(3) .aero-side-by-side {
+      grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    }
+
+    @media (max-width: 1050px) {
+      .aero-section .aero-row:nth-of-type(3) .aero-side-by-side {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    /* FINAL OVERRIDE: restore third-row paragraph/image widths to original horizontal-image layout. */
+    .aero-section .aero-row:nth-of-type(3) {
+      grid-template-columns: minmax(320px, 0.85fr) minmax(0, 1.15fr) !important;
+    }
+
+    .aero-section .aero-row:nth-of-type(3) .aero-side-by-side {
+      grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    }
+
+    @media (max-width: 1050px) {
+      .aero-section .aero-row:nth-of-type(3),
+      .aero-section .aero-row:nth-of-type(3) .aero-side-by-side {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    /* FINAL OVERRIDE: Aerodynamic Analysis paragraph subtitles. */
+    .aero-subheading {
+      color: var(--muted);
+      font-size: clamp(1.0rem, 1.2vw, 1.22rem);
+      line-height: 1.15;
+      letter-spacing: -0.025em;
+      font-weight: 760;
+      margin-bottom: 0.45rem;
+    }
+
+
+    /* FINAL OVERRIDE: Tiltrotor section width tuning and video crop controls. */
+
+    /* Give the top-row image area more width by narrowing the paragraph section slightly. */
+    .tilt-section .tilt-row-1 {
+      grid-template-columns: minmax(300px, 0.78fr) minmax(0, 1.22fr) !important;
+    }
+
+    /* In the top row image pair, make the left image wider than the right image. */
+    .tilt-section .tilt-row-1 .tilt-image-pair {
+      grid-template-columns: minmax(0, 1.28fr) minmax(0, 0.72fr) !important;
+    }
+
+    /* In the bottom row, make the left image wider than the video tile. */
+    .tilt-section .tilt-row:not(.tilt-row-1) .tilt-image-pair {
+      grid-template-columns: minmax(0, 1.20fr) minmax(0, 0.80fr) !important;
+    }
+
+    /* Position/scale controls for the tiltrotor MP4 tile.
+       Edit these inline variables on the video tile:
+       --tilt-video-x: 50%;     left/right crop focus
+       --tilt-video-y: 50%;     up/down crop focus
+       --tilt-video-zoom: 1;    larger = more zoomed/cropped
+    */
+    .tilt-video-crop video {
+      object-fit: cover !important;
+      object-position: var(--tilt-video-x, 50%) var(--tilt-video-y, 50%) !important;
+      transform: scale(var(--tilt-video-zoom, 1)) !important;
+      transform-origin: var(--tilt-video-x, 50%) var(--tilt-video-y, 50%) !important;
+    }
+
+    @media (max-width: 1050px) {
+      .tilt-section .tilt-row-1,
+      .tilt-section .tilt-row-1 .tilt-image-pair,
+      .tilt-section .tilt-row:not(.tilt-row-1) .tilt-image-pair {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    /* FINAL OVERRIDE: corrected Tiltrotor image widths and center-only video crop. */
+
+    /* Top row: keep the paragraph on the left, but give the image area more room. */
+    .tilt-section .tilt-row-1 {
+      grid-template-columns: minmax(280px, 0.72fr) minmax(0, 1.28fr) !important;
+    }
+
+    /* Top row image pair: make the RIGHT image wider than the left image. */
+    .tilt-section .tilt-row-1 .tilt-image-pair {
+      grid-template-columns: minmax(0, 0.72fr) minmax(0, 1.28fr) !important;
+    }
+
+    /* Bottom row: make the left bottom image wider and the video tile narrower. */
+    .tilt-section .tilt-row:not(.tilt-row-1) .tilt-image-pair {
+      grid-template-columns: minmax(0, 1.45fr) minmax(0, 0.55fr) !important;
+    }
+
+    /* Spatial crop for the MP4: focus on the center and chop off top/bottom.
+       Increase --tilt-video-crop-y to crop more from the top and bottom.
+       Use --tilt-video-y to shift the cropped center up/down if needed.
+    */
+    .tilt-video-crop {
+      overflow: hidden !important;
+    }
+
+    .tilt-video-crop video {
+      object-fit: cover !important;
+      object-position: 50% var(--tilt-video-y, 50%) !important;
+      transform: scaleY(var(--tilt-video-crop-y, 1.35)) !important;
+      transform-origin: 50% var(--tilt-video-y, 50%) !important;
+    }
+
+    @media (max-width: 1050px) {
+      .tilt-section .tilt-row-1,
+      .tilt-section .tilt-row-1 .tilt-image-pair,
+      .tilt-section .tilt-row:not(.tilt-row-1) .tilt-image-pair {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    /* FINAL OVERRIDE: corrected Tiltrotor top-right image width and real top/bottom video crop. */
+
+    /* Top row: paragraph a bit narrower so the two image tiles get more total width. */
+    .tilt-section .tilt-row-1 {
+      grid-template-columns: minmax(260px, 0.62fr) minmax(0, 1.38fr) !important;
+    }
+
+    /* Top row image pair: make the RIGHT image tile much wider than the left tile. */
+    .tilt-section .tilt-row-1 .tilt-image-pair {
+      grid-template-columns: minmax(0, 0.48fr) minmax(0, 1.52fr) !important;
+    }
+
+    /* Top-right image: show more of the CAD by containing it instead of cropping it. */
+    .tilt-section .tilt-row-1 .tilt-image-pair .tilt-media-tile:nth-child(2) {
+      background: #ffffff !important;
+    }
+
+    .tilt-section .tilt-row-1 .tilt-image-pair .tilt-media-tile:nth-child(2) img {
+      object-fit: contain !important;
+      object-position: center center !important;
+      background: #ffffff !important;
+    }
+
+    /* Bottom row: make the left image wider and the video tile narrower. */
+    .tilt-section .tilt-row:not(.tilt-row-1) .tilt-image-pair {
+      grid-template-columns: minmax(0, 1.45fr) minmax(0, 0.55fr) !important;
+    }
+
+    /* Actual spatial crop for the MP4:
+       the video is made taller than its tile and clipped by overflow hidden,
+       so the top and bottom are chopped off while the center remains visible.
+       Increase --tilt-video-height for more top/bottom crop.
+       Adjust --tilt-video-y if the center needs to move up/down.
+    */
+    .tilt-video-crop {
+      overflow: hidden !important;
+      position: relative !important;
+    }
+
+    .tilt-video-crop video {
+      position: absolute !important;
+      left: 50% !important;
+      top: var(--tilt-video-y, 50%) !important;
+      width: 100% !important;
+      height: var(--tilt-video-height, 180%) !important;
+      min-height: 0 !important;
+      object-fit: cover !important;
+      object-position: center center !important;
+      transform: translate(-50%, -50%) !important;
+      transform-origin: center center !important;
+    }
+
+    @media (max-width: 1050px) {
+      .tilt-section .tilt-row-1,
+      .tilt-section .tilt-row-1 .tilt-image-pair,
+      .tilt-section .tilt-row:not(.tilt-row-1) .tilt-image-pair {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    /* FINAL OVERRIDE: clean top-right tiltrotor image border and zoom it out slightly. */
+
+    /* Remove the bright/white-looking tile outline from the top-right image tile. */
+    .tilt-section .tilt-row-1 .tilt-image-pair .tilt-media-tile:nth-child(2) {
+      border-color: rgba(255, 255, 255, 0.06) !important;
+      background: #ffffff !important;
+    }
+
+    /* Zoom the top-right image out so the mechanism fits better inside the tile. */
+    .tilt-section .tilt-row-1 .tilt-image-pair .tilt-media-tile:nth-child(2) img {
+      object-fit: contain !important;
+      object-position: center center !important;
+      background: #ffffff !important;
+      transform: scale(0.88) !important;
+      transform-origin: center center !important;
+    }
+
+
+    /* FINAL OVERRIDE: top-right tiltrotor image uses the same centered/absolute sizing approach
+       as the portfolio poppet tile, so it actually zooms out and does not leave a bright
+       white edge touching the caption. */
+    .tilt-section .tilt-row-1 .tilt-image-pair .tilt-media-tile:nth-child(2) {
+      position: relative !important;
+      overflow: hidden !important;
+      background: rgba(5, 5, 5, 0.50) !important;
+      border-color: rgba(255, 255, 255, 0.12) !important;
+      display: grid !important;
+      grid-template-rows: minmax(0, 1fr) auto !important;
+    }
+
+    .tilt-section .tilt-row-1 .tilt-image-pair .tilt-media-tile:nth-child(2) img {
+      position: absolute !important;
+      top: calc(50% - 12px) !important;
+      left: 50% !important;
+      width: 88% !important;
+      height: 82% !important;
+      min-height: 0 !important;
+      object-fit: contain !important;
+      object-position: center center !important;
+      background: #ffffff !important;
+      transform: translate(-50%, -50%) !important;
+      transform-origin: center center !important;
+      border-radius: 0 !important;
+    }
+
+    .tilt-section .tilt-row-1 .tilt-image-pair .tilt-media-tile:nth-child(2) .tilt-image-caption {
+      position: relative !important;
+      z-index: 2 !important;
+      border-top: 1px solid rgba(255, 255, 255, 0.10) !important;
+    }
+
+    /* Bottom row: make the bottom-left image slightly less wide than before. */
+    .tilt-section .tilt-row:not(.tilt-row-1) .tilt-image-pair {
+      grid-template-columns: minmax(0, 1.35fr) minmax(0, 0.65fr) !important;
+    }
+
+    @media (max-width: 1050px) {
+      .tilt-section .tilt-row:not(.tilt-row-1) .tilt-image-pair {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    /* FINAL OVERRIDE: revert ONLY the top-right tiltrotor image behavior.
+       Keep the widened top-right tile, but remove the later zoom/absolute-position tricks.
+       Bottom-row sizing and video crop settings are left unchanged. */
+    .tilt-section .tilt-row-1 {
+      grid-template-columns: minmax(260px, 0.62fr) minmax(0, 1.38fr) !important;
+    }
+
+    .tilt-section .tilt-row-1 .tilt-image-pair {
+      grid-template-columns: minmax(0, 0.48fr) minmax(0, 1.52fr) !important;
+    }
+
+    .tilt-section .tilt-row-1 .tilt-image-pair .tilt-media-tile:nth-child(2) {
+      position: static !important;
+      overflow: hidden !important;
+      display: grid !important;
+      grid-template-rows: minmax(0, 1fr) auto !important;
+      background: #ffffff !important;
+      border: 1px solid rgba(255, 255, 255, 0.12) !important;
+    }
+
+    .tilt-section .tilt-row-1 .tilt-image-pair .tilt-media-tile:nth-child(2) img {
+      position: static !important;
+      top: auto !important;
+      left: auto !important;
+      width: 100% !important;
+      height: 100% !important;
+      min-height: 210px !important;
+      object-fit: contain !important;
+      object-position: center center !important;
+      background: #ffffff !important;
+      transform: none !important;
+      transform-origin: center center !important;
+      border-radius: 0 !important;
+    }
+
+    .tilt-section .tilt-row-1 .tilt-image-pair .tilt-media-tile:nth-child(2) .tilt-image-caption {
+      position: static !important;
+      z-index: auto !important;
+    }
+
+    @media (max-width: 1050px) {
+      .tilt-section .tilt-row-1,
+      .tilt-section .tilt-row-1 .tilt-image-pair {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    /* FINAL OVERRIDE: Tiltrotor top row uses one image only; video caption is visible. */
+    .tilt-section .tilt-row-1 .tilt-image-pair {
+      grid-template-columns: 1fr !important;
+    }
+
+    .tilt-section .tilt-row-1 .tilt-image-pair .tilt-media-tile {
+      min-height: 300px !important;
+    }
+
+    /* Ensure the bottom-right MP4 tile keeps a normal caption underneath it. */
+    .tilt-section .tilt-video-crop {
+      display: grid !important;
+      grid-template-rows: minmax(0, 1fr) auto !important;
+    }
+
+    .tilt-section .tilt-video-crop .tilt-image-caption {
+      position: relative !important;
+      z-index: 3 !important;
+      display: block !important;
+    }
+
+    @media (max-width: 1050px) {
+      .tilt-section .tilt-row-1 .tilt-image-pair {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    /* FINAL OVERRIDE: Tiltrotor layout + cropped video with normal caption. */
+
+    /* Top row: widen paragraph section and shrink the single image section. */
+    .tilt-section .tilt-row-1 {
+      grid-template-columns: minmax(380px, 0.95fr) minmax(0, 1.05fr) !important;
+    }
+
+    .tilt-section .tilt-row-1 .tilt-image-pair {
+      grid-template-columns: 1fr !important;
+    }
+
+    /* Bottom row: keep the calculation image wide and the video tile narrower. */
+    .tilt-section .tilt-row:not(.tilt-row-1) .tilt-image-pair {
+      grid-template-columns: minmax(0, 1.65fr) minmax(0, 0.35fr) !important;
+    }
+
+    /* Video tile acts like every other media tile: media on top, caption underneath. */
+    .tilt-section .tilt-video-crop {
+      display: grid !important;
+      grid-template-rows: minmax(0, 1fr) auto !important;
+      overflow: hidden !important;
+      position: static !important;
+      background: rgba(5, 5, 5, 0.50) !important;
+      border: 1px solid rgba(255, 255, 255, 0.12) !important;
+      border-radius: 16px !important;
+    }
+
+    /* This frame is the cropped viewport. It clips the top and bottom of the MP4. */
+    .tilt-section .tilt-video-frame {
+      position: relative !important;
+      overflow: hidden !important;
+      width: 100% !important;
+      height: 100% !important;
+      min-height: 210px !important;
+      background: rgba(30, 30, 30, 0.82) !important;
+    }
+
+    /* Real spatial crop: video is taller than the visible frame and clipped by the frame. */
+    .tilt-section .tilt-video-frame video {
+      position: absolute !important;
+      left: 50% !important;
+      top: var(--tilt-video-y, 50%) !important;
+      width: 100% !important;
+      height: var(--tilt-video-height, 180%) !important;
+      min-height: 0 !important;
+      object-fit: cover !important;
+      object-position: center center !important;
+      transform: translate(-50%, -50%) !important;
+      transform-origin: center center !important;
+      display: block !important;
+      background: rgba(30, 30, 30, 0.82) !important;
+    }
+
+    /* Caption remains below the cropped video, same behavior as image captions. */
+    .tilt-section .tilt-video-crop .tilt-image-caption {
+      position: static !important;
+      z-index: auto !important;
+      display: block !important;
+      padding: 0.42rem 0.65rem !important;
+      color: rgba(255, 255, 255, 0.78) !important;
+      background: rgba(5, 5, 5, 0.82) !important;
+      border-top: 1px solid rgba(255, 255, 255, 0.10) !important;
+      font-size: 0.78rem !important;
+      line-height: 1.22 !important;
+      text-align: center !important;
+    }
+
+    @media (max-width: 1050px) {
+      .tilt-section .tilt-row-1,
+      .tilt-section .tilt-row-1 .tilt-image-pair,
+      .tilt-section .tilt-row:not(.tilt-row-1) .tilt-image-pair {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    /* FINAL FINAL OVERRIDE: make top paragraph wider and bottom-left image less wide. */
+
+    /* Top row: paragraph/title box gets more width, image area gets less width. */
+    .tilt-section .tilt-row-1 {
+      grid-template-columns: minmax(520px, 1.35fr) minmax(0, 0.65fr) !important;
+    }
+
+    /* Top row now only has one image, so keep that image tile as one column. */
+    .tilt-section .tilt-row-1 .tilt-image-pair {
+      grid-template-columns: 1fr !important;
+    }
+
+    /* Bottom row: reduce the bottom-left image width and give more width back to the video tile. */
+    .tilt-section .tilt-row:not(.tilt-row-1) .tilt-image-pair {
+      grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr) !important;
+    }
+
+    @media (max-width: 1050px) {
+      .tilt-section .tilt-row-1,
+      .tilt-section .tilt-row-1 .tilt-image-pair,
+      .tilt-section .tilt-row:not(.tilt-row-1) .tilt-image-pair {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    /* FINAL FINAL OVERRIDE: make the bottom-right video/image tile narrower, closer to the red-box width. */
+    .tilt-section .tilt-row:not(.tilt-row-1) .tilt-image-pair {
+      grid-template-columns: minmax(0, 1.55fr) minmax(0, 0.45fr) !important;
+    }
+
+    @media (max-width: 1050px) {
+      .tilt-section .tilt-row:not(.tilt-row-1) .tilt-image-pair {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    /* FINAL OVERRIDE: make all Flight Test paragraph boxes wider and video columns narrower. */
+
+    /* Rows 1 and 3: paragraph on left gets more width, video on right gets less width. */
+    .flight-section .flight-row.text-left {
+      grid-template-columns: minmax(520px, 1.25fr) minmax(0, 0.75fr) !important;
+    }
+
+    /* Row 2: video on left gets less width, paragraph on right gets more width. */
+    .flight-section .flight-row.text-right {
+      grid-template-columns: minmax(0, 0.75fr) minmax(520px, 1.25fr) !important;
+    }
+
+    @media (max-width: 1050px) {
+      .flight-section .flight-row.text-left,
+      .flight-section .flight-row.text-right {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    /* FINAL OVERRIDE: updated Tiltrotor section is one row with image + video on the right. */
+    .tilt-section .tilt-row-1 {
+      grid-template-columns: minmax(520px, 1.25fr) minmax(0, 0.95fr) !important;
+    }
+
+    .tilt-section .tilt-row-1 .tilt-image-pair {
+      grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+      align-items: stretch !important;
+    }
+
+    .tilt-section .tilt-row-1 .tilt-media-tile {
+      min-height: 300px !important;
+    }
+
+    /* Keep the moved TiltTest video spatially cropped while still keeping its caption below. */
+    .tilt-section .tilt-video-crop {
+      display: grid !important;
+      grid-template-rows: minmax(0, 1fr) auto !important;
+      overflow: hidden !important;
+      position: static !important;
+      background: rgba(5, 5, 5, 0.50) !important;
+      border: 1px solid rgba(255, 255, 255, 0.12) !important;
+      border-radius: 16px !important;
+    }
+
+    .tilt-section .tilt-video-frame {
+      position: relative !important;
+      overflow: hidden !important;
+      width: 100% !important;
+      height: 100% !important;
+      min-height: 210px !important;
+      background: rgba(30, 30, 30, 0.82) !important;
+    }
+
+    .tilt-section .tilt-video-frame video {
+      position: absolute !important;
+      left: 50% !important;
+      top: var(--tilt-video-y, 50%) !important;
+      width: 100% !important;
+      height: var(--tilt-video-height, 180%) !important;
+      min-height: 0 !important;
+      object-fit: cover !important;
+      object-position: center center !important;
+      transform: translate(-50%, -50%) !important;
+      transform-origin: center center !important;
+      display: block !important;
+    }
+
+    /* FINAL OVERRIDE: updated Manufacturing section is one row with paragraph, 2x2 grid, and fifth image. */
+    .manufacturing-section .manufacturing-row-1 {
+      grid-template-columns: minmax(300px, 0.52fr) minmax(0, 1.48fr) !important;
+    }
+
+    .manufacturing-media-combo {
+      display: grid !important;
+      grid-template-columns: minmax(0, 1.25fr) minmax(0, 0.75fr) !important;
+      gap: 0.75rem !important;
+      min-width: 0 !important;
+      align-items: stretch !important;
+    }
+
+    .manufacturing-two-by-two-grid {
+      display: grid !important;
+      grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+      grid-template-rows: repeat(2, minmax(0, 1fr)) !important;
+      gap: 0.75rem !important;
+      min-width: 0 !important;
+    }
+
+    .manufacturing-media-combo .manufacturing-media-tile {
+      min-height: 165px !important;
+    }
+
+    .manufacturing-media-combo .manufacturing-media-tile img,
+    .manufacturing-media-combo .manufacturing-media-tile video {
+      min-height: 125px !important;
+      object-fit: cover !important;
+      object-position: center center !important;
+    }
+
+    .manufacturing-wide-tile {
+      height: 100% !important;
+      min-height: 340px !important;
+    }
+
+    @media (max-width: 1050px) {
+      .tilt-section .tilt-row-1,
+      .tilt-section .tilt-row-1 .tilt-image-pair,
+      .manufacturing-section .manufacturing-row-1,
+      .manufacturing-media-combo,
+      .manufacturing-two-by-two-grid {
+        grid-template-columns: 1fr !important;
+      }
+
+      .manufacturing-two-by-two-grid {
+        grid-template-rows: auto !important;
+      }
+    }
+
+
+    /* FINAL OVERRIDE: Airfoil/Wing Design paragraph subheadings. */
+    .airfoil-subheading {
+      color: var(--muted);
+      font-size: clamp(1.0rem, 1.2vw, 1.22rem);
+      line-height: 1.15;
+      letter-spacing: -0.025em;
+      font-weight: 760;
+      margin-bottom: 0.45rem;
+    }
+
+
+    /* FINAL OVERRIDE: Gallery is now a 3x3 grid. */
+    .final-gallery-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    }
+
+
+    /* FINAL OVERRIDE: paragraph indentation for all main text boxes. */
+    .project-text-box p,
+    .airfoil-text-box p,
+    .airfoil-bottom-text p,
+    .aero-text-box p,
+    .tilt-text-box p,
+    .manufacturing-text-box p,
+    .flight-text-box p {
+      text-indent: 1.75em !important;
+    }
+
+    /* Keep paragraph breaks readable when multiple paragraphs are stacked. */
+    .project-text-box p + p,
+    .airfoil-text-box p + p,
+    .airfoil-bottom-text p + p,
+    .aero-text-box p + p,
+    .tilt-text-box p + p,
+    .manufacturing-text-box p + p,
+    .flight-text-box p + p {
+      margin-top: 0.55rem !important;
+    }
+
+    /* FINAL OVERRIDE: make the CONOPS text side wider so its text box height better matches the image. */
+    .project-panel {
+      grid-template-columns: minmax(520px, 1.10fr) minmax(0, 0.90fr) !important;
+      align-items: stretch !important;
+    }
+
+    .project-text-box,
+    .vehicle-overview-image {
+      height: 100% !important;
+    }
+
+    @media (max-width: 1050px) {
+      .project-panel {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    /* FINAL OVERRIDE: CONOPS/Vehicle Overview width and top alignment.
+       This makes the text column wider and starts the heading at the top of the box
+       instead of vertically centering the whole text block. */
+    .project-panel {
+      grid-template-columns: minmax(620px, 1.28fr) minmax(0, 0.72fr) !important;
+      align-items: stretch !important;
+    }
+
+    .project-panel .project-text-box {
+      justify-content: flex-start !important;
+      padding-top: 1.35rem !important;
+    }
+
+    .project-panel .project-text-box h2 {
+      margin-top: 0 !important;
+      margin-bottom: 0.85rem !important;
+    }
+
+    @media (max-width: 1050px) {
+      .project-panel {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    /* FINAL OVERRIDE: CONOPS width-only correction.
+       Restore the original vertically-centered text behavior, then make the text column narrower
+       so the wrapped paragraph block becomes taller and the heading naturally sits near the top. */
+    .project-panel {
+      grid-template-columns: minmax(420px, 0.68fr) minmax(0, 1.32fr) !important;
+      align-items: stretch !important;
+    }
+
+    .project-panel .project-text-box {
+      justify-content: center !important;
+      padding-top: 1.0rem !important;
+      padding-bottom: 1.0rem !important;
+    }
+
+    .project-panel .project-text-box h2 {
+      margin-top: 0 !important;
+      margin-bottom: 0.85rem !important;
+    }
+
+    @media (max-width: 1050px) {
+      .project-panel {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    /* FINAL OVERRIDE: make the CONOPS paragraph section slightly wider. */
+    .project-panel {
+      grid-template-columns: minmax(460px, 0.76fr) minmax(0, 1.24fr) !important;
+      align-items: stretch !important;
+    }
+
+    .project-panel .project-text-box {
+      justify-content: center !important;
+    }
+
+    @media (max-width: 1050px) {
+      .project-panel {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    /* FINAL OVERRIDE: Simulation Results section layout only. */
+    .aero-section .aero-results-row {
+      grid-template-columns: minmax(420px, 0.92fr) minmax(0, 1.08fr) !important;
+      align-items: stretch !important;
+    }
+
+    .aero-section .aero-results-images {
+      display: grid !important;
+      grid-template-columns: 1fr !important;
+      gap: 0.75rem !important;
+      min-width: 0 !important;
+    }
+
+    .aero-section .aero-results-images .aero-media-tile {
+      min-height: 255px !important;
+    }
+
+    .aero-section .aero-results-images .aero-media-tile img {
+      min-height: 215px !important;
+      object-fit: cover !important;
+      object-position: center center !important;
+    }
+
+    .aero-section .aero-results-graphs {
+      display: grid !important;
+      grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+      gap: 0.75rem !important;
+      margin-top: 1.1rem !important;
+      padding-top: 1.1rem !important;
+      border-top: 1px solid rgba(255, 255, 255, 0.10) !important;
+    }
+
+    .aero-section .aero-results-graphs .aero-media-tile {
+      min-height: 280px !important;
+    }
+
+    .aero-section .aero-results-graphs .aero-media-tile img {
+      min-height: 235px !important;
+      object-fit: cover !important;
+      object-position: center center !important;
+    }
+
+    /* Simple HTML math formatting. No stacked fractions. */
+    .math {
+      font-family: "Times New Roman", Times, serif;
+      font-style: italic;
+      white-space: nowrap;
+      display: inline;
+      line-height: inherit;
+      vertical-align: baseline;
+    }
+
+    .math sub,
+    .math sup {
+      font-size: 0.72em;
+      line-height: 0;
+    }
+
+    @media (max-width: 1050px) {
+      .aero-section .aero-results-row,
+      .aero-section .aero-results-images,
+      .aero-section .aero-results-graphs {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    /* FINAL OVERRIDE: keep Tiltrotor and following sections as separate normal bounding boxes. */
+    .tilt-section,
+    .manufacturing-section,
+    .flight-section,
+    .final-gallery-section {
+      margin-top: 1.1rem !important;
+      background: rgba(18, 18, 18, 0.92) !important;
+      border: 1px solid rgba(255, 255, 255, 0.16) !important;
+      border-radius: 26px !important;
+      box-shadow: 0 28px 95px rgba(0, 0, 0, 0.5) !important;
+    }
+
+
+    /* FINAL OVERRIDE: remove outline/border from only the tiltrotor video tile. */
+    .tilt-section .tilt-media-tile.tilt-video-crop {
+      border: none !important;
+      outline: none !important;
+      box-shadow: none !important;
+      background: rgba(5, 5, 5, 0.50) !important;
+    }
+
+    .tilt-section .tilt-media-tile.tilt-video-crop .tilt-video-frame {
+      border: none !important;
+      outline: none !important;
+      box-shadow: none !important;
+      overflow: hidden !important;
+    }
+
+    .tilt-section .tilt-media-tile.tilt-video-crop video {
+      border: none !important;
+      outline: none !important;
+      box-shadow: none !important;
+    }
+
+    .tilt-section .tilt-media-tile.tilt-video-crop .tilt-image-caption {
+      border-top: none !important;
+      outline: none !important;
+      box-shadow: none !important;
+    }
+
+
+    /* FINAL OVERRIDE: force-hide the visible white perimeter on the tiltrotor video tile.
+       This does NOT change the page/section backgrounds or the video crop logic. */
+    .tilt-section .tilt-media-tile.tilt-video-crop {
+      position: relative !important;
+      isolation: isolate !important;
+      border: 0 !important;
+      outline: 0 !important;
+      box-shadow: none !important;
+      background: #050505 !important;
+      overflow: hidden !important;
+      border-radius: 16px !important;
+    }
+
+    /* Dark inset mask that covers any white edge coming from the video frame or inherited border. */
+    .tilt-section .tilt-media-tile.tilt-video-crop::after {
+      content: "" !important;
+      position: absolute !important;
+      inset: 0 !important;
+      z-index: 5 !important;
+      pointer-events: none !important;
+      border-radius: 16px !important;
+      box-shadow: inset 0 0 0 3px #050505 !important;
+    }
+
+    .tilt-section .tilt-video-frame {
+      position: relative !important;
+      overflow: hidden !important;
+      border: 0 !important;
+      outline: 0 !important;
+      box-shadow: none !important;
+      background: #050505 !important;
+    }
+
+    /* Overscan the video slightly so any light edge inside the MP4 itself is pushed outside the tile. */
+    .tilt-section .tilt-video-frame video {
+      width: 106% !important;
+      left: 50% !important;
+      transform: translate(-50%, -50%) !important;
+      border: 0 !important;
+      outline: 0 !important;
+      box-shadow: none !important;
+      background: #050505 !important;
+    }
+
+    .tilt-section .tilt-media-tile.tilt-video-crop .tilt-image-caption {
+      position: relative !important;
+      z-index: 2 !important;
+      border: 0 !important;
+      outline: 0 !important;
+      box-shadow: none !important;
+      background: rgba(5, 5, 5, 0.92) !important;
+    }
+
+
+    /* FINAL OVERRIDE: use a dedicated video tile class so the normal image-tile border
+       is not applied to the tiltrotor video at all. */
+    .tilt-section .tilt-video-tile {
+      overflow: hidden !important;
+      border: 0 !important;
+      outline: 0 !important;
+      box-shadow: none !important;
+      background: rgba(5, 5, 5, 0.50) !important;
+      border-radius: 16px !important;
+      min-height: 250px !important;
+      display: grid !important;
+      grid-template-rows: minmax(0, 1fr) auto !important;
+      padding: 0 !important;
+      position: relative !important;
+    }
+
+    .tilt-section .tilt-video-tile::before,
+    .tilt-section .tilt-video-tile::after {
+      content: none !important;
+      display: none !important;
+    }
+
+    .tilt-section .tilt-video-tile .tilt-video-frame {
+      position: relative !important;
+      overflow: hidden !important;
+      width: 100% !important;
+      height: 100% !important;
+      min-height: 210px !important;
+      border: 0 !important;
+      outline: 0 !important;
+      box-shadow: none !important;
+      background: #050505 !important;
+      border-radius: 16px 16px 0 0 !important;
+      padding: 0 !important;
+      margin: 0 !important;
+    }
+
+    .tilt-section .tilt-video-tile video {
+      position: absolute !important;
+      left: 50% !important;
+      top: var(--tilt-video-y, 50%) !important;
+      width: 106% !important;
+      height: var(--tilt-video-height, 180%) !important;
+      min-height: 0 !important;
+      object-fit: cover !important;
+      object-position: center center !important;
+      transform: translate(-50%, -50%) !important;
+      transform-origin: center center !important;
+      display: block !important;
+      border: 0 !important;
+      outline: 0 !important;
+      box-shadow: none !important;
+      background: #050505 !important;
+    }
+
+    .tilt-section .tilt-video-tile .tilt-image-caption {
+      padding: 0.42rem 0.65rem !important;
+      color: rgba(255, 255, 255, 0.78) !important;
+      background: rgba(5, 5, 5, 0.82) !important;
+      border: 0 !important;
+      border-top: 0 !important;
+      outline: 0 !important;
+      box-shadow: none !important;
+      font-size: 0.78rem !important;
+      line-height: 1.22 !important;
+      text-align: center !important;
+      border-radius: 0 0 16px 16px !important;
+    }
+
+    /* Keep the remaining still image tile unchanged. */
+    .tilt-section .tilt-media-tile {
+      border: 1px solid rgba(255, 255, 255, 0.12) !important;
+    }
+
+
+    /* E3 MVA placeholder page cleanup */
+    .airfoil-section,
+    .aero-section,
+    .tilt-section,
+    .manufacturing-section,
+    .flight-section {
+      display: none !important;
+    }
+
+    .final-gallery-section {
+      margin-top: 1.1rem !important;
+    }
+
+
+    /* FINAL OVERRIDE: make E3 MVA overview image box behave like the normal dark media tiles. */
+    .vehicle-overview-image {
+      background: rgba(5, 5, 5, 0.50) !important;
+      border-radius: 22px !important;
+      overflow: hidden !important;
+    }
+
+    .vehicle-overview-image img {
+      width: 100% !important;
+      height: 100% !important;
+      min-height: 0 !important;
+      object-fit: cover !important;
+      object-position: center center !important;
+      background: rgba(30, 30, 30, 0.82) !important;
+      display: block !important;
+    }
+
+
+    /* Main Valve Assembly Design section */
+    .mva-design-section {
+      margin-top: 1.1rem;
+      padding: clamp(1.2rem, 2.4vw, 2rem);
+      background: rgba(18, 18, 18, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 26px;
+      box-shadow: 0 28px 95px rgba(0, 0, 0, 0.5);
+    }
+
+    .mva-design-row {
+      display: grid;
+      /* Image on the left is narrower; design paragraph section on the right is wider. */
+      grid-template-columns: minmax(0, 0.65fr) minmax(520px, 1.35fr);
+      gap: 1.1rem;
+      align-items: stretch;
+    }
+
+    .mva-design-image {
+      min-width: 0;
+      min-height: 360px;
+      overflow: hidden;
+      background: rgba(5, 5, 5, 0.50);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 22px;
+      box-shadow: 0 24px 90px var(--shadow);
+      display: grid;
+      grid-template-rows: minmax(0, 1fr) auto;
+    }
+
+    .mva-design-image img {
+      width: 100%;
+      height: 100%;
+      min-height: 320px;
+      object-fit: cover;
+      object-position: center center;
+      display: block;
+      background: rgba(30, 30, 30, 0.82);
+    }
+
+    .mva-design-text-box {
+      min-height: 0;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 1.0rem 1.15rem;
+      background: rgba(18, 18, 18, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 20px;
+      box-shadow: 0 22px 70px rgba(0, 0, 0, 0.42);
+    }
+
+    .mva-design-text-box h2 {
+      color: white;
+      font-size: clamp(1.55rem, 2.4vw, 2.65rem);
+      line-height: 1.0;
+      letter-spacing: -0.055em;
+      margin-bottom: 0.75rem;
+      text-align: left;
+    }
+
+    .mva-design-text-box p {
+      color: rgba(255, 255, 255, 0.74);
+      font-size: clamp(0.84rem, 0.95vw, 1.02rem);
+      line-height: 1.38;
+      margin: 0;
+      text-indent: 1.75em;
+    }
+
+    .mva-design-text-box p + p {
+      margin-top: 0.55rem;
+    }
+
+    @media (max-width: 1050px) {
+      .mva-design-row {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    /* Manufacturing and Assembly section */
+    .mva-manufacturing-section {
+      margin-top: 1.1rem;
+      padding: clamp(1.2rem, 2.4vw, 2rem);
+      background: rgba(18, 18, 18, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 26px;
+      box-shadow: 0 28px 95px rgba(0, 0, 0, 0.5);
+    }
+
+    .mva-manufacturing-row {
+      display: grid;
+      /* Paragraph section on the left is slightly wider; image on the right is slightly narrower. */
+      grid-template-columns: minmax(560px, 1.35fr) minmax(0, 0.65fr);
+      gap: 1.1rem;
+      align-items: stretch;
+    }
+
+    .mva-manufacturing-text-box {
+      min-height: 0;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 1.0rem 1.15rem;
+      background: rgba(18, 18, 18, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 20px;
+      box-shadow: 0 22px 70px rgba(0, 0, 0, 0.42);
+    }
+
+    .mva-manufacturing-text-box h2 {
+      color: white;
+      font-size: clamp(1.55rem, 2.4vw, 2.65rem);
+      line-height: 1.0;
+      letter-spacing: -0.055em;
+      margin-bottom: 0.75rem;
+      text-align: left;
+    }
+
+    .mva-manufacturing-text-box p {
+      color: rgba(255, 255, 255, 0.74);
+      font-size: clamp(0.84rem, 0.95vw, 1.02rem);
+      line-height: 1.38;
+      margin: 0;
+      text-indent: 1.75em;
+    }
+
+    .mva-manufacturing-text-box p + p {
+      margin-top: 0.55rem;
+    }
+
+    .mva-manufacturing-image {
+      min-width: 0;
+      min-height: 360px;
+      overflow: hidden;
+      background: rgba(5, 5, 5, 0.50);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 22px;
+      box-shadow: 0 24px 90px var(--shadow);
+    }
+
+    .mva-manufacturing-image img {
+      width: 100%;
+      height: 100%;
+      min-height: 320px;
+      object-fit: cover;
+      object-position: center center;
+      display: block;
+      background: rgba(30, 30, 30, 0.82);
+    }
+
+    @media (max-width: 1050px) {
+      .mva-manufacturing-row {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+
+    /* Unit Testing section */
+    .mva-unit-testing-section {
+      margin-top: 1.1rem;
+      padding: clamp(1.2rem, 2.4vw, 2rem);
+      background: rgba(18, 18, 18, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 26px;
+      box-shadow: 0 28px 95px rgba(0, 0, 0, 0.5);
+    }
+
+    .mva-unit-testing-row {
+      display: grid;
+      /* Looping video on the left; paragraph section with heading on the right. */
+      grid-template-columns: minmax(0, 0.85fr) minmax(460px, 1.15fr);
+      gap: 1.1rem;
+      align-items: stretch;
+    }
+
+    .mva-unit-testing-video {
+      min-width: 0;
+      min-height: 360px;
+      overflow: hidden;
+      background: rgba(5, 5, 5, 0.50);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 22px;
+      box-shadow: 0 24px 90px var(--shadow);
+    }
+
+    .mva-unit-testing-video video {
+      width: 100%;
+      height: 100%;
+      min-height: 320px;
+      object-fit: cover;
+      object-position: center center;
+      display: block;
+      background: rgba(30, 30, 30, 0.82);
+    }
+
+    .mva-unit-testing-text-box {
+      min-height: 0;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 1.0rem 1.15rem;
+      background: rgba(18, 18, 18, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 20px;
+      box-shadow: 0 22px 70px rgba(0, 0, 0, 0.42);
+    }
+
+    .mva-unit-testing-text-box h2 {
+      color: white;
+      font-size: clamp(1.55rem, 2.4vw, 2.65rem);
+      line-height: 1.0;
+      letter-spacing: -0.055em;
+      margin-bottom: 0.75rem;
+      text-align: left;
+    }
+
+    .mva-unit-testing-text-box p {
+      color: rgba(255, 255, 255, 0.74);
+      font-size: clamp(0.84rem, 0.95vw, 1.02rem);
+      line-height: 1.38;
+      margin: 0;
+      text-indent: 1.75em;
+    }
+
+    .mva-unit-testing-text-box p + p {
+      margin-top: 0.55rem;
+    }
+
+    @media (max-width: 1050px) {
+      .mva-unit-testing-row {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    /* Final Integration and Hot-fire section */
+    .mva-final-hotfire-section {
+      margin-top: 1.1rem;
+      padding: clamp(1.2rem, 2.4vw, 2rem);
+      background: rgba(18, 18, 18, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 26px;
+      box-shadow: 0 28px 95px rgba(0, 0, 0, 0.5);
+    }
+
+    .mva-final-hotfire-row {
+      display: grid;
+      /* Paragraph section on the left; looping MP4 on the right. */
+      grid-template-columns: minmax(520px, 1.25fr) minmax(0, 0.75fr);
+      gap: 1.1rem;
+      align-items: stretch;
+    }
+
+    .mva-final-hotfire-text-box {
+      min-height: 0;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 1.0rem 1.15rem;
+      background: rgba(18, 18, 18, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 20px;
+      box-shadow: 0 22px 70px rgba(0, 0, 0, 0.42);
+    }
+
+    .mva-final-hotfire-text-box h2 {
+      color: white;
+      font-size: clamp(1.55rem, 2.4vw, 2.65rem);
+      line-height: 1.0;
+      letter-spacing: -0.055em;
+      margin-bottom: 0.75rem;
+      text-align: left;
+    }
+
+    .mva-final-hotfire-text-box p {
+      color: rgba(255, 255, 255, 0.74);
+      font-size: clamp(0.84rem, 0.95vw, 1.02rem);
+      line-height: 1.38;
+      margin: 0;
+      text-indent: 1.75em;
+    }
+
+    .mva-final-hotfire-text-box p + p {
+      margin-top: 0.55rem;
+    }
+
+    .mva-final-hotfire-video {
+      min-width: 0;
+      min-height: 360px;
+      overflow: hidden;
+      background: rgba(5, 5, 5, 0.50);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 22px;
+      box-shadow: 0 24px 90px var(--shadow);
+    }
+
+    .mva-final-hotfire-video video {
+      width: 100%;
+      height: 100%;
+      min-height: 320px;
+      object-fit: cover;
+      object-position: center center;
+      display: block;
+      background: rgba(30, 30, 30, 0.82);
+    }
+
+    /* Keep the final gallery as one row with exactly three images. */
+    .final-gallery-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    }
+
+    @media (max-width: 1050px) {
+      .mva-final-hotfire-row,
+      .final-gallery-grid {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    /* FINAL OVERRIDE: widen Final Integration paragraph section and tune gallery with width only. */
+    .mva-final-hotfire-row {
+      grid-template-columns: minmax(640px, 1.48fr) minmax(0, 0.52fr) !important;
+    }
+
+    .mva-final-hotfire-text-box {
+      width: 100% !important;
+    }
+
+    /* Gallery sizing is now controlled by column widths and image aspect ratios only.
+       No fixed pixel height is applied to the gallery row or gallery images. */
+    .final-gallery-grid {
+      grid-template-columns: minmax(0, 0.95fr) minmax(0, 0.70fr) minmax(0, 0.95fr) !important;
+      align-items: start !important;
+      gap: 0.75rem !important;
+    }
+
+    .final-gallery-tile {
+      height: auto !important;
+      min-height: 0 !important;
+      align-self: start !important;
+    }
+
+    .final-gallery-tile img,
+    .final-gallery-tile video {
+      width: 100% !important;
+      height: auto !important;
+      min-height: 0 !important;
+      object-fit: cover !important;
+      object-position: center center !important;
+      display: block !important;
+    }
+
+    @media (max-width: 1050px) {
+      .mva-final-hotfire-row,
+      .final-gallery-grid {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    /* FINAL OVERRIDE: Gallery uses the same media-card behavior as the paragraph/image sections.
+       Instead of letting each image decide its own height, the gallery is a stretched grid row:
+       - the two image tiles are grid cells
+       - both cells have the same row height
+       - images fill their cells with object-fit: cover
+       - adjust the column ratio below to tune image widths
+    */
+    .final-gallery-grid {
+      display: grid !important;
+      grid-template-columns: minmax(0, 1.28fr) minmax(0, 0.72fr) !important;
+      gap: 0.75rem !important;
+      align-items: stretch !important;
+      min-height: 520px !important;
+      height: min(62vh, 620px) !important;
+    }
+
+    .final-gallery-tile {
+      width: 100% !important;
+      height: 100% !important;
+      min-height: 0 !important;
+      overflow: hidden !important;
+      border-radius: 16px !important;
+      border: 1px solid rgba(255, 255, 255, 0.12) !important;
+      background: rgba(5, 5, 5, 0.50) !important;
+      align-self: stretch !important;
+    }
+
+    .final-gallery-tile img,
+    .final-gallery-tile video {
+      width: 100% !important;
+      height: 100% !important;
+      min-height: 0 !important;
+      object-fit: cover !important;
+      object-position: center center !important;
+      display: block !important;
+      background: rgba(30, 30, 30, 0.82) !important;
+    }
+
+    @media (max-width: 1050px) {
+      .final-gallery-grid {
+        grid-template-columns: 1fr !important;
+        height: auto !important;
+        min-height: 0 !important;
+      }
+
+      .final-gallery-tile {
+        height: 320px !important;
+      }
+    }
+
+
+    /* FINAL OVERRIDE: Final Integration and Hot-fire uses image | text | video layout. */
+    .mva-final-hotfire-row {
+      display: grid !important;
+      grid-template-columns: minmax(0, 0.72fr) minmax(520px, 1.45fr) minmax(0, 0.72fr) !important;
+      gap: 1.1rem !important;
+      align-items: stretch !important;
+    }
+
+    .mva-final-hotfire-media {
+      min-width: 0 !important;
+      min-height: 0 !important;
+      height: 100% !important;
+      overflow: hidden !important;
+      border-radius: 16px !important;
+      border: 1px solid rgba(255, 255, 255, 0.12) !important;
+      background: rgba(5, 5, 5, 0.50) !important;
+      box-shadow: 0 24px 90px var(--shadow) !important;
+    }
+
+    .mva-final-hotfire-media img,
+    .mva-final-hotfire-media video {
+      width: 100% !important;
+      height: 100% !important;
+      min-height: 0 !important;
+      object-fit: cover !important;
+      object-position: center center !important;
+      display: block !important;
+      background: rgba(30, 30, 30, 0.82) !important;
+    }
+
+    .mva-final-hotfire-text-box {
+      min-width: 0 !important;
+      height: 100% !important;
+      align-self: stretch !important;
+    }
+
+    @media (max-width: 1050px) {
+      .mva-final-hotfire-row {
+        grid-template-columns: 1fr !important;
+      }
+
+      .mva-final-hotfire-media {
+        min-height: 320px !important;
+      }
+    }
+
+
+    /* FINAL OVERRIDE: combined Design and Assembly section.
+       Order from left to right:
+       design image | paragraph | assembly image
+
+       This matches the other working image/paragraph sections:
+       the image cards stretch with the row, and the images fill the cards with cover
+       so there are no empty top/bottom gaps. */
+    .mva-design-row {
+      display: grid !important;
+      grid-template-columns: minmax(0, 0.82fr) minmax(560px, 1.46fr) minmax(0, 0.82fr) !important;
+      gap: 1.1rem !important;
+      align-items: stretch !important;
+    }
+
+    .mva-design-text-box {
+      min-width: 0 !important;
+      height: 100% !important;
+      align-self: stretch !important;
+      justify-content: center !important;
+    }
+
+    .mva-design-row > .mva-design-image,
+    .mva-design-row > .mva-design-assembly-image {
+      width: 100% !important;
+      height: 100% !important;
+      min-height: 0 !important;
+      align-self: stretch !important;
+      overflow: hidden !important;
+      display: block !important;
+      border-radius: 16px !important;
+      border: 1px solid rgba(255, 255, 255, 0.12) !important;
+      background: rgba(5, 5, 5, 0.50) !important;
+      box-shadow: 0 24px 90px var(--shadow) !important;
+    }
+
+    .mva-design-row > .mva-design-image img,
+    .mva-design-row > .mva-design-assembly-image img {
+      width: 100% !important;
+      height: 100% !important;
+      min-height: 0 !important;
+      object-fit: cover !important;
+      object-position: center center !important;
+      display: block !important;
+      background: rgba(30, 30, 30, 0.82) !important;
+      transform: none !important;
+      position: static !important;
+    }
+
+    @media (max-width: 1050px) {
+      .mva-design-row {
+        grid-template-columns: 1fr !important;
+      }
+
+      .mva-design-row > .mva-design-image,
+      .mva-design-row > .mva-design-assembly-image {
+        min-height: 320px !important;
+      }
+    }
+
+</style>
+</head>
+
+<body>
+  <div class="gif-background" aria-hidden="true">
+    <video id="heroVideo" muted playsinline loop autoplay preload="auto">
+      <source src="assets/Videos/AblativeVerticalHotfire1.mp4" type="video/mp4" />
+    </video>
+  </div>
+
+  <header class="topbar">
+    <a class="brand" href="index.html" aria-label="Jaden Dew homepage">
+      <span>Jaden Dew</span>
+    </a>
+
+    <nav aria-label="Main navigation">
+      <a class="nav-link" href="index.html">Home</a>
+
+      <div class="nav-item">
+        <a class="nav-link" href="portfolio.html">Portfolio</a>
+        <div class="nav-dropdown" aria-label="Portfolio project links">
+          <a class="dropdown-link" href="BEAR.html">BEAR: Berkeley Aerial Emergency Response</a>
+          <a class="dropdown-link" href="E3_MVA.html">Liquid Rocket Test Stand Main Valves</a>
+          <a class="dropdown-link" href="E178_ME103.html">Flying Wing Simulation and Control</a>
+          <a class="dropdown-link" href="ME100.html">The Devious Alarm</a>
+          <a class="dropdown-link" href="vast.html">Vast Space: Saiph Thruster Testing</a>
+          <a class="dropdown-link" href="poppet.html">Custom Poppet Valve</a>
+          <a class="dropdown-link" href="NASA.html">NASA: Dragonfly Rotor Blade Optimization</a>
+        </div>
+      </div>
+
+      <a class="nav-link" href="assets/jaden_resume_alt_3-22-2026.pdf" target="_blank" rel="noopener">Resume</a>
+      <a class="nav-link" href="https://www.linkedin.com/in/jaden-dew-178a37249/" target="_blank" rel="noopener">LinkedIn</a>
+    </nav>
+  </header>
+
+  <main id="top">
+    <section class="hero" aria-label="E3 MVA project hero">
+      <div class="hero-card">
+        <div class="hero-kicker">Student Team</div>
+        <h1>Liquid Rocket Test Stand Main Valves</h1>
+        <div class="hero-subtitle">Main valve assembly for the vertical test stand of the propulsion system for the "Eureka 3" rocket.</div>
+      </div>
+    </section>
+
+    <section class="section" aria-label="E3 MVA project overview">
+      <div class="section-inner">
+        <section class="project-panel">
+<div class="project-text-box">
+            <div>
+              <div class="section-kicker">Project Overview</div>
+              <h2> Vertical Test Stand Overview</h2>
+            </div>
+
+            <div class="vehicle-overview-grid">
+              <div class="vehicle-overview-column">
+                <p>
+                  Eureka 3 is my undergraduate student rocketry team's third liquid rocket and is the most recent step the team is taking towards developing a liquid spaceshot.
+                  This rocket marked a transition for the team away from utilizing mostly off the shelf hardware towards developing our own mass optimized custom flight
+                  hardware. Specifically with Eureka 3 the team sought to utilize a set of concentric tanks with the outer tank containing the oxidizer, nitrous oxide, and the
+                  inner tank containing the fuel, isopropyl alcohol (IPA). This would allow for the nitrous oxide ullage to push a piston in the IPA tank pressurizing them both.
+                  This configuration had never been attempted before by the team and as such required the creation of a stand to test these tanks in hot-fire conditions.
+                </p>
+                <p>
+                  To create a stand that could be used to validate our tank and piston's design an entirely new propulsion feed system needed to be developed from the ground up. This
+                  included an all new fill system, ignition system, ablative engine, and set of main valves that we knew were reliable to isolate issues to just the custom tanks.
+                  As such I was tasked with creating a main valve assembly that included both the plumbing and structure that was robust, reliable, and easily repairable to be used in
+                  this test stand. 
+                </p>
+
+              </div>
+            </div>
+          </div>
+
+            <div class="vehicle-overview-image">
+              <img src="assets/MVA/E3MidHotfire.JPG" alt="E3 MVA overview image" />
+            </div>
+        </section>
+
+        <section class="mva-design-section" aria-label="Main Valve Assembly Design">
+          <div class="mva-design-row">
+            <div class="mva-design-image">
+              <img src="assets/MVA/MVACAD.png" alt="Main valve assembly design image" />
+            </div>
+
+            <div class="mva-design-text-box">
+              <h2>Main Valve Design, Manufacturing, and Assembly</h2>
+              <p>
+                	Since the main valves needed to be reliable i chose to utilize a simple heritage design similar to the main valves used on the team's two previous
+                  rockets. This design utilized two COTS ball valves, one for each propellant, that are actuated by two COTS pneumatic cylinders. These pneumatic
+                  cylinders were connected to the ball valves via a custom-designed handle that attached to the ball valves at the stem. On the other side of the
+                  handle was a slot that interfaced with a clevis attached to the pneumatic cylinders. This allows the clevis to slide along the slot as the pneumatic
+                  cylinder actuates, rotating the valve 90 degrees, either fully opening or fully closing the ball valve. Pneumatic cylinders were specifically used due to
+                  their fast response time as these valves needed the ability to open and close instantaneously such that the necessary valve timing could be achieved. Additionally,
+                  only two states were needed for these valves, fully open and fully closed, removing the need for actuators like motors that can achieve in between states. Additionally the plumbing in the
+                  assembly was designed to minimize and in some cases completely remove bends in order to reduce the pressure loss experienced between the tanks and the injector. This provided
+                  the additional benefit of making the main valve assembly area fairly large and as such easy to access during test operations.
+              <p>
+                For the surrounding structure a simple set of waterjetted plates were designed to constrain the valves in 2 dimensions with the fittings on either side of the valve constraining it vertically.
+                These plates were able to be fairly thin due to the thrust being completely absorbed by the steel thrust transfer plates below. The rails were designed by a different member of the team and served as the
+                attachment point between the constraining rings and the tanks above fully holding the structures in place.
+              </p>
+              <p>
+                Due to the fairly simple design and the widespread use of off the shelf parts the manufacturing and assembly of the main valve assembly was fairly straightforward.
+                In terms of manufacturing both the handles and the retaining rings were cut out of 6061 aluminum on an OMAX waterjet cutter. The handles were cut out of 3/8 in and 1/4
+                in respectively. There were a few issues with the initial assembly due to previously looked over collisions between parts and due to differences between the CAD of the valves and reality
+                but these issues were quickly fixed with a revised CAD and re-cutting on the waterjet. Once these conflicts were sorted, assembly was straightforward and went quickly.
+              </p>
+            </div>
+
+            <div class="mva-design-image mva-design-assembly-image">
+              <img src="assets/MVA/MVAAssembly.jpg" alt="Manufacturing and assembly image" />
+            </div>
+          </div>
+        </section>
+
+        <section class="mva-unit-testing-section" aria-label="Unit Testing">
+          <div class="mva-unit-testing-row">
+            <div class="mva-unit-testing-video">
+              <video muted playsinline loop autoplay preload="auto">
+                <source src="assets/Videos/MVATest.mp4" type="video/mp4" />
+              </video>
+            </div>
+
+            <div class="mva-unit-testing-text-box">
+              <h2>Unit Testing</h2>
+              <p>
+                Before integrating the main valve assembly with the rest of the test stand a quick unit test was performed to ensure the valves were operating as expected.
+                To do so the pneumatic lines were connected to a set of solenoid valves and then to a nitrogen pressurized gas cylinder. In this way were were able to use the solenoids to
+                control the opening and closing of the valves verifying their range of motion and responsiveness. As can be seen, the test was a success indicating that the assembly was ready
+                to be integrated into the rest of the test stand. 
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section class="mva-final-hotfire-section" aria-label="Final Integration and Hot-fire">
+          <div class="mva-final-hotfire-row">
+            <div class="mva-final-hotfire-media mva-final-hotfire-image">
+              <img src="assets/MVA/MVA_GloryShot2.jpg" alt="Final integration image" />
+            </div>
+
+            <div class="mva-final-hotfire-text-box">
+              <h2>Final Integration and Hot-Fire</h2>
+              <p>
+                Building off of the unit test, the main valve assembly was successfully integrated into the vertical test stand. THe goal of this test stand was to enable the
+                testing of our new tank architecture in hotfire conditions. To make it to hot-fire and series of cold-flow tests were performed with the valves working nominally
+                throughout the cold-flow campaign. This built up confidence that the valve would work correctly under hot-fire conditions. From the video on the right it can be
+                it can be seen that despite the issues that were experienced with ignition and hard-starting, the main valves worked nominally during the hot-fire test, validating the reliability of the design.
+              <p>
+                The root cause of this hard-start was determined to be issues with the way our  igniter was set up. The team utilized an up-the-throat style igniter meaning that a small solid rocket motor was pointed at the injector face to ignite the
+                propellant mixture. This style of igniter is designed to be shot out of the chamber once the propellants ignite, clearing up the chamber for proper combustion. In this case the igniter was not strong enough
+                to ignite the oncoming mixture due to the oncoming velocity of the propellants being too high as well as nitrous being a notoriously hard fuel to ignite in its liquid phase. This compounded with the
+                premature release of the igniter from the chamber resulting in it landing within the cloud of unburned propellants settling outside of the chamber. This resulted in the outside gasses igniting and
+                flashing back into the chamber causing the hardstart. This indicates that despite the sub-par hot-fire the valves were not the issue as such their validation under hot-fire conditions still stands.
+              </p>
+            </div>
+
+            <div class="mva-final-hotfire-video">
+              <video muted playsinline loop autoplay preload="auto">
+                <source src="assets/Videos/E3Verticla_SideProf.mp4" type="video/mp4" />
+              </video>
+            </div>
+          </div>
+        </section>
+
+
+
+
+        <section class="final-gallery-section" aria-label="Gallery">
+          <h2>Gallery</h2>
+
+          <div class="final-gallery-grid">
+            <div class="final-gallery-tile">
+              <img src="assets/MVA/E3NightShot.jpg" alt="E3 MVA gallery image 1" />
+            </div>
+
+            <div class="final-gallery-tile">
+              <img src="assets/MVA_GloryShot.JPG" alt="E3 MVA gallery image 3" />
+            </div>
+          </div>
+        </section>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>© 2026 Jaden Dew.</p>
+  </footer>
+
+  <script>
+    const heroVideo = document.getElementById("heroVideo");
+
+    function updateBackgroundFade() {
+      const y = window.scrollY || window.pageYOffset;
+      const fadeStart = window.innerHeight * 0.55;
+      const fadeEnd = window.innerHeight * 1.10;
+
+      let opacity = 1.0;
+      if (y > fadeStart) {
+        const p = Math.min(1, (y - fadeStart) / Math.max(1, fadeEnd - fadeStart));
+        opacity = 1.0 - 0.55 * p;
+      }
+
+      if (heroVideo) heroVideo.style.opacity = String(opacity);
+    }
+
+    if (heroVideo) {
+      heroVideo.play().catch(() => {});
+    }
+
+    window.addEventListener("load", updateBackgroundFade);
+    window.addEventListener("scroll", updateBackgroundFade, { passive: true });
+    window.addEventListener("resize", updateBackgroundFade);
+  </script>
+</body>
+</html>
