@@ -181,6 +181,7 @@
 
     .hero {
       min-height: 100vh;
+      min-height: 100svh;
       display: flex;
       align-items: end;
       padding: calc(var(--topbar-h) + 2rem) 6vw 3.5rem;
@@ -227,7 +228,8 @@
 
     .section {
       min-height: 100vh;
-      padding: calc(var(--topbar-h) + 0.75rem) 2rem 0.9rem;
+      min-height: 100svh;
+      padding: calc(var(--topbar-h) + 1rem) clamp(1rem, 4vw, 2rem) clamp(1.25rem, 3vh, 2rem);
       display: grid;
       align-items: stretch;
       background: rgba(0, 0, 0, 0.72);
@@ -1270,6 +1272,149 @@
     @media (max-width: 1050px) {
       .blade-3d-section .blade-3d-row:nth-of-type(3).blade-3d-text-left {
         grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    /* ==================================================================
+       PREVENTIVE FIXES. Nothing here changes the page at a normal
+       desktop width.
+       ================================================================== */
+
+
+    /* ------------------------------------------------------------------
+       1. THE ONE THAT IS ALREADY CLOSE TO FAILING
+
+       The OVERFLOW verification pair:
+
+         .blade-3d-overflow-media-pair .blade-3d-captioned-tile
+             { min-height: 320px; grid-template-rows: minmax(0,1fr) auto; }
+         .blade-3d-overflow-media-pair .blade-3d-captioned-tile img
+             { height: 100%; min-height: 275px; }
+
+       The tile's 320px covers the image row AND the caption row. A
+       one-line caption leaves 290px for the image, which clears 275px
+       with 15px to spare. But the caption reads "OVERFLOW verification
+       table for the first optimized blade geometry." - in a half-width
+       tile that wraps to two lines, leaving 274px, and the image
+       overruns its row. overflow:hidden then clips the bottom.
+
+       The first tile escapes this because a later override already gives
+       it min-height: 0 with contain. The second tile does not.
+
+       Handing sizing back to the grid row fixes it. The tiles keep their
+       own floors, so nothing collapses.
+       ------------------------------------------------------------------ */
+    .blade-3d-overflow-media-pair .blade-3d-captioned-tile.blade-3d-captioned-tile > img,
+    .blade-3d-overflow-media-pair .blade-3d-captioned-tile.blade-3d-captioned-tile > video {
+      min-height: 0 !important;
+    }
+
+    /* Same latent fault, everywhere else it appears. */
+    .blade-3d-captioned-tile > img,
+    .blade-3d-captioned-tile > video,
+    .blade-3d-media-tile > img,
+    .blade-3d-media-tile > video,
+    .airfoil-2d-media-tile > img,
+    .airfoil-2d-media-tile > video,
+    .preliminary-media-tile > img,
+    .poppet-design-media-tile > img,
+    .poppet-analysis-media-tile > img,
+    .overview-gif-card > img,
+    .overview-gif-card > video,
+    .final-gallery-tile > img,
+    .final-gallery-tile > video,
+    .project-media-card > img,
+    .project-media-card > video {
+      min-height: 0 !important;
+    }
+
+
+    /* ------------------------------------------------------------------
+       2. THE SQUEEZE ZONE (1051px - ~1300px)
+
+       The tuned rows put hard pixel floors on the paragraph column:
+
+         blade-3d row 3   minmax(640px, 1.40fr)
+         .poppet-design-row              520px
+         blade-3d row 2                  420px
+         .project-panel                  360px
+         .blade-3d-text-left / -right    340px
+         .preliminary-row                340px
+
+       Those floors do not shrink; the image column does. Just above the
+       1050px stacking point a row has about 923px of usable width, so
+       the 640px floor leaves roughly 265px for the media - while the
+       tiles carry min-height: 360px. A 265x360 portrait box holding a
+       wide plot loses most of its width to object-fit: cover.
+
+       Stacking earlier skips the zone. The image PAIR is left alone -
+       once the parent row is full width, two tiles side by side is right.
+       ------------------------------------------------------------------ */
+    @media (max-width: 1300px) {
+      .project-panel,
+      .preliminary-row,
+      .poppet-design-row,
+      .airfoil-2d-top-row,
+      .airfoil-2d-bottom-row,
+      .blade-3d-row.blade-3d-text-left,
+      .blade-3d-row.blade-3d-text-right,
+      .blade-3d-section .blade-3d-row:nth-of-type(2),
+      .blade-3d-section .blade-3d-row:nth-of-type(3).blade-3d-text-left,
+      .blade-3d-section .blade-3d-row:nth-of-type(3).blade-3d-text-right {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    /* ------------------------------------------------------------------
+       3. The 12-column gallery mosaic
+
+       The mosaic spans (4/4/4 then 3/6/3) hold until the 1050px
+       breakpoint, where every tile drops to one per row. Between about
+       700px and 1050px that means six full-width tiles at min-height
+       260px each - a very long scroll. Two-up in that band reads better
+       and costs nothing above it.
+       ------------------------------------------------------------------ */
+    @media (min-width: 641px) and (max-width: 1050px) {
+      .final-gallery-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+      }
+
+      .final-gallery-grid .final-gallery-tile:nth-child(n) {
+        grid-column: auto !important;
+      }
+    }
+
+
+    /* ------------------------------------------------------------------
+       4. Small-screen odds and ends
+       ------------------------------------------------------------------ */
+
+    img,
+    video,
+    svg {
+      max-width: 100%;
+    }
+
+    @media (max-width: 640px) {
+      /* 235px of nowrap links, centred on the nav item, runs off a phone. */
+      .nav-dropdown {
+        min-width: 0;
+        width: max-content;
+        max-width: 88vw;
+      }
+
+      .dropdown-link {
+        white-space: normal;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      * {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
       }
     }
 

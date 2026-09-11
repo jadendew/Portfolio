@@ -199,7 +199,8 @@
 
     .section {
       min-height: 100vh;
-      padding: calc(var(--topbar-h) + 1.25rem) 2rem 1.25rem;
+      min-height: 100svh;   /* mobile: excludes the collapsing address bar */
+      padding: calc(var(--topbar-h) + 1.25rem) clamp(1rem, 4vw, 2rem) clamp(1.25rem, 3vh, 2rem);
       display: grid;
       align-items: stretch;
       background: rgba(0, 0, 0, 0.72);
@@ -212,7 +213,7 @@
     }
 
     .portfolio-panel {
-      min-height: calc(100vh - var(--topbar-h) - 2.5rem);
+      min-height: calc(100svh - var(--topbar-h) - 2.5rem);
       padding: clamp(1.2rem, 2.4vw, 2rem);
       background: rgba(18, 18, 18, 0.92);
       border: 1px solid rgba(255, 255, 255, 0.16);
@@ -304,7 +305,7 @@
 
 
     .portfolio-panel {
-      min-height: calc(100vh - var(--topbar-h) - 2.5rem);
+      min-height: calc(100svh - var(--topbar-h) - 2.5rem);
       padding: clamp(1.2rem, 2.4vw, 2rem);
       background: rgba(18, 18, 18, 0.92);
       border: 1px solid rgba(255, 255, 255, 0.16);
@@ -312,7 +313,7 @@
       box-shadow: 0 28px 95px rgba(0, 0, 0, 0.5);
       display: flex;
       flex-direction: column;
-      gap: 1rem;
+      gap: clamp(0.7rem, 1.4vw, 1.2rem);
       text-align: center;
     }
 
@@ -369,7 +370,9 @@
 
     .featured-project {
       display: grid;
-      grid-template-columns: minmax(0, 1.12fr) minmax(320px, 0.88fr);
+      /* minmax(0, ...) rather than minmax(320px, ...): the text column can
+         now shrink instead of forcing horizontal overflow */
+      grid-template-columns: minmax(0, 1.12fr) minmax(0, 0.88fr);
       align-items: stretch;
       min-height: 315px;
     }
@@ -408,7 +411,7 @@
     .project-tag {
       display: inline-block;
       color: var(--muted);
-      font-size: 0.72rem;
+      font-size: clamp(0.68rem, 0.6rem + 0.14vw, 0.8rem);
       text-transform: uppercase;
       letter-spacing: 0.12em;
       font-weight: 760;
@@ -425,21 +428,33 @@
 
     .project-content p {
       color: var(--subtle);
-      font-size: 0.92rem;
-      line-height: 1.38;
+      font-size: clamp(0.86rem, 0.62rem + 0.32vw, 1rem);
+      line-height: 1.45;
       margin-bottom: 0.85rem;
+      max-width: 72ch;   /* keeps line length readable on a wide monitor */
     }
 
 
     .project-grid {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 0.9rem;
+      gap: clamp(0.6rem, 1.1vw, 1.1rem);
     }
 
     .project-grid .project-card {
       display: grid;
-      grid-template-rows: 185px auto;
+      /* auto = the image's own height (set below), 1fr = the text row,
+         which absorbs any extra height so cards in a row stay level
+         WITHOUT stretching the image */
+      grid-template-rows: auto 1fr;
+      container-type: inline-size;
+    }
+
+    .project-grid .project-media {
+      /* 21cqw = 21% of THIS CARD's width, so the image keeps the same
+         proportion whether the card is 875px wide or 350px.
+         At 1920px this evaluates to ~185px, matching the old fixed value. */
+      height: clamp(150px, 21cqw, 260px);
     }
 
     .project-grid .project-media {
@@ -492,6 +507,16 @@
         padding-left: 1rem;
         padding-right: 1rem;
       }
+
+      .nav-dropdown {
+        min-width: 0;
+        width: max-content;
+        max-width: 88vw;
+      }
+
+      .dropdown-link {
+        white-space: normal;
+      }
     }
 
     @media (max-width: 1050px) {
@@ -514,15 +539,21 @@
     .featured-project-grid {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 0.9rem;
+      gap: clamp(0.6rem, 1.1vw, 1.1rem);
       width: 100%;
     }
 
     .featured-project-grid .featured-project {
       display: grid;
       grid-template-columns: 1fr !important;
-      grid-template-rows: 230px auto;
+      grid-template-rows: auto 1fr;
       min-height: 0;
+      container-type: inline-size;
+    }
+
+    .featured-project-grid .project-media {
+      /* ~230px at 1920px, same as the old fixed row */
+      height: clamp(170px, 26cqw, 300px);
     }
 
     .featured-project-grid .project-media {
@@ -603,6 +634,46 @@
       border: none !important;
       outline: none !important;
       box-shadow: none !important;
+    }
+
+
+    /* ------------------------------------------------------------------
+       Responsive safety net
+       ------------------------------------------------------------------ */
+
+    img,
+    video,
+    svg {
+      max-width: 100%;
+    }
+
+    /* Browsers without container query support fall back to the old
+       fixed rows rather than a collapsed image. */
+    @supports not (container-type: inline-size) {
+      .project-grid .project-card {
+        grid-template-rows: 185px 1fr;
+      }
+
+      .featured-project-grid .featured-project {
+        grid-template-rows: 230px 1fr;
+      }
+    }
+
+    /* Once the cards go single column they are full width, so the images
+       want a shallower ratio or they dominate the tile. */
+    @media (max-width: 1050px) {
+      .project-grid .project-media,
+      .featured-project-grid .project-media {
+        height: clamp(150px, 34cqw, 240px);
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      * {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
     }
 
   </style>

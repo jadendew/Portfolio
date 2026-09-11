@@ -211,10 +211,11 @@
     }
 
     .hero {
-      min-height: 100vh;
+      min-height: 100vh;      /* fallback for old browsers */
+      min-height: 100svh;     /* mobile: ignores the collapsing address bar */
       display: flex;
       align-items: end;
-      padding: calc(var(--topbar-h) + 2rem) 6vw 3.5rem;
+      padding: calc(var(--topbar-h) + 2rem) 6vw clamp(2rem, 5vh, 3.5rem);
       background: transparent;
     }
 
@@ -252,7 +253,10 @@
 
     .section {
       min-height: 100vh;
-      padding: calc(var(--topbar-h) + 0.75rem) 2rem 0.9rem;
+      min-height: 100svh;
+      /* min-height, not height: the section is allowed to grow past one
+         screen when the content needs more room. */
+      padding: calc(var(--topbar-h) + 1rem) clamp(1rem, 4vw, 2rem) clamp(1.5rem, 4vh, 2.5rem);
       display: grid;
       align-items: stretch;
     }
@@ -274,17 +278,25 @@
     }
 
     .media-results-layout {
-      height: calc(100vh - var(--topbar-h) - 1.65rem);
+      /* was: height: calc(100vh - ...) which CLIPPED content on short screens.
+         min-height keeps the full-screen look, but lets it grow if it must. */
+      min-height: calc(100svh - var(--topbar-h) - 4rem);
       display: grid;
-      grid-template-columns: minmax(360px, 0.32fr) minmax(390px, 0.68fr);
-      grid-template-rows: minmax(0, 1fr);
-      gap: 0.85rem;
+      /* minmax(0, ...) instead of minmax(360px, ...): the columns can now
+         shrink below their content width instead of forcing a scrollbar. */
+      grid-template-columns: minmax(0, 0.34fr) minmax(0, 0.66fr);
+      /* row 1 = headshot + About Me, takes the leftover space
+         row 2 = Learn More, full width, sized to its own content */
+      grid-template-rows: minmax(0, 1fr) auto;
+      gap: clamp(0.6rem, 1.2vw, 1.1rem);
     }
 
     .media-text-column {
       min-height: 0;
-      height: 100%;
-      overflow: hidden;
+      height: auto;
+      /* was overflow: hidden -- that is what silently cut off the bottom of
+         the About Me / Skills text on any screen shorter than yours. */
+      overflow: visible;
     }
 
     .media-grid {
@@ -295,7 +307,11 @@
     }
 
     .combined-media-grid {
-      min-height: 0;
+      min-height: min(60svh, 34rem);
+      /* stops the headshot from stretching into a very tall crop when the
+         text column grows on a narrow window */
+      max-height: calc(100svh - var(--topbar-h) - 3rem);
+      align-self: stretch;
       grid-template-columns: 1fr;
       grid-template-rows: minmax(0, 1fr);
     }
@@ -404,8 +420,9 @@
 
     .compact-results-box p {
       color: rgba(255, 255, 255, 0.74);
-      font-size: clamp(0.755rem, 0.795vw, 0.92rem);
-      line-height: 1.255;
+      /* fluid type: 0.3rem + 0.8vw grows smoothly between the two bounds */
+      font-size: clamp(0.88rem, 0.3rem + 0.8vw, 1.02rem);
+      line-height: 1.45;
       max-width: 100%;
       margin: 0;
       text-align: center;
@@ -432,8 +449,10 @@
 
     .skills-grid {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 0.75rem;
+      /* auto-fit reflows 3 -> 2 -> 1 columns on its own, at whatever width
+         the cards actually stop fitting. No breakpoint needed. */
+      grid-template-columns: repeat(auto-fit, minmax(min(15rem, 100%), 1fr));
+      gap: clamp(0.5rem, 1vw, 0.9rem);
       width: 100%;
     }
 
@@ -470,21 +489,31 @@
 
 
     .learn-more-section {
-      margin-top: 0.65rem;
-      padding-top: 0.55rem;
-      border-top: 1px solid rgba(255, 255, 255, 0.10);
+      grid-column: 1 / -1;   /* full width, under both columns */
+      padding: clamp(0.7rem, 1.1vw, 1.1rem) clamp(0.85rem, 1.3vw, 1.3rem);
+      background: rgba(18, 18, 18, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 20px;
+      box-shadow: 0 22px 70px rgba(0, 0, 0, 0.42);
     }
 
     .learn-more-section h2 {
       color: white;
       text-align: center;
-      margin-bottom: 0.55rem;
+      /* this used to inherit its size from .compact-results-box h2;
+         now that it lives outside that box it needs its own */
+      font-size: clamp(1.3rem, 0.6rem + 1.1vw, 1.84rem);
+      line-height: 1.05;
+      letter-spacing: -0.04em;
+      margin-bottom: clamp(0.45rem, 0.9vw, 0.8rem);
     }
 
     .learn-more-grid {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 0.75rem;
+      /* auto-fit reflows 3 -> 2 -> 1 columns on its own, at whatever width
+         the cards actually stop fitting. No breakpoint needed. */
+      grid-template-columns: repeat(auto-fit, minmax(min(15rem, 100%), 1fr));
+      gap: clamp(0.5rem, 1vw, 0.9rem);
       width: 100%;
     }
 
@@ -509,7 +538,9 @@
 
     .learn-more-tile img {
       width: 100%;
-      height: 115px;
+      aspect-ratio: 16 / 6.5;
+      height: auto;
+      max-height: 26vh;
       object-fit: cover;
       display: block;
       background: rgba(30, 30, 30, 0.82);
@@ -555,7 +586,7 @@
     }
 
     .text-panel {
-      min-height: calc(100vh - var(--topbar-h) - 3.35rem);
+      min-height: calc(100svh - var(--topbar-h) - 3.35rem);
       display: grid;
       grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
       gap: 1.25rem;
@@ -631,7 +662,7 @@
     }
 
     .flowchart-panel {
-      min-height: calc(100vh - var(--topbar-h) - 3.35rem);
+      min-height: calc(100svh - var(--topbar-h) - 3.35rem);
       padding: clamp(1.2rem, 2.4vw, 2rem);
       background: rgba(18, 18, 18, 0.90);
       border: 1px solid rgba(255, 255, 255, 0.16);
@@ -666,7 +697,10 @@
 
     .flowchart {
       display: grid;
-      grid-template-columns: minmax(0, 1fr) 70px minmax(0, 1fr) 70px minmax(0, 1fr);
+      grid-template-columns:
+        minmax(0, 1fr) clamp(28px, 4vw, 70px)
+        minmax(0, 1fr) clamp(28px, 4vw, 70px)
+        minmax(0, 1fr);
       align-items: stretch;
       gap: 0.9rem;
     }
@@ -692,7 +726,7 @@
 
     .flow-step img {
       width: 100%;
-      height: 170px;
+      height: clamp(120px, 18vh, 200px);
       object-fit: cover;
       display: block;
       background: rgba(30, 30, 30, 0.82);
@@ -780,9 +814,14 @@
 
       .media-results-layout {
         height: auto;
-        min-height: calc(100vh - var(--topbar-h) - 3.35rem);
+        min-height: 0;
         grid-template-columns: 1fr;
-        grid-template-rows: auto minmax(300px, 1fr);
+        grid-template-rows: auto auto auto;
+      }
+
+      .learn-more-tile img {
+        aspect-ratio: 16 / 7;
+        max-height: none;
       }
 
       .media-text-column {
@@ -794,14 +833,14 @@
         grid-template-rows: minmax(240px, 1fr);
       }
 
+      .combined-media-grid {
+        min-height: clamp(220px, 42svh, 420px);
+        max-height: none;
+      }
+
       .compact-results-box {
         grid-template-columns: 1fr;
         height: auto;
-      }
-
-      .skills-grid,
-      .learn-more-grid {
-        grid-template-columns: 1fr;
       }
 
       .flow-arrow {
@@ -832,6 +871,16 @@
 
       .flow-step img {
         height: 120px;
+      }
+
+      .nav-dropdown {
+        min-width: 0;
+        width: max-content;
+        max-width: 88vw;
+      }
+
+      .dropdown-link {
+        white-space: normal;
       }
     }
   
@@ -884,35 +933,21 @@
     }
 
 
-    /* FINAL OVERRIDE: make Learn More tiles stretch to the bottom of the text box. */
+    /* The About Me column still stretches to fill row 1. */
     .compact-results-box {
       display: flex !important;
       flex-direction: column !important;
       align-content: stretch !important;
     }
 
-    .learn-more-section {
-      flex: 1 1 auto !important;
-      display: flex !important;
-      flex-direction: column !important;
-      min-height: 0 !important;
-    }
-
+    /* Tiles are equal height across the row, sized by their own content. */
     .learn-more-grid {
-      flex: 1 1 auto !important;
-      min-height: 0 !important;
-      align-items: stretch !important;
+      align-items: stretch;
     }
 
     .learn-more-tile {
-      height: 100% !important;
-      display: grid !important;
-      grid-template-rows: minmax(0, 1fr) auto !important;
-    }
-
-    .learn-more-tile img {
-      height: 100% !important;
-      min-height: 115px !important;
+      display: grid;
+      grid-template-rows: auto 1fr;
     }
 
 
@@ -937,6 +972,50 @@
       margin-top: 0.35rem;
       padding-top: 0;
       border-top: none;
+    }
+
+
+    /* ------------------------------------------------------------------
+       Responsive safety net
+       ------------------------------------------------------------------ */
+
+    /* Nothing is ever allowed to be wider than its container. */
+    img,
+    video,
+    svg {
+      max-width: 100%;
+    }
+
+    /* Short screens (most laptops are ~700-800px of usable height).
+       Let sections size to their content instead of fighting for 100vh. */
+    @media (max-height: 820px) and (min-width: 1051px) {
+      .section {
+        min-height: 0;
+      }
+
+      .media-results-layout {
+        min-height: 0;
+      }
+
+      .combined-media-grid {
+        min-height: min(78svh, 30rem);
+      }
+    }
+
+    /* Very wide screens: stop the line length from getting unreadable. */
+    @media (min-width: 1900px) {
+      .compact-results-box p {
+        max-width: 78ch;
+        margin-inline: auto;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      * {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
     }
 
   </style>
@@ -1004,7 +1083,7 @@
 
             <div class="about-me-box">
               <p>
-                Hello, my name is Jaden and I am currently a Masters student at UCLA studying Aerospace Engineering. I have recently graduated from the University of California, Berkeley 
+                Hello, my name is Jaden. I am a Masters student at UCLA studying Aerospace Engineering who is currently interning at Orbital Operations as a propulsion engineer. I have recently graduated from the University of California, Berkeley 
                 with a B.S. in Aerospace Engineering as a part of the major's inaugural class. I am interested in all things propulsion and aerodynamics, a passion I have cultivated throughout
                 my undergraduate degree.  I believe that the exploration and inhabitation of space is essential for humanity's future, and I am determined to push us towards this reality.    
               </p>
@@ -1046,36 +1125,37 @@
               </div>
             </div>
 
-            <div class="learn-more-section">
-              <h2>Learn More!</h2>
-              <div class="learn-more-grid">
-                <a class="learn-more-tile" href="portfolio.html">
-                  <img src="assets/MVA_GloryShot.JPG" alt="Portfolio preview" />
-                  <div class="learn-more-tile-content">
-                    <span class="learn-more-tile-page">Portfolio</span>
-                    <h3>Engineering Project Portfolio</h3>
-                    <p>Learn about my various engineering projects and technical work.</p>
-                  </div>
-                </a>
+          </div>
 
-                <a class="learn-more-tile" href="assets/jaden_resume_alt_3-22-2026.pdf" target="_blank" rel="noopener">
-                  <img src="assets/ResumeSnippet.png" alt="Resume preview" />
-                  <div class="learn-more-tile-content">
-                    <span class="learn-more-tile-page">Resume</span>
-                    <h3>Updated Resume PDF</h3>
-                    <p>View the most up to date version of my resume.</p>
-                  </div>
-                </a>
+          <div class="learn-more-section">
+            <h2>Learn More!</h2>
+            <div class="learn-more-grid">
+              <a class="learn-more-tile" href="portfolio.html">
+                <img src="assets/MVA_GloryShot.JPG" alt="Portfolio preview" />
+                <div class="learn-more-tile-content">
+                  <span class="learn-more-tile-page">Portfolio</span>
+                  <h3>Engineering Project Portfolio</h3>
+                  <p>Learn about my various engineering projects and technical work.</p>
+                </div>
+              </a>
 
-                <a class="learn-more-tile" href="https://www.linkedin.com/in/jaden-dew-178a37249/" target="_blank" rel="noopener">
-                  <img src="assets/LinkedInIcon.png" alt="LinkedIn preview" />
-                  <div class="learn-more-tile-content">
-                    <span class="learn-more-tile-page">LinkedIn</span>
-                    <h3>Connect With Me</h3>
-                    <p>Visit my LinkedIn profile for more information.</p>
-                  </div>
-                </a>
-              </div>
+              <a class="learn-more-tile" href="assets/jaden_resume_alt_3-22-2026.pdf" target="_blank" rel="noopener">
+                <img src="assets/ResumeSnippet.png" alt="Resume preview" />
+                <div class="learn-more-tile-content">
+                  <span class="learn-more-tile-page">Resume</span>
+                  <h3>Updated Resume PDF</h3>
+                  <p>View the most up to date version of my resume.</p>
+                </div>
+              </a>
+
+              <a class="learn-more-tile" href="https://www.linkedin.com/in/jaden-dew-178a37249/" target="_blank" rel="noopener">
+                <img src="assets/LinkedInIcon.png" alt="LinkedIn preview" />
+                <div class="learn-more-tile-content">
+                  <span class="learn-more-tile-page">LinkedIn</span>
+                  <h3>Connect With Me</h3>
+                  <p>Visit my LinkedIn profile for more information.</p>
+                </div>
+              </a>
             </div>
           </div>
 

@@ -185,6 +185,7 @@
 
     .hero {
       min-height: 100vh;
+      min-height: 100svh;
       display: flex;
       align-items: end;
       padding: calc(var(--topbar-h) + 2rem) 6vw 3.5rem;
@@ -231,7 +232,8 @@
 
     .section {
       min-height: 100vh;
-      padding: calc(var(--topbar-h) + 0.75rem) 2rem 0.9rem;
+      min-height: 100svh;
+      padding: calc(var(--topbar-h) + 1rem) clamp(1rem, 4vw, 2rem) clamp(1.25rem, 3vh, 2rem);
       display: grid;
       align-items: stretch;
       background: rgba(0, 0, 0, 0.72);
@@ -244,7 +246,7 @@
     }
 
     .project-panel {
-      min-height: calc(100vh - var(--topbar-h) - 1.65rem);
+      min-height: calc(100svh - var(--topbar-h) - 1.65rem);
       padding: clamp(1.2rem, 2.4vw, 2rem);
       background: rgba(18, 18, 18, 0.92);
       border: 1px solid rgba(255, 255, 255, 0.16);
@@ -696,6 +698,115 @@
         padding-right: 1rem;
       }
     }
+
+    /* ==================================================================
+       PREVENTIVE FIXES. Nothing here changes the page at a normal
+       desktop width.
+       ================================================================== */
+
+
+    /* ------------------------------------------------------------------
+       1. MEDIA min-height OVERRUNNING ITS OWN GRID ROW
+
+         .poppet-analysis-media-tile     { min-height: 360px;
+                                grid-template-rows: minmax(0,1fr) auto; }
+         .poppet-analysis-media-tile img { height: 100%;
+                                           min-height: 315px; }
+
+       The tile's 360px covers the image row AND the caption row, so the
+       image row is 360px minus the caption - but the image is told to be
+       315px on its own. Your two captions are short enough to stay on one
+       line today, which leaves ~45px of slack. A caption that wraps to
+       two lines drops the row to ~314px, the image overruns it, and
+       overflow:hidden clips the bottom.
+
+       The narrower of the two tiles is the one to watch: it sits in the
+       0.944fr column, so its caption wraps first as the window narrows.
+
+       The tiles keep their own floors, so nothing collapses.
+       ------------------------------------------------------------------ */
+    .poppet-analysis-media-tile > img,
+    .poppet-analysis-media-tile > video,
+    .preliminary-media-tile > img,
+    .preliminary-media-tile > video,
+    .poppet-design-media-tile > img,
+    .poppet-design-media-tile > video,
+    .project-media-card > img,
+    .project-media-card > video {
+      min-height: 0 !important;
+    }
+
+
+    /* ------------------------------------------------------------------
+       2. THE SQUEEZE ZONE (1051px - ~1300px)
+
+         .poppet-design-row   minmax(0, 0.75fr) minmax(520px, 1.25fr)
+         .preliminary-row     minmax(340px, 0.85fr) minmax(0, 1.15fr)
+
+       The pixel floors do not shrink; the image columns do. Just above
+       the 1050px stacking point a row has about 923px of usable width,
+       so the 520px floor leaves roughly 385px for the media - while
+       .poppet-design-media-tile carries min-height: 360px. A 385x360
+       near-square box holding a wide CAD render loses most of its width
+       to object-fit: cover.
+
+       Stacking earlier skips the zone entirely.
+       ------------------------------------------------------------------ */
+    @media (max-width: 1300px) {
+      .project-panel,
+      .preliminary-row,
+      .poppet-design-row {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    /* ------------------------------------------------------------------
+       3. The two analysis images side by side
+
+       .poppet-analysis-media-row holds 1.658fr / 0.944fr and only
+       collapses at 640px. Between 640px and 1050px the narrower tile is
+       roughly 230px wide while still 360px tall, which is a hard crop on
+       a wide plot. Collapse it with the rest of the layout instead.
+       ------------------------------------------------------------------ */
+    @media (max-width: 1050px) {
+      .poppet-analysis-media-row {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    /* ------------------------------------------------------------------
+       4. Small-screen odds and ends
+       ------------------------------------------------------------------ */
+
+    img,
+    video,
+    svg {
+      max-width: 100%;
+    }
+
+    @media (max-width: 640px) {
+      /* 235px of nowrap links, centred on the nav item, runs off a phone. */
+      .nav-dropdown {
+        min-width: 0;
+        width: max-content;
+        max-width: 88vw;
+      }
+
+      .dropdown-link {
+        white-space: normal;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      * {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+    }
+
   </style>
 </head>
 

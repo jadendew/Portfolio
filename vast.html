@@ -181,6 +181,7 @@
 
     .hero {
       min-height: 100vh;
+      min-height: 100svh;
       display: flex;
       align-items: end;
       padding: calc(var(--topbar-h) + 2rem) 6vw 3.5rem;
@@ -227,7 +228,8 @@
 
     .section {
       min-height: 100vh;
-      padding: calc(var(--topbar-h) + 0.75rem) 2rem 0.9rem;
+      min-height: 100svh;
+      padding: calc(var(--topbar-h) + 1rem) clamp(1rem, 4vw, 2rem) clamp(1.25rem, 3vh, 2rem);
       display: grid;
       align-items: stretch;
       background: rgba(0, 0, 0, 0.72);
@@ -249,7 +251,7 @@
     }
 
     .project-panel {
-      min-height: calc(100vh - var(--topbar-h) - 1.65rem);
+      min-height: calc(100svh - var(--topbar-h) - 1.65rem);
       display: grid;
       grid-template-columns: minmax(260px, 0.55fr) minmax(0, 1.45fr);
       gap: 1.1rem;
@@ -453,6 +455,94 @@
         padding-right: 1rem;
       }
     }
+
+    /* ==================================================================
+       PREVENTIVE FIXES. Nothing here changes the page at a normal
+       desktop width.
+       ================================================================== */
+
+
+    /* ------------------------------------------------------------------
+       1. THE SQUEEZE ZONE (1051px - ~1300px)
+
+         .saiph-row       minmax(0, 0.65fr) minmax(560px, 1.35fr)
+         .project-panel   minmax(260px, 0.55fr) minmax(0, 1.45fr)
+
+       The 560px floor on the paragraph column does not shrink; the image
+       column does. Just above the 1050px stacking point a row has about
+       923px of usable width, so the floor leaves roughly 345px for the
+       image - while .saiph-image carries min-height: 340px. That makes a
+       345x340 near-square box, and object-fit: cover trims a landscape
+       photo hard to fill it.
+
+       Stacking earlier skips the zone entirely.
+       ------------------------------------------------------------------ */
+    @media (max-width: 1300px) {
+      .project-panel,
+      .saiph-row {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    /* ------------------------------------------------------------------
+       2. MEDIA min-height, defused
+
+         .vehicle-overview-image, .saiph-image     { min-height: 340px; }
+         .vehicle-overview-image img, .saiph-image img
+                                { height: 100%; min-height: 320px; }
+
+       Both cards hold a bare <img> with no caption, so today the 320px
+       floor sits safely inside the 340px card and nothing clips. The
+       failure only appears if a caption is ever added: the card's height
+       would then have to cover both the image and the caption, the image
+       would overrun its share, and overflow:hidden would clip the bottom.
+       That is the exact fault that was live on several of the other
+       pages, all of which started from this same template.
+
+       The cards keep their own floors, so nothing collapses.
+       ------------------------------------------------------------------ */
+    .vehicle-overview-image > img,
+    .vehicle-overview-image > video,
+    .saiph-image > img,
+    .saiph-image > video,
+    .project-media-card > img,
+    .project-media-card > video {
+      min-height: 0 !important;
+    }
+
+
+    /* ------------------------------------------------------------------
+       3. Small-screen odds and ends
+       ------------------------------------------------------------------ */
+
+    img,
+    video,
+    svg {
+      max-width: 100%;
+    }
+
+    @media (max-width: 640px) {
+      /* 235px of nowrap links, centred on the nav item, runs off a phone. */
+      .nav-dropdown {
+        min-width: 0;
+        width: max-content;
+        max-width: 88vw;
+      }
+
+      .dropdown-link {
+        white-space: normal;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      * {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+    }
+
   </style>
 </head>
 

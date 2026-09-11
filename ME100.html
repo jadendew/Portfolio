@@ -182,6 +182,7 @@
 
     .hero {
       min-height: 100vh;
+      min-height: 100svh;
       display: flex;
       align-items: end;
       padding: calc(var(--topbar-h) + 2rem) 6vw 3.5rem;
@@ -228,7 +229,8 @@
 
     .section {
       min-height: 100vh;
-      padding: calc(var(--topbar-h) + 0.75rem) 2rem 0.9rem;
+      min-height: 100svh;
+      padding: calc(var(--topbar-h) + 1rem) clamp(1rem, 4vw, 2rem) clamp(1.25rem, 3vh, 2rem);
       display: grid;
       align-items: stretch;
       background: rgba(0, 0, 0, 0.72);
@@ -4249,6 +4251,134 @@
       .submission-video-section .youtube-inline-tile {
         width: 100% !important;
         max-width: 100% !important;
+      }
+    }
+
+
+    /* ==================================================================
+       PREVENTIVE FIXES. Nothing here changes the page at a normal
+       desktop width - each one addresses a failure that needs a
+       different window size to appear.
+       ================================================================== */
+
+
+    /* ------------------------------------------------------------------
+       1. THE SQUEEZE ZONE (1051px - ~1300px)
+
+       The tuned rows put hard pixel floors on the paragraph column:
+
+         .esp1-row                        minmax(360px, 0.78fr)
+         .esp1-testing-row                minmax(420px, 0.92fr)
+         .alarm-architecture-row          minmax(420px, 0.85fr)
+         architecture row 1               minmax(470px, 0.98fr)
+         architecture row 2               minmax(500px, 1.28fr)
+         .system-demo-row                 minmax(300px, 0.65fr)
+
+       Those floors do not shrink. The image column does. Just above the
+       1050px stacking point a row has about 923px of usable width, so a
+       500px floor leaves roughly 400px for the media - and the tiles
+       carry min-height: 285px to 320px, so they stay tall while getting
+       narrow. object-fit: cover then trims the sides hard.
+
+       Stacking earlier skips the zone. The image PAIRS are deliberately
+       left alone here - once the parent row is full width, two tiles
+       side by side is the right layout.
+       ------------------------------------------------------------------ */
+    @media (max-width: 1300px) {
+      .project-panel,
+      .esp1-row.text-left,
+      .esp1-row.text-right,
+      .esp1-testing-row.text-left,
+      .esp1-testing-row.text-right,
+      .alarm-architecture-row.text-left,
+      .alarm-architecture-row.text-right,
+      .alarm-architecture-section .alarm-architecture-row:nth-of-type(1),
+      .alarm-architecture-section .alarm-architecture-row:nth-of-type(2),
+      .alarm-architecture-section .alarm-architecture-row.text-left,
+      .alarm-architecture-section .alarm-architecture-row.text-right,
+      .system-demo-row {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    /* ------------------------------------------------------------------
+       2. MEDIA min-height LANDMINES
+
+       The pattern inherited from the template is:
+
+         .x-tile     { min-height: 320px;
+                       grid-template-rows: minmax(0, 1fr) auto; }
+         .x-tile img { height: 100%; min-height: 320px; }
+
+       The tile's 320px covers the image row AND the caption row, so the
+       image row is 320px minus the caption - but the image is told to be
+       320px on its own. It overruns and overflow:hidden clips the bottom.
+       `min-height: inherit` (the aero and manufacturing tiles carried
+       over from the template) copies the tile's floor onto the image, so
+       it clips every time.
+
+       You already fixed this by hand on .esp1-media-tile and
+       .alarm-media-tile - both correctly carry min-height: 0. The tiles
+       below are the ones still holding the old value. None of them has a
+       caption today, which is why nothing is visibly wrong; adding one is
+       what sets it off.
+
+       The tiles keep their own floors, so nothing collapses.
+       ------------------------------------------------------------------ */
+    .esp1-testing-media-tile > img,
+    .esp1-testing-media-tile > video,
+    .system-demo-media-tile > img,
+    .system-demo-media-tile > video,
+    .final-gallery-tile > img,
+    .final-gallery-tile > video,
+    .vehicle-overview-image > img,
+    .project-media-card > img,
+    .project-media-card > video,
+    .gallery-tile > img,
+    .airfoil-media-tile > img,
+    .airfoil-media-tile > video,
+    .airfoil-bottom-image > img,
+    .aero-media-tile > img,
+    .aero-media-tile > video,
+    .tilt-media-tile > img,
+    .tilt-media-tile > video,
+    .manufacturing-media-tile > img,
+    .manufacturing-media-tile > video,
+    .flight-media-tile > img,
+    .flight-media-tile > video {
+      min-height: 0 !important;
+    }
+
+
+    /* ------------------------------------------------------------------
+       3. Small-screen odds and ends
+       ------------------------------------------------------------------ */
+
+    img,
+    video,
+    svg {
+      max-width: 100%;
+    }
+
+    @media (max-width: 640px) {
+      /* 235px of nowrap links, centred on the nav item, runs off a phone. */
+      .nav-dropdown {
+        min-width: 0;
+        width: max-content;
+        max-width: 88vw;
+      }
+
+      .dropdown-link {
+        white-space: normal;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      * {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
       }
     }
 

@@ -182,6 +182,7 @@
 
     .hero {
       min-height: 100vh;
+      min-height: 100svh;
       display: flex;
       align-items: end;
       padding: calc(var(--topbar-h) + 2rem) 6vw 3.5rem;
@@ -228,7 +229,8 @@
 
     .section {
       min-height: 100vh;
-      padding: calc(var(--topbar-h) + 0.75rem) 2rem 0.9rem;
+      min-height: 100svh;
+      padding: calc(var(--topbar-h) + 1rem) clamp(1rem, 4vw, 2rem) clamp(1.25rem, 3vh, 2rem);
       display: grid;
       align-items: stretch;
       background: rgba(0, 0, 0, 0.72);
@@ -3334,6 +3336,184 @@
     #model-predictive-controller .mpc-pid-summary-row .section-text-box .section-subheading,
     #model-predictive-controller .pid-comparison-summary-row .section-text-box .section-subheading {
       margin-top: 0 !important;
+    }
+
+
+    /* ==================================================================
+       PART 1 - WHITE-BACKGROUND PLOTS, results section downwards.
+
+       Same treatment as the tiltrotor tile on the BEAR page:
+         - object-fit: contain, so no part of a plot is ever cropped
+         - the leftover space is filled WHITE, on the <img> only
+         - the tile's background, border, radius and caption bar are
+           left exactly as they are
+
+       That last point is the one that matters. Painting the TILE white
+       leaks colour around the whole perimeter and up through the caption
+       bar, because the caption background is only ~82% opaque. Colouring
+       the image alone keeps the white strictly inside the image row.
+
+       Scope: #results, #surrogate-data-generation,
+       #surrogate-model-creation, #model-predictive-controller.
+       The gallery is deliberately excluded - it mixes photos with
+       plots, so it keeps filling edge to edge. Everything above the
+       results section is untouched.
+
+       Videos are excluded - only `> img` is selected - so every .mp4
+       tile keeps filling edge to edge as before.
+
+       The class name is repeated four times to raise specificity above
+       the tuned per-tile overrides earlier in this file (several of
+       which are id-qualified and already use !important).
+       ================================================================== */
+
+    #results .results-media-tile.results-media-tile.results-media-tile.results-media-tile > img,
+    #results .section-media-tile.section-media-tile.section-media-tile.section-media-tile > img,
+    #surrogate-data-generation .section-media-tile.section-media-tile.section-media-tile.section-media-tile > img,
+    #surrogate-model-creation .section-media-tile.section-media-tile.section-media-tile.section-media-tile > img,
+    #model-predictive-controller .section-media-tile.section-media-tile.section-media-tile.section-media-tile > img {
+      width: 100% !important;
+      height: 100% !important;
+      min-height: 0 !important;
+      object-fit: contain !important;
+      object-position: center center !important;
+      background: var(--tile-bg, #ffffff) !important;
+      padding: var(--tile-inset, 0) !important;
+      box-sizing: border-box !important;
+      display: block !important;
+    }
+
+    /* Per-tile knobs, set inline on the tile:
+         --tile-bg     fill colour behind the image  (default white)
+         --tile-inset  breathing room around it      (default 0)
+
+       And an opt-out for any tile that is a photo rather than a plot:
+
+         <div class="results-media-tile tile-fill" style="--tile-focus-y: top;">
+    */
+    .tile-fill.tile-fill.tile-fill.tile-fill > img,
+    .tile-fill.tile-fill.tile-fill.tile-fill > video {
+      object-fit: cover !important;
+      object-position: var(--tile-focus-x, center) var(--tile-focus-y, center) !important;
+      background: rgba(30, 30, 30, 0.82) !important;
+      padding: 0 !important;
+    }
+
+
+    /* ==================================================================
+       PART 2 - the same template faults as the other pages.
+       None of these show at a normal desktop width.
+       ================================================================== */
+
+
+    /* ------------------------------------------------------------------
+       2a. Media min-height overrunning its own grid row.
+
+         .results-media-tile     { min-height: 310px;
+                                   grid-template-rows: minmax(0,1fr) auto; }
+         .results-media-tile img { height: 100%; min-height: 270px; }
+
+       The tile's 310px covers the image row AND the caption row, so the
+       image row is 310px minus the caption. The image is told to be at
+       least 270px on its own. A one-line caption leaves 10px of slack;
+       a caption that wraps to two lines overruns the row and
+       overflow:hidden clips the bottom of the plot.
+
+       The tiles keep their own floors, so nothing collapses.
+       ------------------------------------------------------------------ */
+    .results-media-tile > img,
+    .results-media-tile > video,
+    .section-media-tile > img,
+    .section-media-tile > video,
+    .method-media-tile > img,
+    .method-media-tile > video,
+    .final-gallery-tile > img,
+    .final-gallery-tile > video,
+    .project-media-card > img,
+    .project-media-card > video,
+    .vehicle-overview-image > img,
+    .gallery-tile > img {
+      min-height: 0 !important;
+    }
+
+
+    /* ------------------------------------------------------------------
+       2b. The squeeze zone, 1051px to about 1300px.
+
+       The tuned rows put hard pixel floors on the paragraph columns -
+       this file goes up to minmax(700px, 1.18fr). Those floors do not
+       shrink; the image columns do. At a 1051px window, one pixel above
+       where the layout stacks, a row has ~923px of usable width, the
+       paragraph takes 700px of it, and the image column is left with
+       roughly 220px. object-fit: cover then discards most of the image.
+
+       Stacking earlier skips the zone entirely.
+       ------------------------------------------------------------------ */
+    @media (max-width: 1300px) {
+      #overview .project-panel,
+      #data-collection .method-row,
+      #data-collection .method-row:first-child,
+      #data-collection .ansys-method-top-row,
+      #data-collection .ansys-method-bottom-row,
+      #data-collection .ansys-method-layout,
+      #results .results-row,
+      #results .results-row.text-left,
+      #results .results-row.text-right,
+      #results .simulation-results-top-row,
+      #results .simulation-results-analysis-row,
+      #results .ansys-vsp-split-row,
+      #results .ansys-vsp-overview-row,
+      #results .ansys-vsp-analysis-row,
+      #results .design-variable-results-block,
+      #results .design-variable-results-top-row,
+      #results .design-variable-results-bottom-row,
+      #surrogate-data-generation .surrogate-two-row,
+      #surrogate-data-generation .surrogate-two-row-reverse,
+      #surrogate-model-creation .surrogate-model-row,
+      #surrogate-model-creation .surrogate-model-training-row,
+      #surrogate-model-creation .surrogate-model-evaluation-row,
+      #model-predictive-controller .mpc-top-row,
+      #model-predictive-controller .mpc-bottom-row,
+      #model-predictive-controller .mpc-performance-row,
+      #model-predictive-controller .mpc-controller-creation-row,
+      #model-predictive-controller .mpc-comparison-intro-row,
+      .image-text-image-row,
+      .method-row.text-left,
+      .method-row.text-right {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    /* ------------------------------------------------------------------
+       2c. Small-screen odds and ends
+       ------------------------------------------------------------------ */
+
+    img,
+    video,
+    svg {
+      max-width: 100%;
+    }
+
+    @media (max-width: 640px) {
+      /* 235px of nowrap links, centred on the nav item, runs off a phone. */
+      .nav-dropdown {
+        min-width: 0;
+        width: max-content;
+        max-width: 88vw;
+      }
+
+      .dropdown-link {
+        white-space: normal;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      * {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
     }
 
 </style>

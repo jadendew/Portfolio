@@ -182,6 +182,7 @@
 
     .hero {
       min-height: 100vh;
+      min-height: 100svh;
       display: flex;
       align-items: end;
       padding: calc(var(--topbar-h) + 2rem) 6vw 3.5rem;
@@ -228,7 +229,8 @@
 
     .section {
       min-height: 100vh;
-      padding: calc(var(--topbar-h) + 0.75rem) 2rem 0.9rem;
+      min-height: 100svh;
+      padding: calc(var(--topbar-h) + 1rem) clamp(1rem, 4vw, 2rem) clamp(1.25rem, 3vh, 2rem);
       display: grid;
       align-items: stretch;
       background: rgba(0, 0, 0, 0.72);
@@ -241,7 +243,7 @@
     }
 
     .project-panel {
-      min-height: calc(100vh - var(--topbar-h) - 1.65rem);
+      min-height: calc(100svh - var(--topbar-h) - 1.65rem);
       padding: clamp(1.2rem, 2.4vw, 2rem);
       background: rgba(18, 18, 18, 0.92);
       border: 1px solid rgba(255, 255, 255, 0.16);
@@ -2833,6 +2835,162 @@
       .mva-design-row > .mva-design-image,
       .mva-design-row > .mva-design-assembly-image {
         min-height: 320px !important;
+      }
+    }
+
+
+    /* ==================================================================
+       PREVENTIVE FIXES - nothing here changes how the page looks at a
+       normal desktop width. Each one addresses a failure that only
+       appears at a window size you have not tried yet.
+       ================================================================== */
+
+
+    /* ------------------------------------------------------------------
+       1. THE SQUEEZE ZONE (1051px - ~1300px)
+
+       The tuned rows put a hard pixel floor on the paragraph column:
+
+         .mva-design-row        minmax(560px, 1.46fr)   3 columns
+         .mva-final-hotfire-row minmax(640px, 1.48fr)
+         .mva-unit-testing-row  minmax(460px, 1.15fr)
+
+       Those floors do not shrink. Everything else does. At a 1051px
+       window - one pixel above where the layout stacks - the design row
+       has 923px of usable width, the text takes 560px of it, and the two
+       image columns are left with 164px each. object-fit: cover then
+       throws away most of both photos.
+
+       Stacking a little earlier skips the whole zone.
+       ------------------------------------------------------------------ */
+    @media (max-width: 1300px) {
+      .mva-design-row,
+      .mva-unit-testing-row,
+      .mva-manufacturing-row,
+      .mva-final-hotfire-row,
+      .project-panel {
+        grid-template-columns: 1fr !important;
+      }
+
+      .mva-design-row > .mva-design-image,
+      .mva-design-row > .mva-design-assembly-image,
+      .mva-unit-testing-video,
+      .mva-final-hotfire-media {
+        min-height: 320px !important;
+      }
+    }
+
+
+    /* ------------------------------------------------------------------
+       2. THE GALLERY HAS TWO RULES FIGHTING EACH OTHER
+
+       An earlier block sets a fixed height on the gallery:
+
+         .final-gallery-grid { min-height: 520px !important;
+                               height: min(62vh, 620px) !important; }
+
+       A later block makes the tiles auto-height and top-aligned, and its
+       comment says "No fixed pixel height is applied to the gallery row"
+       - but that later block never actually removes the height above, so
+       it is still in force.
+
+       The container is therefore locked to a height the images no longer
+       agree with. Whichever way they disagree looks wrong: images shorter
+       than the box leave dead space, images taller than it spill out
+       (the grid has no overflow:hidden). On a 660px-tall laptop viewport
+       62vh is 409px, so the 520px floor takes over and the mismatch is
+       largest exactly where there is least room.
+
+       Auto height is what the later block intended.
+       ------------------------------------------------------------------ */
+    .final-gallery-grid {
+      height: auto !important;
+      min-height: 0 !important;
+    }
+
+
+    /* ------------------------------------------------------------------
+       3. MEDIA min-height LANDMINES
+
+       Throughout the stylesheet, tiles are written as:
+
+         .x-tile     { min-height: 360px;
+                       grid-template-rows: minmax(0, 1fr) auto; }
+         .x-tile img { height: 100%; min-height: 320px; }
+
+       The tile's 360px covers the image row AND the caption row, so the
+       image row is 360px minus the caption. But the image is told to be
+       at least 320px on its own. With a one-line caption there is 10px
+       of slack; a caption that wraps to two lines overruns the row and
+       overflow:hidden clips the bottom of the image.
+
+       `min-height: inherit` (used by the aero and manufacturing tiles
+       carried over from the template) is worse - it copies the tile's
+       full min-height onto the image, so it clips every time.
+
+       None of these tiles currently carries a caption, which is why you
+       see nothing. The moment one does, it clips. Handing sizing back to
+       the grid row costs nothing today and removes the trap.
+       ------------------------------------------------------------------ */
+    .mva-design-image > img,
+    .mva-design-assembly-image > img,
+    .mva-manufacturing-image > img,
+    .mva-unit-testing-video > video,
+    .mva-final-hotfire-media > img,
+    .mva-final-hotfire-media > video,
+    .mva-final-hotfire-video > video,
+    .final-gallery-tile > img,
+    .final-gallery-tile > video,
+    .vehicle-overview-image > img,
+    .project-media-card > img,
+    .project-media-card > video,
+    .aero-media-tile > img,
+    .aero-media-tile > video,
+    .manufacturing-media-tile > img,
+    .manufacturing-media-tile > video,
+    .tilt-media-tile > img,
+    .tilt-media-tile > video,
+    .flight-media-tile > img,
+    .flight-media-tile > video,
+    .airfoil-media-tile > img,
+    .airfoil-media-tile > video,
+    .gallery-tile > img {
+      min-height: 0 !important;
+    }
+
+    /* The tile keeps its own floor, so nothing collapses. */
+
+
+    /* ------------------------------------------------------------------
+       4. Small-screen odds and ends
+       ------------------------------------------------------------------ */
+
+    /* Nothing may be wider than its container. */
+    img,
+    video,
+    svg {
+      max-width: 100%;
+    }
+
+    @media (max-width: 640px) {
+      /* The Portfolio dropdown is 235px wide with nowrap links and is
+         centred on the nav item, so it runs off the edge of a phone. */
+      .nav-dropdown {
+        min-width: 0;
+        width: max-content;
+        max-width: 88vw;
+      }
+
+      .dropdown-link {
+        white-space: normal;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      * {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
       }
     }
 

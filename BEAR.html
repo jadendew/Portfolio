@@ -182,9 +182,10 @@
 
     .hero {
       min-height: 100vh;
+      min-height: 100svh;
       display: flex;
       align-items: end;
-      padding: calc(var(--topbar-h) + 2rem) 6vw 3.5rem;
+      padding: calc(var(--topbar-h) + 2rem) 6vw clamp(2rem, 5vh, 3.5rem);
       background: transparent;
     }
 
@@ -228,7 +229,8 @@
 
     .section {
       min-height: 100vh;
-      padding: calc(var(--topbar-h) + 0.75rem) 2rem 0.9rem;
+      min-height: 100svh;
+      padding: calc(var(--topbar-h) + 1rem) clamp(1rem, 4vw, 2rem) clamp(1.25rem, 3vh, 2rem);
       display: grid;
       align-items: stretch;
       background: rgba(0, 0, 0, 0.72);
@@ -241,7 +243,7 @@
     }
 
     .project-panel {
-      min-height: calc(100vh - var(--topbar-h) - 1.65rem);
+      min-height: calc(100svh - var(--topbar-h) - 1.65rem);
       padding: clamp(1.2rem, 2.4vw, 2rem);
       background: rgba(18, 18, 18, 0.92);
       border: 1px solid rgba(255, 255, 255, 0.16);
@@ -2280,6 +2282,256 @@
       border: 1px solid rgba(255, 255, 255, 0.12) !important;
     }
 
+
+    /* ==================================================================
+       PART 1 - the overflow bug, fixed everywhere.
+
+       Tiles are built as:
+         .x-media-tile     { min-height: 235px;
+                             grid-template-rows: minmax(0, 1fr) auto; }
+         .x-media-tile img { height: 100%; min-height: inherit; }
+
+       The tile's 235px covers the image row AND the caption row, but the
+       image was told to be at least 235px on its own, inside a row that
+       is 235px minus the caption. It overran, and overflow:hidden clipped
+       the bottom strip. min-height: 0 hands sizing back to the grid.
+       ================================================================== */
+
+    .tilt-section .tilt-row .tilt-media-tile,
+    .manufacturing-section .manufacturing-media-tile,
+    .aero-section .aero-media-tile,
+    .aero-section .aero-results-images .aero-media-tile,
+    .aero-section .aero-results-graphs .aero-media-tile,
+    .flight-section .flight-media-tile {
+      display: grid !important;
+      grid-template-rows: minmax(0, 1fr) auto !important;
+      overflow: hidden !important;
+    }
+
+    .tilt-section .tilt-row .tilt-media-tile > img,
+    .tilt-section .tilt-row .tilt-media-tile > video,
+    .manufacturing-section .manufacturing-media-tile > img,
+    .manufacturing-section .manufacturing-media-tile > video,
+    .aero-section .aero-media-tile > img,
+    .aero-section .aero-media-tile > video,
+    .aero-section .aero-results-images .aero-media-tile > img,
+    .aero-section .aero-results-graphs .aero-media-tile > img,
+    .flight-section .flight-media-tile > img,
+    .flight-section .flight-media-tile > video {
+      width: 100% !important;
+      height: 100% !important;
+      min-height: 0 !important;   /* <- the fix */
+      display: block !important;
+    }
+
+
+    /* ==================================================================
+       PART 2 - Tiltrotor: whole image, white filler.
+
+       The source image has a white background, so filling the leftover
+       space with white makes the image edge disappear into the tile.
+       ================================================================== */
+
+    .tilt-section .tilt-row {
+      align-items: stretch !important;
+    }
+
+    .tilt-section .tilt-row-1 .tilt-image-pair {
+      grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+      align-items: stretch !important;
+    }
+
+    .tilt-section .tilt-row .tilt-media-tile,
+    .tilt-section .tilt-row .tilt-video-tile {
+      align-self: stretch !important;
+      height: 100% !important;
+      /* Deliberately NOT --tile-bg. The tile carries the border, the
+         radius and the backdrop behind the caption (whose own background
+         is only 82% opaque), so tinting the tile leaks colour around the
+         perimeter and through the caption bar. Filler colour belongs on
+         the image alone - see the img rule below. */
+      background: rgba(5, 5, 5, 0.50) !important;
+    }
+
+    .tilt-section .tilt-row .tilt-media-tile > img,
+    .tilt-section .tilt-row .tilt-media-tile > video {
+      object-fit: contain !important;
+      object-position: center center !important;
+      background: var(--tile-bg, rgba(5, 5, 5, 0.55)) !important;
+      padding: var(--tile-inset, 0) !important;
+      box-sizing: border-box !important;
+    }
+
+    .tilt-section .tilt-video-tile > .tilt-video-frame {
+      height: 100% !important;
+      min-height: 0 !important;
+    }
+
+
+    /* ==================================================================
+       PART 3 - Manufacturing.
+
+       Top row:    text box  |  Bending photo
+       Bottom row: the four process photos, four across
+
+       The Bending tile is given the image's own aspect ratio, so
+       object-fit: cover has nothing to crop. The text box beside it
+       stretches to match that height automatically.
+
+         --mfg-wide-ar   aspect ratio of Bending.jpg   (default 3/2)
+         --mfg-img-col   how wide the image column is  (default 0.85fr)
+
+       --mfg-img-col is the dial that makes the two heights match: a
+       wider image column makes the photo taller AND the text column
+       narrower (so the text runs taller too). Nudge it until the
+       bottoms line up on your monitor.
+       ================================================================== */
+
+    .manufacturing-section .manufacturing-row-1 {
+      grid-template-columns: minmax(0, 1fr) minmax(0, var(--mfg-img-col, 0.85fr)) !important;
+      align-items: stretch !important;
+    }
+
+    .manufacturing-section .manufacturing-wide-tile {
+      align-self: stretch !important;
+      height: 100% !important;
+      min-height: 0 !important;
+      align-content: start !important;
+      background: var(--tile-bg, rgba(5, 5, 5, 0.55)) !important;
+      grid-template-rows: auto auto !important;
+    }
+
+    .manufacturing-section .manufacturing-wide-tile > img {
+      width: 100% !important;
+      height: auto !important;
+      aspect-ratio: var(--mfg-wide-ar, 3 / 2) !important;
+      object-fit: cover !important;
+      object-position: var(--tile-focus-x, center) var(--tile-focus-y, center) !important;
+    }
+
+    /* Bottom row: four across, all the same height, filling edge to edge
+       exactly as they did before. Equal widths + one shared aspect ratio
+       means equal heights without any of them stretching. */
+    .manufacturing-section .manufacturing-row-bottom {
+      margin-top: 1.1rem !important;
+      padding-top: 1.1rem !important;
+      border-top: 1px solid rgba(255, 255, 255, 0.10) !important;
+    }
+
+    .manufacturing-four-grid {
+      display: grid !important;
+      grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+      gap: 0.75rem !important;
+      align-items: stretch !important;
+      min-width: 0 !important;
+    }
+
+    .manufacturing-four-grid .manufacturing-media-tile {
+      height: 100% !important;
+      min-height: 0 !important;
+      grid-template-rows: auto 1fr !important;
+    }
+
+    .manufacturing-four-grid .manufacturing-media-tile > img {
+      width: 100% !important;
+      height: auto !important;
+      aspect-ratio: var(--mfg-grid-ar, 4 / 3) !important;
+      object-fit: cover !important;
+    }
+
+
+    /* ------------------------------------------------------------------
+       class="tile-crop"  - fill edge to edge, crop the overhang.
+       class="tile-white" - white filler behind a contained image.
+
+         <div class="manufacturing-media-tile tile-crop"
+              style="--tile-focus-y: 35%;">
+       ------------------------------------------------------------------ */
+
+    .tilt-section .tilt-media-tile.tile-crop > img,
+    .tilt-section .tilt-media-tile.tile-crop > video,
+    .manufacturing-section .manufacturing-media-tile.tile-crop > img,
+    .manufacturing-section .manufacturing-media-tile.tile-crop > video {
+      object-fit: cover !important;
+      object-position: var(--tile-focus-x, center) var(--tile-focus-y, center) !important;
+      padding: 0 !important;
+    }
+
+    /* Fills only the empty space inside the image row - the tile's
+       border, corner radius and caption are untouched. */
+    .tile-white {
+      --tile-bg: #ffffff;
+    }
+
+
+    /* Captions own their own grid row and are never overlapped. */
+    .tilt-image-caption,
+    .manufacturing-image-caption,
+    .aero-image-caption,
+    .flight-image-caption,
+    .media-caption {
+      min-width: 0;
+      overflow-wrap: anywhere;
+    }
+
+
+    /* ------------------------------------------------------------------
+       The text-heavy rows carry a 520px minimum on the paragraph column.
+       Between 1051px and ~1250px that floor squeezes the image column
+       badly, so stack a little earlier. The four-across strip drops to
+       two-by-two rather than a single tall column.
+       ------------------------------------------------------------------ */
+    @media (max-width: 1250px) {
+      .tilt-section .tilt-row-1,
+      .tilt-section .tilt-row-1 .tilt-image-pair,
+      .tilt-section .tilt-row:not(.tilt-row-1) .tilt-image-pair,
+      .manufacturing-section .manufacturing-row-1,
+      .flight-section .flight-row.text-left,
+      .flight-section .flight-row.text-right,
+      .project-panel {
+        grid-template-columns: 1fr !important;
+      }
+
+      .manufacturing-four-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .manufacturing-four-grid {
+        grid-template-columns: 1fr !important;
+      }
+
+      .nav-dropdown {
+        min-width: 0;
+        width: max-content;
+        max-width: 88vw;
+      }
+
+      .dropdown-link {
+        white-space: normal;
+      }
+    }
+
+
+    /* ------------------------------------------------------------------
+       Responsive safety net
+       ------------------------------------------------------------------ */
+
+    img,
+    video,
+    svg {
+      max-width: 100%;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      * {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+    }
+
   </style>
 </head>
 
@@ -2578,7 +2830,7 @@
             </div>
 
             <div class="tilt-image-pair">
-              <div class="tilt-media-tile">
+              <div class="tilt-media-tile tile-white">
                 <img src="assets/BEAR/TiltConfigs.png" alt="Tiltrotor mechanism configuration image" />
                 <div class="tilt-image-caption">Tiltrotor mechanism design and configurations.</div>
               </div>
@@ -2616,32 +2868,32 @@
               </p>
             </div>
 
-            <div class="manufacturing-media-combo">
-              <div class="manufacturing-two-by-two-grid">
-                <div class="manufacturing-media-tile">
-                  <img src="assets/BEAR/Waterjet.jpg" alt="Manufacturing image 1" />
-                  <div class="manufacturing-image-caption">OMAX waterjet cutter used in CF manufacturing.</div>
-                </div>
+            <div class="manufacturing-media-tile manufacturing-wide-tile" style="--tile-focus-y: top;">
+              <img src="assets/BEAR/Bending.jpg" alt="Manufacturing image 5" />
+              <div class="manufacturing-image-caption">Manual break used for aluminum part bending.</div>
+            </div>
+          </div>
 
-                <div class="manufacturing-media-tile">
-                  <img src="assets/BEAR/CFPlate.jpg" alt="Manufacturing image 2" />
-                  <div class="manufacturing-image-caption"> CF plate used for fuslage components halfway through cutting.</div>
-                </div>
-
-                <div class="manufacturing-media-tile">
-                  <img src="assets/BEAR/Fablight.jpg" alt="Manufacturing image 3" />
-                  <div class="manufacturing-image-caption">Fablight laser cutter used during aluminum manufacturing.</div>
-                </div>
-
-                <div class="manufacturing-media-tile">
-                  <img src="assets/BEAR/Aluminum.jpg" alt="Manufacturing image 4" />
-                  <div class="manufacturing-image-caption">Unbent alimunum components.</div>
-                </div>
+          <div class="manufacturing-row manufacturing-row-bottom">
+            <div class="manufacturing-four-grid">
+              <div class="manufacturing-media-tile tile-crop">
+                <img src="assets/BEAR/Waterjet.jpg" alt="Manufacturing image 1" />
+                <div class="manufacturing-image-caption">OMAX waterjet cutter used in CF manufacturing.</div>
               </div>
 
-              <div class="manufacturing-media-tile manufacturing-wide-tile">
-                <img src="assets/BEAR/Bending.jpg" alt="Manufacturing image 5" />
-                <div class="manufacturing-image-caption">Manual break used for aluminum part bending.</div>
+              <div class="manufacturing-media-tile tile-crop">
+                <img src="assets/BEAR/CFPlate.jpg" alt="Manufacturing image 2" />
+                <div class="manufacturing-image-caption"> CF plate used for fuslage components halfway through cutting.</div>
+              </div>
+
+              <div class="manufacturing-media-tile tile-crop">
+                <img src="assets/BEAR/Fablight.jpg" alt="Manufacturing image 3" />
+                <div class="manufacturing-image-caption">Fablight laser cutter used during aluminum manufacturing.</div>
+              </div>
+
+              <div class="manufacturing-media-tile tile-crop">
+                <img src="assets/BEAR/Aluminum.jpg" alt="Manufacturing image 4" />
+                <div class="manufacturing-image-caption">Unbent alimunum components.</div>
               </div>
             </div>
           </div>
